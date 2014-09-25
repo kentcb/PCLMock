@@ -436,6 +436,11 @@
 
         private sealed class TestTargetMock : MockBase<ITestTarget>, ITestTarget
         {
+            public TestTargetMock(MockBehavior behavior = MockBehavior.Strict)
+                : base(behavior)
+            {
+            }
+
             public override ITestTarget MockedObject
             {
                 get { return this; }
@@ -526,7 +531,8 @@
         {
             private readonly UnsealedClass mockedObject;
 
-            public UnsealedClassMock()
+            public UnsealedClassMock(MockBehavior behavior = MockBehavior.Strict)
+                : base(behavior)
             {
                 this.mockedObject = new UnsealedClassSubclass(this);
             }

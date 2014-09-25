@@ -12,11 +12,6 @@
         private readonly object continuationsSync;
         private readonly MockBehavior behavior;
 
-        protected MockBase()
-            : this(MockBehavior.Strict)
-        {
-        }
-
         protected MockBase(MockBehavior behavior)
         {
             this.continuations = new Dictionary<object, WhenContinuation>();
