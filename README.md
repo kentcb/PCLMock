@@ -1,3 +1,5 @@
+![Logo](Logo150x150.png "Logo")
+
 # PCLMock
 
 ## What?
