@@ -8,11 +8,14 @@
     using System.Reflection;
     using System.Text;
 
+    /// <summary>
+    /// Provides the ability to fluently write specifications against a <see cref="MockBase{T}"/>.
+    /// </summary>
     public abstract class WhenContinuation
     {
         private readonly IDictionary<int, object> outAndRefAssignments;
 
-        protected WhenContinuation()
+        internal WhenContinuation()
         {
             this.outAndRefAssignments = new Dictionary<int, object>();
         }
@@ -68,12 +71,7 @@
             return (T)value;
         }
 
-        protected void AssignOutOrRefParameter(int parameterIndex, object value)
-        {
-            this.outAndRefAssignments[parameterIndex] = value;
-        }
-
-        protected object[] ValidateActionArgs(string actionType, Type[] expected, object[] received)
+        internal object[] ValidateActionArgs(string actionType, Type[] expected, object[] received)
         {
             if (expected.Length == 0)
             {
@@ -102,6 +100,21 @@
             }
 
             return received;
+        }
+
+        /// <summary>
+        /// Assigns a specified value to an <c>out</c> or <c>ref</c> parameter, so that invocations against the member being specified will result in
+        /// the corresponding <c>out</c> or <c>ref</c> parameter being set to the specified value.
+        /// </summary>
+        /// <param name="parameterIndex">
+        /// The zero-based index of the parameter.
+        /// </param>
+        /// <param name="value">
+        /// The value to assign to the <c>out</c> or <c>ref</c> parameter.
+        /// </param>
+        protected void AssignOutOrRefParameter(int parameterIndex, object value)
+        {
+            this.outAndRefAssignments[parameterIndex] = value;
         }
 
         private string ConvertTypesToString(IEnumerable<Type> types)
@@ -152,71 +165,134 @@
         }
     }
 
+    /// <summary>
+    /// Provides the ability to fluently write specifications against a <see cref="MockBase{T}"/>.
+    /// </summary>
+    /// <typeparam name="TMock">
+    /// The type of the object being mocked.
+    /// </typeparam>
     public class WhenContinuation<TMock> : WhenContinuation
     {
         private Exception exception;
         private Delegate doAction;
 
+        /// <summary>
+        /// Requests that an exception be thrown if the member is accessed.
+        /// </summary>
+        /// <remarks>
+        /// This overload simply throws an <see cref="InvalidOperationException"/>.
+        /// </remarks>
         public void Throw()
         {
             this.Throw(new InvalidOperationException());
         }
 
+        /// <summary>
+        /// Requests that an exception be thrown if the member is accessed.
+        /// </summary>
+        /// <param name="exception">
+        /// The exception to be thrown.
+        /// </param>
         public void Throw(Exception exception)
         {
             this.exception = exception;
         }
 
+        /// <inheritdoc />
         public new WhenContinuation<TMock> AssignOutOrRefParameter(int parameterIndex, object value)
         {
             base.AssignOutOrRefParameter(parameterIndex, value);
             return this;
         }
 
+        /// <summary>
+        /// Requests that an action be invoked if the member is accessed.
+        /// </summary>
+        /// <param name="doAction">
+        /// The action to be invoked.
+        /// </param>
+        /// <returns>
+        /// A continuation object so that the specification can be resumed.
+        /// </returns>
         public WhenContinuation<TMock> Do(Action doAction)
         {
             this.SetDoAction(doAction);
             return this;
         }
 
+        /// <summary>
+        /// Requests that an action be invoked if the member is accessed.
+        /// </summary>
+        /// <param name="doAction">
+        /// The action to be invoked.
+        /// </param>
+        /// <returns>
+        /// A continuation object so that the specification can be resumed.
+        /// </returns>
         public WhenContinuation<TMock> Do<T1>(Action<T1> doAction)
         {
             this.SetDoAction(doAction);
             return this;
         }
 
+        /// <summary>
+        /// Requests that an action be invoked if the member is accessed.
+        /// </summary>
+        /// <param name="doAction">
+        /// The action to be invoked.
+        /// </param>
+        /// <returns>
+        /// A continuation object so that the specification can be resumed.
+        /// </returns>
         public WhenContinuation<TMock> Do<T1, T2>(Action<T1, T2> doAction)
         {
             this.SetDoAction(doAction);
             return this;
         }
 
+        /// <summary>
+        /// Requests that an action be invoked if the member is accessed.
+        /// </summary>
+        /// <param name="doAction">
+        /// The action to be invoked.
+        /// </param>
+        /// <returns>
+        /// A continuation object so that the specification can be resumed.
+        /// </returns>
         public WhenContinuation<TMock> Do<T1, T2, T3>(Action<T1, T2, T3> doAction)
         {
             this.SetDoAction(doAction);
             return this;
         }
 
+        /// <summary>
+        /// Requests that an action be invoked if the member is accessed.
+        /// </summary>
+        /// <param name="doAction">
+        /// The action to be invoked.
+        /// </param>
+        /// <returns>
+        /// A continuation object so that the specification can be resumed.
+        /// </returns>
         public WhenContinuation<TMock> Do<T1, T2, T3, T4>(Action<T1, T2, T3, T4> doAction)
         {
             this.SetDoAction(doAction);
             return this;
         }
 
+        /// <summary>
+        /// Requests that an action be invoked if the member is accessed.
+        /// </summary>
+        /// <param name="doAction">
+        /// The action to be invoked.
+        /// </param>
+        /// <returns>
+        /// A continuation object so that the specification can be resumed.
+        /// </returns>
         public WhenContinuation<TMock> Do<T1, T2, T3, T4, T5>(Action<T1, T2, T3, T4, T5> doAction)
         {
             this.SetDoAction(doAction);
             return this;
-        }
-
-        private void SetDoAction(Delegate doAction)
-        {
-            if (this.doAction != null)
-            {
-                throw new InvalidOperationException("Do can only be specified once per mocked invocation.");
-            }
-
-            this.doAction = doAction;
         }
 
         internal override object Apply(object mockedObject, params object[] args)
@@ -234,85 +310,153 @@
 
             return null;
         }
+
+        private void SetDoAction(Delegate doAction)
+        {
+            if (this.doAction != null)
+            {
+                throw new InvalidOperationException("Do can only be specified once per mocked invocation.");
+            }
+
+            this.doAction = doAction;
+        }
     }
 
+    /// <summary>
+    /// Provides the ability to fluently write specifications against a <see cref="MockBase{T}"/>.
+    /// </summary>
+    /// <typeparam name="TMock">
+    /// The type of the object being mocked.
+    /// </typeparam>
+    /// <typeparam name="TMember">
+    /// The type being returned by the member being specified.
+    /// </typeparam>
     public sealed class WhenContinuation<TMock, TMember> : WhenContinuation<TMock>
     {
         private TMember returnValue;
         private Delegate returnAction;
 
+        /// <inheritdoc />
         public new WhenContinuation<TMock, TMember> AssignOutOrRefParameter(int parameterIndex, object value)
         {
             base.AssignOutOrRefParameter(parameterIndex, value);
             return this;
         }
 
+        /// <inheritdoc />
         public new WhenContinuation<TMock, TMember> Do(Action doAction)
         {
             base.Do(doAction);
             return this;
         }
 
+        /// <inheritdoc />
         public new WhenContinuation<TMock, TMember> Do<T1>(Action<T1> doAction)
         {
             base.Do(doAction);
             return this;
         }
 
+        /// <inheritdoc />
         public new WhenContinuation<TMock, TMember> Do<T1, T2>(Action<T1, T2> doAction)
         {
             base.Do(doAction);
             return this;
         }
 
+        /// <inheritdoc />
         public new WhenContinuation<TMock, TMember> Do<T1, T2, T3>(Action<T1, T2, T3> doAction)
         {
             base.Do(doAction);
             return this;
         }
 
+        /// <inheritdoc />
         public new WhenContinuation<TMock, TMember> Do<T1, T2, T3, T4>(Action<T1, T2, T3, T4> doAction)
         {
             base.Do(doAction);
             return this;
         }
 
+        /// <inheritdoc />
         public new WhenContinuation<TMock, TMember> Do<T1, T2, T3, T4, T5>(Action<T1, T2, T3, T4, T5> doAction)
         {
             base.Do(doAction);
             return this;
         }
 
+        /// <summary>
+        /// Requests that a specified value be returned if the member is accessed.
+        /// </summary>
+        /// <param name="value">
+        /// The value to return.
+        /// </param>
         public void Return(TMember value)
         {
             this.returnValue = value;
         }
 
+        /// <summary>
+        /// Requests that a <c>Func</c> be invoked to obtain a return value if the member is accessed.
+        /// </summary>
+        /// <param name="returnAction">
+        /// The <c>Func</c> that will be invoked to obtain the return value.
+        /// </param>
         public void Return(Func<TMember> returnAction)
         {
             this.returnAction = returnAction;
         }
 
+        /// <summary>
+        /// Requests that a <c>Func</c> be invoked to obtain a return value if the member is accessed.
+        /// </summary>
+        /// <param name="returnAction">
+        /// The <c>Func</c> that will be invoked to obtain the return value.
+        /// </param>
         public void Return<T1>(Func<T1, TMember> returnAction)
         {
             this.returnAction = returnAction;
         }
 
+        /// <summary>
+        /// Requests that a <c>Func</c> be invoked to obtain a return value if the member is accessed.
+        /// </summary>
+        /// <param name="returnAction">
+        /// The <c>Func</c> that will be invoked to obtain the return value.
+        /// </param>
         public void Return<T1, T2>(Func<T1, T2, TMember> returnAction)
         {
             this.returnAction = returnAction;
         }
 
+        /// <summary>
+        /// Requests that a <c>Func</c> be invoked to obtain a return value if the member is accessed.
+        /// </summary>
+        /// <param name="returnAction">
+        /// The <c>Func</c> that will be invoked to obtain the return value.
+        /// </param>
         public void Return<T1, T2, T3>(Func<T1, T2, T3, TMember> returnAction)
         {
             this.returnAction = returnAction;
         }
 
+        /// <summary>
+        /// Requests that a <c>Func</c> be invoked to obtain a return value if the member is accessed.
+        /// </summary>
+        /// <param name="returnAction">
+        /// The <c>Func</c> that will be invoked to obtain the return value.
+        /// </param>
         public void Return<T1, T2, T3, T4>(Func<T1, T2, T3, T4, TMember> returnAction)
         {
             this.returnAction = returnAction;
         }
 
+        /// <summary>
+        /// Requests that a <c>Func</c> be invoked to obtain a return value if the member is accessed.
+        /// </summary>
+        /// <param name="returnAction">
+        /// The <c>Func</c> that will be invoked to obtain the return value.
+        /// </param>
         public void Return<T1, T2, T3, T4, T5>(Func<T1, T2, T3, T4, T5, TMember> returnAction)
         {
             this.returnAction = returnAction;
