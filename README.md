@@ -27,7 +27,7 @@ Install-Package Kent.Boogaart.PCLMock -Pre
 
 ## How?
 
-Only mocking of interfaces is supported, and mocks must be created manually (or by code generation). Mocks are created by subclassing `Mock<T>`, where `T` is the interface being mocked. For example:
+Mocks must be created manually (or by code generation). Mocks are created by subclassing `MockBase<T>`, where `T` is the interface or non-`sealed` class being mocked. For example:
 
 ```C#
 public class SomeServiceMock : MockBase<ISomeService>, ISomeService

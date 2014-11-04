@@ -7,6 +7,25 @@
     public sealed class MockBaseFixture
     {
         [Fact]
+        public void mocked_object_throws_if_the_mocked_object_cannot_be_automatically_determined()
+        {
+            var mock = new InvalidMockedObject();
+            var ex = Assert.Throws<InvalidOperationException>(() => mock.MockedObject);
+            var expectedMessage = @"The default implementation of MockBase<UnsealedClass> is unable to automatically determine an instance of type UnsealedClass to be used as the mocked object. You should override MockedObject in InvalidMockedObject and return the mocked object.
+Full mock type name: Kent.Boogaart.PCLMock.UnitTests.MockBaseFixture+InvalidMockedObject
+Full mocked object type name: Kent.Boogaart.PCLMock.UnitTests.MockBaseFixture+UnsealedClass";
+
+            Assert.Equal(expectedMessage, ex.Message);
+        }
+
+        [Fact]
+        public void mocked_object_attempts_to_cast_the_mock_to_the_mocked_type_by_default()
+        {
+            var mock = new TestTargetMock();
+            Assert.Same(mock, mock.MockedObject);
+        }
+
+        [Fact]
         public void when_can_be_used_to_specify_result_of_property_getter()
         {
             var mock = new TestTargetMock();
@@ -440,11 +459,6 @@
                 : base(behavior)
             {
             }
-
-            public override ITestTarget MockedObject
-            {
-                get { return this; }
-            }
                 
             public int SomeProperty
             {
@@ -555,6 +569,14 @@
                 {
                     return this.owner.Apply(x => x.DoSomething());
                 }
+            }
+        }
+
+        private class InvalidMockedObject : MockBase<UnsealedClass>
+        {
+            public InvalidMockedObject(MockBehavior behavior = MockBehavior.Strict)
+                : base(behavior)
+            {
             }
         }
 

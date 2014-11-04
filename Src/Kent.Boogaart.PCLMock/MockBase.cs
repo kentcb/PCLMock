@@ -18,6 +18,9 @@
     /// </typeparam>
     public abstract class MockBase<TMock>
     {
+        private const string mockedObjectErrorTemplate = @"The default implementation of MockBase<{0}> is unable to automatically determine an instance of type {0} to be used as the mocked object. You should override MockedObject in {1} and return the mocked object.
+Full mock type name: {2}
+Full mocked object type name: {3}";
         private readonly IDictionary<object, WhenContinuation> continuations;
         private readonly object continuationsSync;
         private readonly MockBehavior behavior;
@@ -46,9 +49,26 @@
         /// <summary>
         /// Gets the mocked object.
         /// </summary>
-        public abstract TMock MockedObject
+        public virtual TMock MockedObject
         {
-            get;
+            get
+            {
+                object toCast = this;
+
+                if (!(toCast is TMock))
+                {
+                    throw new InvalidOperationException(
+                        string.Format(
+                            CultureInfo.InvariantCulture,
+                            mockedObjectErrorTemplate,
+                            typeof(TMock).Name,
+                            this.GetType().Name,
+                            this.GetType().FullName,
+                            typeof(TMock).FullName));
+                }
+
+                return (TMock)toCast;
+            }
         }
 
         /// <summary>

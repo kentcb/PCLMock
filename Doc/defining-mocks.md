@@ -37,11 +37,6 @@ public class AuthenticationServiceMock : MockBase<IAuthenticationService>, IAuth
     {
     }
 
-    public override IAuthenticationService MockedObject
-    {
-        get { return this; }
-    }
-
     public bool IsAuthenticated
     {
         get { return this.Apply(x => x.IsAuthenticated); }
@@ -68,8 +63,6 @@ public class AuthenticationServiceMock : MockBase<IAuthenticationService>, IAuth
 As you can see, the basic approach is to implement each member to call `Apply()` on the `MockBase<T>` base class. The `MockBase<T>` implementation takes care of applying any expectations configured by the consumer of the mock, be they invoking callbacks, throwing exceptions, or returning values.
 
 The `MockBehavior` passed into the base constructor is used to determine whether invocations against the mock *must* have expectations configured (`MockBehavior.Strict`) or not (`MockBehavior.Loose`). This is covered in more detail below. 
-
-The `MockedObject` property must return an instance of `T`. When mocking an interface, it is easiest to just have the mock implement the interface and return `this` from `MockedObject`. When mocking a class, it is not so straightforward (see below).
 
 Perhaps the least intuitive aspect of mock implementations is the need to pass parameters twice when calling `Apply`:
 
@@ -170,7 +163,9 @@ public class AuthenticationServiceMock : MockBase<AuthenticationService>
 }
 ```
 
-As you can see, it is more onerous and limited defining mocks for classes. Any members that aren't `virtual` will not be mockable. And consumers of the mock need to dereference `MockedObject` to configure expectations:
+As you can see, it is more onerous and limited defining mocks for classes. Any members that aren't `virtual` will not be mockable. Moreover, we had to override `MockedObject` to help the mocking infrastructure obtain an instance of the type being mocked. We didn't have to do this when mocking interfaces because the default implementation of `MockBase<T>.MockedObject` automatically attempts to convert the mock object to an instance of the mocked type. Since our interface-based mock object also implemented the mocked interface, this conversion succeeds. But when mocking classes we have to explicitly help out.
+
+Finally, note that consumers of the mock need to dereference `MockedObject` to configure expectations:
 
 ```C#
 var mock = new AuthenticationServiceMock();
