@@ -7,6 +7,22 @@
     public sealed class MockBaseFixture
     {
         [Fact]
+        public void apply_throws_if_method_without_specifications_is_invoked_on_a_strict_mock()
+        {
+            var mock = new TestTargetMock();
+            var ex = Assert.Throws<InvalidOperationException>(() => mock.SomeMethod());
+            Assert.Equal("Method 'SomeMethod', for which no specifications have been configured, was invoked on a strict mock. You must either configure specifications via calls to When on the mock, or use a loose mock by passing in MockBehavior.Loose to the mock's constructor.", ex.Message);
+        }
+
+        [Fact]
+        public void apply_throws_if_property_without_specifications_is_invoked_on_a_strict_mock()
+        {
+            var mock = new TestTargetMock();
+            var ex = Assert.Throws<InvalidOperationException>(() => mock.SomeProperty);
+            Assert.Equal("Property 'SomeProperty', for which no specifications have been configured, was invoked on a strict mock. You must either configure specifications via calls to When on the mock, or use a loose mock by passing in MockBehavior.Loose to the mock's constructor.", ex.Message);
+        }
+
+        [Fact]
         public void mocked_object_throws_if_the_mocked_object_cannot_be_automatically_determined()
         {
             var mock = new InvalidMockedObject();
@@ -23,6 +39,22 @@ Full mocked object type name: Kent.Boogaart.PCLMock.UnitTests.MockBaseFixture+Un
         {
             var mock = new TestTargetMock();
             Assert.Same(mock, mock.MockedObject);
+        }
+
+        [Fact]
+        public void when_throws_if_property_access_is_chained()
+        {
+            var mock = new TestTargetMock();
+            var ex = Assert.Throws<InvalidOperationException>(() => mock.When(x => x.SomeComplexProperty.Name).Return("foo"));
+            Assert.Equal("Specifications against properties cannot be chained: x.SomeComplexProperty.Name", ex.Message);
+        }
+
+        [Fact]
+        public void when_throws_if_method_access_is_chained()
+        {
+            var mock = new TestTargetMock();
+            var ex = Assert.Throws<InvalidOperationException>(() => mock.When(x => x.SomeComplexMethod().GetAge()).Return(35));
+            Assert.Equal("Specifications against methods cannot be chained: x.SomeComplexMethod().GetAge()", ex.Message);
         }
 
         [Fact]
@@ -378,7 +410,7 @@ Full mocked object type name: Kent.Boogaart.PCLMock.UnitTests.MockBaseFixture+Un
         }
 
         [Fact]
-        public void methods_with_ref_parameters_dont_require_a_parameter_assignment_when_setting_expectations()
+        public void methods_with_ref_parameters_dont_require_a_parameter_assignment_when_configuring_specifications()
         {
             var mock = new TestTargetMock();
             var called = false;
@@ -424,6 +456,17 @@ Full mocked object type name: Kent.Boogaart.PCLMock.UnitTests.MockBaseFixture+Un
 
         #region Supporting Members
 
+        private interface ITestSubTarget
+        {
+            string Name
+            {
+                get;
+                set;
+            }
+
+            int GetAge();
+        }
+
         private interface ITestTarget
         {
             int SomeProperty
@@ -432,7 +475,14 @@ Full mocked object type name: Kent.Boogaart.PCLMock.UnitTests.MockBaseFixture+Un
                 set;
             }
 
+            ITestSubTarget SomeComplexProperty
+            {
+                get;
+            }
+
             void SomeMethod();
+
+            ITestSubTarget SomeComplexMethod();
 
             void SomeMethod(int i, float f);
 
@@ -466,9 +516,19 @@ Full mocked object type name: Kent.Boogaart.PCLMock.UnitTests.MockBaseFixture+Un
                 set { this.Apply(x => x.SomeProperty, value); }
             }
 
+            public ITestSubTarget SomeComplexProperty
+            {
+                get { return this.Apply(x => x.SomeComplexProperty); }
+            }
+
             public void SomeMethod()
             {
                 this.Apply(x => x.SomeMethod());
+            }
+
+            public ITestSubTarget SomeComplexMethod()
+            {
+                return this.Apply(x => x.SomeComplexMethod());
             }
 
             public void SomeMethod(int i, float f)
