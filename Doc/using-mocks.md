@@ -75,3 +75,62 @@ mock.When(x => x.SomeMethod(It.IsAny<int>(), It.IsAny<string>())
     .Do((int i, string s) => calledWithZero = i == 0)
     .Return("foo");
 ```
+
+## Matching Arguments
+
+When specifying expectations, you can use the `It` class to define how arguments in your expectation are to be filtered. Here are some examples:
+
+```C#
+// accept any string at all
+mock.When(x => x.SomeMethod(It.IsAny<string>())).Return(1);
+
+// accept only a specific string
+mock.When(x => x.SomeMethod(It.Is("foo"))).Return(1);
+
+// same as above, only easier to read and write
+mock.When(x => x.SomeMethod("foo")).Return(1);
+
+// accept any of a set of values
+mock.When(x => x.SomeMethod(It.IsIn("foo", "bar")).Return(1);
+
+// accept values matching a regular expression
+mock.When(x => x.SomeMethod(It.IsLike("[Hh]ello")).Return(1);
+```
+
+There are a whole range of methods on the `It` class to help you specify constraints against arguments:
+
+* `IsAny<T>`
+* `Is<T>`
+* `IsNot<T>`
+* `IsNull<T>`
+* `IsNotNull<T>`
+* `IsOfType<T>`
+* `IsNotOfType<T>`
+* `IsLessThan<T>`
+* `IsLessThanOrEqualTo<T>`
+* `IsGreaterThan<T>`
+* `IsGreaterThanOrEqualTo<T>`
+* `IsBetween<T>`
+* `IsNotBetween<T>`
+* `IsLike`
+
+Multiple expectations can be configured, each one for different arguments:
+
+```C#
+mock.When(x => x.SomeMethod("foo")).Return(1);
+mock.When(x => x.SomeMethod("bar")).Return(2);
+
+Assert.Equals(1, mock.SomeMethod("foo"));
+Assert.Equals(2, mock.SomeMethod("bar"));
+```
+
+Note that order is important. Later expectations take precedence over earlier ones:
+
+```C#
+// these are the wrong way around to illustrate
+mock.When(x => x.SomeMethod("foo")).Return(1);
+mock.When(x => x.SomeMethod(It.IsAny<string>())).Return(2);
+
+// this will fail because 2 will be returned!
+Assert.Equals(1, mock.SomeMethod("foo"));
+```

@@ -62,7 +62,7 @@ public class AuthenticationServiceMock : MockBase<IAuthenticationService>, IAuth
 
 As you can see, the basic approach is to implement each member to call `Apply()` on the `MockBase<T>` base class. The `MockBase<T>` implementation takes care of applying any expectations configured by the consumer of the mock, be they invoking callbacks, throwing exceptions, or returning values.
 
-The `MockBehavior` passed into the base constructor is used to determine whether invocations against the mock *must* have expectations configured (`MockBehavior.Strict`) or not (`MockBehavior.Loose`). This is covered in more detail below. 
+The `MockBehavior` passed into the base constructor is used to determine whether invocations against the mock *must* have expectations configured (`MockBehavior.Strict`) or can *optionally* specify expectations (`MockBehavior.Loose`). This is covered in more detail below. 
 
 Perhaps the least intuitive aspect of mock implementations is the need to pass parameters twice when calling `Apply`:
 

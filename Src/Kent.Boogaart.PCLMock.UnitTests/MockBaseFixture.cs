@@ -3,6 +3,7 @@
     using System;
     using Xunit;
     using Kent.Boogaart.PCLMock;
+    using System.Text.RegularExpressions;
 
     public sealed class MockBaseFixture
     {
@@ -119,6 +120,18 @@ Full mocked object type name: Kent.Boogaart.PCLMock.UnitTests.MockBaseFixture+Un
 
             mock.SomeMethodWithReturnValue(1, 1f);
             Assert.True(called);
+        }
+
+        [Fact]
+        public void when_can_have_multiple_specifications()
+        {
+            var mock = new TestTargetMock(MockBehavior.Loose);
+            mock.When(x => x.SomeMethodTakingStringWithReturnValue("foo")).Return(1);
+            mock.When(x => x.SomeMethodTakingStringWithReturnValue("bar")).Return(2);
+
+            Assert.Equal(1, mock.SomeMethodTakingStringWithReturnValue("foo"));
+            Assert.Equal(2, mock.SomeMethodTakingStringWithReturnValue("bar"));
+            Assert.Equal(0, mock.SomeMethodTakingStringWithReturnValue("not specified"));
         }
 
         [Fact]
@@ -454,6 +467,169 @@ Full mocked object type name: Kent.Boogaart.PCLMock.UnitTests.MockBaseFixture+Un
             Assert.True(mock.MockedObject.DoSomething());
         }
 
+        [Fact]
+        public void it_is_any_can_be_used_to_specify_arguments()
+        {
+            var mock = new TestTargetMock();
+            mock.When(x => x.SomeMethodWithReturnValue(It.IsAny<int>(), It.IsAny<float>())).Return(35);
+
+            Assert.Equal(35, mock.SomeMethodWithReturnValue(5, 1f));
+        }
+
+        [Fact]
+        public void it_is_can_be_used_explicitly_to_specify_arguments()
+        {
+            var mock = new TestTargetMock();
+            mock.When(x => x.SomeMethodWithReturnValue(It.Is(3), It.Is(5f))).Return(35);
+
+            Assert.Equal(35, mock.SomeMethodWithReturnValue(3, 5f));
+        }
+
+        [Fact]
+        public void it_is_can_be_used_implicitly_to_specify_arguments()
+        {
+            var mock = new TestTargetMock();
+            mock.When(x => x.SomeMethodWithReturnValue(3, 5f)).Return(35);
+
+            Assert.Equal(35, mock.SomeMethodWithReturnValue(3, 5f));
+        }
+
+        [Fact]
+        public void it_is_not_can_be_used_to_specify_arguments()
+        {
+            var mock = new TestTargetMock();
+            mock.When(x => x.SomeMethodWithReturnValue(It.IsNot(3), It.IsNot(5f))).Return(35);
+
+            Assert.Equal(35, mock.SomeMethodWithReturnValue(2, 4f));
+        }
+
+        [Fact]
+        public void it_is_null_be_used_to_specify_arguments()
+        {
+            var mock = new TestTargetMock();
+            mock.When(x => x.SomeMethodTakingStringWithReturnValue(It.IsNull<string>())).Return(35);
+
+            Assert.Equal(35, mock.SomeMethodTakingStringWithReturnValue(null));
+        }
+
+        [Fact]
+        public void it_is_not_null_be_used_to_specify_arguments()
+        {
+            var mock = new TestTargetMock();
+            mock.When(x => x.SomeMethodTakingStringWithReturnValue(It.IsNotNull<string>())).Return(35);
+
+            Assert.Equal(35, mock.SomeMethodTakingStringWithReturnValue("foo"));
+        }
+
+        [Fact]
+        public void it_is_less_than_can_be_used_to_specify_arguments()
+        {
+            var mock = new TestTargetMock();
+            mock.When(x => x.SomeMethodWithReturnValue(It.IsLessThan(3), It.IsLessThan(5f))).Return(35);
+
+            Assert.Equal(35, mock.SomeMethodWithReturnValue(2, 4f));
+        }
+
+        [Fact]
+        public void it_is_less_than_or_equal_to_can_be_used_to_specify_arguments()
+        {
+            var mock = new TestTargetMock();
+            mock.When(x => x.SomeMethodWithReturnValue(It.IsLessThanOrEqualTo(3), It.IsLessThanOrEqualTo(5f))).Return(35);
+
+            Assert.Equal(35, mock.SomeMethodWithReturnValue(2, 4f));
+        }
+
+        [Fact]
+        public void it_is_greater_than_can_be_used_to_specify_arguments()
+        {
+            var mock = new TestTargetMock();
+            mock.When(x => x.SomeMethodWithReturnValue(It.IsGreaterThan(3), It.IsGreaterThan(5f))).Return(35);
+
+            Assert.Equal(35, mock.SomeMethodWithReturnValue(4, 6f));
+        }
+
+        [Fact]
+        public void it_is_greater_than_or_equal_to_can_be_used_to_specify_arguments()
+        {
+            var mock = new TestTargetMock();
+            mock.When(x => x.SomeMethodWithReturnValue(It.IsGreaterThanOrEqualTo(3), It.IsGreaterThanOrEqualTo(5f))).Return(35);
+
+            Assert.Equal(35, mock.SomeMethodWithReturnValue(4, 6f));
+        }
+
+        [Fact]
+        public void it_is_between_can_be_used_to_specify_arguments()
+        {
+            var mock = new TestTargetMock();
+            mock.When(x => x.SomeMethodWithReturnValue(It.IsBetween(3, 8), It.IsBetween(5f, 10f))).Return(35);
+
+            Assert.Equal(35, mock.SomeMethodWithReturnValue(4, 9f));
+        }
+
+        [Fact]
+        public void it_is_not_between_can_be_used_to_specify_arguments()
+        {
+            var mock = new TestTargetMock();
+            mock.When(x => x.SomeMethodWithReturnValue(It.IsNotBetween(3, 8), It.IsNotBetween(5f, 10f))).Return(35);
+
+            Assert.Equal(35, mock.SomeMethodWithReturnValue(2, 11f));
+        }
+
+        [Fact]
+        public void it_is_of_type_can_be_used_to_specify_arguments()
+        {
+            var mock = new TestTargetMock();
+            mock.When(x => x.SomeMethodTakingObjectWithReturnValue(It.IsOfType<int>())).Return(30);
+            mock.When(x => x.SomeMethodTakingObjectWithReturnValue(It.IsOfType<string>())).Return(35);
+
+            Assert.Equal(30, mock.SomeMethodTakingObjectWithReturnValue(4));
+            Assert.Equal(35, mock.SomeMethodTakingObjectWithReturnValue("foo"));
+        }
+
+        [Fact]
+        public void it_is_not_of_type_can_be_used_to_specify_arguments()
+        {
+            var mock = new TestTargetMock();
+            mock.When(x => x.SomeMethodTakingObjectWithReturnValue(It.IsNotOfType<int>())).Return(30);
+            mock.When(x => x.SomeMethodTakingObjectWithReturnValue(It.IsNotOfType<string>())).Return(35);
+
+            Assert.Equal(35, mock.SomeMethodTakingObjectWithReturnValue(4));
+            Assert.Equal(30, mock.SomeMethodTakingObjectWithReturnValue("foo"));
+            Assert.Equal(35, mock.SomeMethodTakingObjectWithReturnValue(1f));
+        }
+
+        [Fact]
+        public void it_is_in_can_be_used_to_specify_arguments()
+        {
+            var mock = new TestTargetMock();
+            mock.When(x => x.SomeMethodTakingObjectWithReturnValue(It.IsIn(1, 2, 3, 5, 8, 13))).Return(30);
+
+            Assert.Equal(30, mock.SomeMethodTakingObjectWithReturnValue(2));
+            Assert.Equal(30, mock.SomeMethodTakingObjectWithReturnValue(8));
+            Assert.Equal(30, mock.SomeMethodTakingObjectWithReturnValue(13));
+        }
+
+        [Fact]
+        public void it_is_like_can_be_used_to_specify_arguments()
+        {
+            var mock = new TestTargetMock();
+            mock.When(x => x.SomeMethodTakingStringWithReturnValue(It.IsLike(@"[Hh]ello\s*?world."))).Return(30);
+
+            Assert.Equal(30, mock.SomeMethodTakingStringWithReturnValue("hello world!"));
+            Assert.Equal(30, mock.SomeMethodTakingStringWithReturnValue("Hello world!"));
+            Assert.Equal(30, mock.SomeMethodTakingStringWithReturnValue("hello \t  world."));
+        }
+
+        [Fact]
+        public void it_is_like_can_be_used_with_options_to_specify_arguments()
+        {
+            var mock = new TestTargetMock();
+            mock.When(x => x.SomeMethodTakingStringWithReturnValue(It.IsLike(@"[Hh]ello\s*?world.", RegexOptions.IgnoreCase))).Return(30);
+
+            Assert.Equal(30, mock.SomeMethodTakingStringWithReturnValue("HELLO WoRlD!"));
+        }
+
+
         #region Supporting Members
 
         private interface ITestSubTarget
@@ -491,6 +667,12 @@ Full mocked object type name: Kent.Boogaart.PCLMock.UnitTests.MockBaseFixture+Un
             int SomeMethodWithReturnValue(int i, float f);
 
             void SomeMethodTakingString(string s);
+
+            int SomeMethodTakingStringWithReturnValue(string s);
+
+            void SomeMethodTakingObject(object o);
+
+            int SomeMethodTakingObjectWithReturnValue(object o);
 
             void SomeMethodWithOutParameter(out string s);
 
@@ -549,6 +731,21 @@ Full mocked object type name: Kent.Boogaart.PCLMock.UnitTests.MockBaseFixture+Un
             public void SomeMethodTakingString(string s)
             {
                 this.Apply(x => x.SomeMethodTakingString(s), s);
+            }
+
+            public int SomeMethodTakingStringWithReturnValue(string s)
+            {
+                return this.Apply(x => x.SomeMethodTakingStringWithReturnValue(s), s);
+            }
+
+            public void SomeMethodTakingObject(object o)
+            {
+                this.Apply(x => x.SomeMethodTakingObject(o), o);
+            }
+
+            public int SomeMethodTakingObjectWithReturnValue(object o)
+            {
+                return this.Apply(x => x.SomeMethodTakingObjectWithReturnValue(o), o);
             }
 
             public void SomeMethodWithOutParameter(out string s)

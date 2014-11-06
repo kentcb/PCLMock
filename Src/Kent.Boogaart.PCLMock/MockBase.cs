@@ -7,6 +7,7 @@
     using System.Globalization;
     using System.Linq.Expressions;
     using System.Reflection;
+    using System.Collections.ObjectModel;
 
     /// <summary>
     /// A base class from which mock objects must be derived.
@@ -27,7 +28,7 @@ Full mocked object type name: {3}";
 
         private const string noContinuationErrorTemplate = @"{0} '{1}', for which no specifications have been configured, was invoked on a strict mock. You must either configure specifications via calls to When on the mock, or use a loose mock by passing in MockBehavior.Loose to the mock's constructor.";
 
-        private readonly IDictionary<ContinuationKey, WhenContinuation> continuations;
+        private readonly IDictionary<ContinuationKey, FilteredContinuationCollection> continuations;
         private readonly object continuationsSync;
         private readonly MockBehavior behavior;
 
@@ -39,7 +40,7 @@ Full mocked object type name: {3}";
         /// </param>
         protected MockBase(MockBehavior behavior)
         {
-            this.continuations = new Dictionary<ContinuationKey, WhenContinuation>();
+            this.continuations = new Dictionary<ContinuationKey, FilteredContinuationCollection>();
             this.continuationsSync = new object();
             this.behavior = behavior;
         }
@@ -88,16 +89,11 @@ Full mocked object type name: {3}";
         /// </returns>
         public WhenContinuation<TMock> When(Expression<Action<TMock>> selector)
         {
-            var continuationKey = this.GetContinuationKey(selector);
             var continuation = new WhenContinuation<TMock>();
-
-            lock (this.continuationsSync)
-            {
-                this.continuations[continuationKey] = continuation;
-            }
-
+            this.RegisterContinuation(selector, continuation);
             return continuation;
         }
+
         /// <summary>
         /// Begins the specification of what the mock should do when a given member is accessed.
         /// </summary>
@@ -110,14 +106,8 @@ Full mocked object type name: {3}";
 
         public WhenContinuation<TMock, TMember> When<TMember>(Expression<Func<TMock, TMember>> selector)
         {
-            var continuationKey = this.GetContinuationKey(selector);
             var continuation = new WhenContinuation<TMock, TMember>();
-
-            lock (this.continuationsSync)
-            {
-                this.continuations[continuationKey] = continuation;
-            }
-
+            this.RegisterContinuation(selector, continuation);
             return continuation;
         }
 
@@ -132,7 +122,7 @@ Full mocked object type name: {3}";
         /// </param>
         protected void Apply(Expression<Action<TMock>> selector, params object[] args)
         {
-            var continuation = this.GetContinuation(selector);
+            var continuation = this.GetContinuation(selector, args);
 
             if (continuation == null)
             {
@@ -153,7 +143,7 @@ Full mocked object type name: {3}";
         /// </param>
         protected TMember Apply<TMember>(Expression<Func<TMock, TMember>> selector, params object[] args)
         {
-            var continuation = this.GetContinuation(selector);
+            var continuation = this.GetContinuation(selector, args);
 
             if (continuation == null)
             {
@@ -180,7 +170,7 @@ Full mocked object type name: {3}";
         /// </returns>
         protected T GetOutParameterValue<T>(Expression<Action<TMock>> selector, int parameterIndex)
         {
-            var continuation = this.GetContinuation(selector);
+            var continuation = this.GetContinuation(selector, null);
 
             if (continuation == null)
             {
@@ -189,6 +179,7 @@ Full mocked object type name: {3}";
 
             return continuation.GetOutParameterValue<T>(parameterIndex);
         }
+
         /// <summary>
         /// Gets the value for a <c>ref</c> parameter for a given method at a given parameter index.
         /// </summary>
@@ -210,7 +201,7 @@ Full mocked object type name: {3}";
 
         protected T GetRefParameterValue<T>(Expression<Action<TMock>> selector, int parameterIndex, T defaultValue = default(T))
         {
-            var continuation = this.GetContinuation(selector);
+            var continuation = this.GetContinuation(selector, null);
 
             if (continuation == null)
             {
@@ -220,7 +211,100 @@ Full mocked object type name: {3}";
             return continuation.GetRefParameterValue<T>(parameterIndex, defaultValue);
         }
 
-        private ContinuationKey GetContinuationKey(LambdaExpression selector)
+        // determines and resolves an argument filter within the specified expression
+        // if an explicit filter argument is applied, this will be returned (e.g. <c>When(x => x.SomeMethod(It.IsAny<string>())</c>) would result in an appropriate argument filter)
+        // if, instead, a constant is applied (e.g. <c>When(x => x.SomeMethod("hello")</c>), this will be wrapped in an appropriate argument filter
+        private static IArgumentFilter FindArgumentFilterFor(Expression expression)
+        {
+            var argumentFilter = FindExplicitArgumentFilterFor(expression);
+
+            if (argumentFilter != null)
+            {
+                return argumentFilter;
+            }
+
+            object constant;
+
+            if (TryFindConstantWithin(expression, out constant))
+            {
+                return new It.IsArgumentFilter(constant);
+            }
+
+            // we never return null - instead, we return a filter that will always yield true
+            return It.IsAnyArgumentFilter<object>.Instance;
+        }
+
+        // determines and resolves any explicit argument filter within the specified expression
+        // for example, if the expression is It.Is("hello") then an appropriate argument filter will be returned
+        private static IArgumentFilter FindExplicitArgumentFilterFor(Expression expression)
+        {
+            var methodCallExpression = expression as MethodCallExpression;
+
+            if (methodCallExpression == null)
+            {
+                return null;
+            }
+
+            var filterMethod = methodCallExpression
+                .Method
+                .DeclaringType
+                .GetTypeInfo()
+                .GetDeclaredMethods(methodCallExpression.Method.Name + "Filter")
+                .Where(x => x.GetParameters().Length == methodCallExpression.Arguments.Count)
+                .FirstOrDefault();
+
+            if (filterMethod == null || filterMethod.ReturnType != typeof(IArgumentFilter))
+            {
+                return null;
+            }
+
+            if (methodCallExpression.Method.IsGenericMethod)
+            {
+                filterMethod = filterMethod.MakeGenericMethod(methodCallExpression.Method.GetGenericArguments());
+            }
+
+            var argumentsToFilterMethod = methodCallExpression
+                .Arguments
+                .Select(FindConstantWithin)
+                .ToArray();
+
+            return filterMethod.Invoke(null, argumentsToFilterMethod) as IArgumentFilter;
+        }
+
+        private static object FindConstantWithin(Expression expression)
+        {
+            object result;
+
+            if (!TryFindConstantWithin(expression, out result))
+            {
+                return null;
+            }
+
+            return result;
+        }
+
+        private static bool TryFindConstantWithin(Expression expression, out object constant)
+        {
+            var constantExpression = expression as ConstantExpression;
+
+            if (constantExpression != null)
+            {
+                constant = constantExpression.Value;
+                return true;
+            }
+
+            var memberExpression = expression as MemberExpression;
+
+            if (memberExpression != null)
+            {
+                return TryFindConstantWithin(memberExpression.Expression, out constant);
+            }
+
+            constant = null;
+            return false;
+        }
+
+        private static ContinuationKey GetContinuationKey(LambdaExpression selector)
         {
             var methodCallExpression = selector.Body as MethodCallExpression;
 
@@ -242,25 +326,95 @@ Full mocked object type name: {3}";
                 {
                     throw new InvalidOperationException("Specifications against properties cannot be chained: " + memberExpression);
                 }
-
+                
                 return new ContinuationKey(memberExpression.Member);
             }
 
             throw new InvalidOperationException("Unable to determine the details of the member being mocked.");
         }
 
-        private WhenContinuation GetContinuation(LambdaExpression selector)
+        private static IEnumerable<IList<IArgumentFilter>> GetContinuationFilters(LambdaExpression selector)
         {
-            return this.GetContinuation(this.GetContinuationKey(selector));
+            var methodCallExpression = selector.Body as MethodCallExpression;
+
+            if (methodCallExpression != null)
+            {
+                yield return methodCallExpression.Arguments
+                    .Select(FindArgumentFilterFor)
+                    .ToList();
+                yield break;
+            }
+
+            var memberExpression = selector.Body as MemberExpression;
+
+            if (memberExpression != null)
+            {
+                var propertyInfo = memberExpression.Member as PropertyInfo;
+
+                if (propertyInfo != null)
+                {
+                    // for properties, we need to register argument filters for both the getter and setter
+                    yield return new List<IArgumentFilter>();
+                    yield return new List<IArgumentFilter>(new IArgumentFilter[] { It.IsAnyArgumentFilter<object>.Instance });
+                }
+            }
+
+            yield return new List<IArgumentFilter>();
         }
 
-        private WhenContinuation GetContinuation(ContinuationKey continuationKey)
+        private void RegisterContinuation(LambdaExpression selector, WhenContinuation continuation)
         {
-            WhenContinuation continuation;
+            var continuationKey = GetContinuationKey(selector);
+            var continuationFiltersSet = GetContinuationFilters(selector);
 
             lock (this.continuationsSync)
             {
-                if (!this.continuations.TryGetValue(continuationKey, out continuation))
+                foreach (var continuationFilter in continuationFiltersSet)
+                {
+                    var filteredContinuation = new FilteredContinuation(continuationFilter, continuation);
+
+                    FilteredContinuationCollection filteredContinuationCollection;
+
+                    if (!this.continuations.TryGetValue(continuationKey, out filteredContinuationCollection))
+                    {
+                        filteredContinuationCollection = new FilteredContinuationCollection();
+                        this.continuations[continuationKey] = filteredContinuationCollection;
+                    }
+
+                    // first remove any existing filtered continuation that matches the one we're trying to add to avoid memory leaks
+                    filteredContinuationCollection.Remove(filteredContinuation);
+                    filteredContinuationCollection.Add(filteredContinuation);
+                }
+            }
+        }
+
+        private WhenContinuation GetContinuation(LambdaExpression selector, object[] args)
+        {
+            return this.GetContinuation(GetContinuationKey(selector), args);
+        }
+
+        private WhenContinuation GetContinuation(ContinuationKey continuationKey, object[] args)
+        {
+            FilteredContinuationCollection filteredContinuationCollection;
+            WhenContinuation continuation = null;
+
+            lock (this.continuationsSync)
+            {
+                if (this.continuations.TryGetValue(continuationKey, out filteredContinuationCollection))
+                {
+                    // we loop backwards so that more recently registered continuations take a higher precedence
+                    for (var i = filteredContinuationCollection.Count - 1; i >= 0; --i)
+                    {
+                        var filteredContinuation = filteredContinuationCollection[i];
+
+                        if (args == null || filteredContinuation.Filters == null || ArgumentsMatchFilters(args, filteredContinuation.Filters)){
+                            continuation = filteredContinuation.Continuation;
+                            break;
+                        }
+                    }
+                }
+
+                if (continuation == null)
                 {
                     if (this.behavior == MockBehavior.Loose)
                     {
@@ -274,6 +428,35 @@ Full mocked object type name: {3}";
             return continuation;
         }
 
+        // determine whether the given arguments match corresponding filters
+        private static bool ArgumentsMatchFilters(object[] args, IList<IArgumentFilter> filters)
+        {
+            Debug.Assert(args != null);
+            Debug.Assert(filters != null);
+
+            if (args.Length != filters.Count)
+            {
+                return false;
+            }
+
+            for (var i = 0; i < args.Length; ++i)
+            {
+                var filter = filters[i];
+
+                if (filter == null)
+                {
+                    continue;
+                }
+
+                if (!filter.Matches(args[i]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         private enum ContinuationKeyType
         {
             Method,
@@ -282,18 +465,16 @@ Full mocked object type name: {3}";
 
         private struct ContinuationKey : IEquatable<ContinuationKey>
         {
-            private readonly ContinuationKeyType type;
             private readonly MemberInfo memberInfo;
 
             public ContinuationKey(MemberInfo memberInfo)
             {
-                this.type = memberInfo is MethodInfo ? ContinuationKeyType.Method : ContinuationKeyType.Property;
                 this.memberInfo = memberInfo;
             }
 
             public ContinuationKeyType Type
             {
-                get { return this.type; }
+                get { return this.memberInfo is MethodInfo ? ContinuationKeyType.Method : ContinuationKeyType.Property; }
             }
 
             public MemberInfo MemberInfo
@@ -323,6 +504,81 @@ Full mocked object type name: {3}";
             {
                 Debug.Assert(this.memberInfo != null);
                 return this.memberInfo.GetHashCode();
+            }
+        }
+
+        // a continuation associated with a set of filters to be applied to arguments in order to determine whether the continuation should be used
+        private sealed class FilteredContinuation : IEquatable<FilteredContinuation>
+        {
+            private readonly IList<IArgumentFilter> filters;
+            private readonly WhenContinuation continuation;
+
+            public FilteredContinuation(IList<IArgumentFilter> filters, WhenContinuation continuation)
+            {
+                Debug.Assert(filters != null);
+                Debug.Assert(continuation != null);
+
+                this.filters = filters;
+                this.continuation = continuation;
+            }
+
+            public IList<IArgumentFilter> Filters
+            {
+                get { return this.filters; }
+            }
+
+            public WhenContinuation Continuation
+            {
+                get { return this.continuation; }
+            }
+
+            // a FilteredContinuation is considered equal to another if the filters match exactly (the continuation itself doesn't matter)
+            public bool Equals(FilteredContinuation other)
+            {
+                if (other == null)
+                {
+                    return false;
+                }
+
+                if (this.filters.Count != other.filters.Count)
+                {
+                    return false;
+                }
+
+                for (var i = 0; i < this.filters.Count; ++i)
+                {
+                    Debug.Assert(this.filters[i] != null);
+                    Debug.Assert(other.filters[i] != null);
+
+                    // filters implement equality semantics, so this is totally OK
+                    if (!this.filters[i].Equals(other.filters[i]))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            public override bool Equals(object obj)
+            {
+                return this.Equals(obj as FilteredContinuation);
+            }
+
+            public override int GetHashCode()
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        // a collection of FilteredContinuation objects
+        private sealed class FilteredContinuationCollection : Collection<FilteredContinuation>
+        {
+            private readonly IList<FilteredContinuation> items;
+
+            public FilteredContinuationCollection()
+            {
+                this.items = new List<FilteredContinuation>();
             }
         }
     }

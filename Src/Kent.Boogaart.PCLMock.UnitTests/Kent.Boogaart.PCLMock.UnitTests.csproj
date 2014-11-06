@@ -45,7 +45,21 @@
     <Compile Include="..\AssemblyInfoCommon.cs">
       <Link>Properties\AssemblyInfoCommon.cs</Link>
     </Compile>
-    <Compile Include="ItFixture.cs" />
+    <Compile Include="ItIsAnyFixture.cs" />
+    <Compile Include="ItIsBetweenFixture.cs" />
+    <Compile Include="ItIsFixture.cs" />
+    <Compile Include="ItIsGreaterThanFixture.cs" />
+    <Compile Include="ItIsGreaterThanOrEqualToFixture.cs" />
+    <Compile Include="ItIsInFixture.cs" />
+    <Compile Include="ItIsLessThanFixture.cs" />
+    <Compile Include="ItIsLessThanOrEqualToFixture.cs" />
+    <Compile Include="ItIsLikeFixture.cs" />
+    <Compile Include="ItIsNotBetweenFixture.cs" />
+    <Compile Include="ItIsNotFixture.cs" />
+    <Compile Include="ItIsNotNullFixture.cs" />
+    <Compile Include="ItIsNotOfTypeFixture.cs" />
+    <Compile Include="ItIsNullFixture.cs" />
+    <Compile Include="ItIsOfTypeFixture.cs" />
     <Compile Include="MockBaseFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
