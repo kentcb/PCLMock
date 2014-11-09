@@ -2,11 +2,10 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
     using System.Diagnostics;
     using System.Globalization;
     using System.Linq.Expressions;
-    using System.Reflection;
+    using Kent.Boogaart.PCLMock.Utility;
     using Kent.Boogaart.PCLMock.Visitors;
 
     /// <summary>
@@ -347,7 +346,7 @@ Full mocked object type name: {3}";
                     {
                         var filteredContinuation = filteredContinuationCollection[i];
 
-                        if (args == null || filteredContinuation.Filters == null || ArgumentsMatchFilters(args, filteredContinuation.Filters)){
+                        if (args == null || filteredContinuation.Filters == null || filteredContinuation.Matches(args)){
                             continuation = filteredContinuation.Continuation;
                             break;
                         }
@@ -366,160 +365,6 @@ Full mocked object type name: {3}";
             }
 
             return continuation;
-        }
-
-        // determine whether the given arguments match corresponding filters
-        private static bool ArgumentsMatchFilters(object[] args, IList<IArgumentFilter> filters)
-        {
-            Debug.Assert(args != null);
-            Debug.Assert(filters != null);
-
-            if (args.Length != filters.Count)
-            {
-                return false;
-            }
-
-            for (var i = 0; i < args.Length; ++i)
-            {
-                var filter = filters[i];
-
-                if (filter == null)
-                {
-                    continue;
-                }
-
-                if (!filter.Matches(args[i]))
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        private enum ContinuationKeyType
-        {
-            Method,
-            Property
-        }
-
-        private struct ContinuationKey : IEquatable<ContinuationKey>
-        {
-            private readonly MemberInfo memberInfo;
-
-            public ContinuationKey(MemberInfo memberInfo)
-            {
-                this.memberInfo = memberInfo;
-            }
-
-            public ContinuationKeyType Type
-            {
-                get { return this.memberInfo is MethodInfo ? ContinuationKeyType.Method : ContinuationKeyType.Property; }
-            }
-
-            public MemberInfo MemberInfo
-            {
-                get { return this.memberInfo; }
-            }
-
-            public bool Equals(ContinuationKey other)
-            {
-                Debug.Assert(this.memberInfo != null);
-                Debug.Assert(other.memberInfo != null);
-
-                return other.memberInfo.Equals(this.memberInfo);
-            }
-
-            public override bool Equals(object obj)
-            {
-                if (!(obj is ContinuationKey))
-                {
-                    return false;
-                }
-
-                return this.Equals((ContinuationKey)obj);
-            }
-
-            public override int GetHashCode()
-            {
-                Debug.Assert(this.memberInfo != null);
-                return this.memberInfo.GetHashCode();
-            }
-        }
-
-        // a continuation associated with a set of filters to be applied to arguments in order to determine whether the continuation should be used
-        private sealed class FilteredContinuation : IEquatable<FilteredContinuation>
-        {
-            private readonly IList<IArgumentFilter> filters;
-            private readonly WhenContinuation continuation;
-
-            public FilteredContinuation(IList<IArgumentFilter> filters, WhenContinuation continuation)
-            {
-                Debug.Assert(filters != null);
-                Debug.Assert(continuation != null);
-
-                this.filters = filters;
-                this.continuation = continuation;
-            }
-
-            public IList<IArgumentFilter> Filters
-            {
-                get { return this.filters; }
-            }
-
-            public WhenContinuation Continuation
-            {
-                get { return this.continuation; }
-            }
-
-            // a FilteredContinuation is considered equal to another if the filters match exactly (the continuation itself doesn't matter)
-            public bool Equals(FilteredContinuation other)
-            {
-                if (other == null)
-                {
-                    return false;
-                }
-
-                if (this.filters.Count != other.filters.Count)
-                {
-                    return false;
-                }
-
-                for (var i = 0; i < this.filters.Count; ++i)
-                {
-                    Debug.Assert(this.filters[i] != null);
-                    Debug.Assert(other.filters[i] != null);
-
-                    // filters implement equality semantics, so this is totally OK
-                    if (!this.filters[i].Equals(other.filters[i]))
-                    {
-                        return false;
-                    }
-                }
-
-                return true;
-            }
-
-            public override bool Equals(object obj)
-            {
-                return this.Equals(obj as FilteredContinuation);
-            }
-
-            public override int GetHashCode()
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        // a collection of FilteredContinuation objects
-        private sealed class FilteredContinuationCollection : Collection<FilteredContinuation>
-        {
-            private readonly IList<FilteredContinuation> items;
-
-            public FilteredContinuationCollection()
-            {
-                this.items = new List<FilteredContinuation>();
-            }
         }
     }
 }

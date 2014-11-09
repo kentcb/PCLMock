@@ -132,6 +132,7 @@ There are a whole range of methods on the `It` class to help you specify constra
 * `IsBetween<T>`
 * `IsNotBetween<T>`
 * `IsLike`
+* `IsNotLike`
 
 Multiple expectations can be configured, each one for different arguments:
 

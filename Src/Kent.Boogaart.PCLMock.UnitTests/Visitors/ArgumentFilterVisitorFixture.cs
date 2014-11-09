@@ -1,14 +1,11 @@
-﻿using Kent.Boogaart.PCLMock.Visitors;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
-using Xunit;
-
-namespace Kent.Boogaart.PCLMock.UnitTests.Visitors
+﻿namespace Kent.Boogaart.PCLMock.UnitTests.Visitors
 {
+    using System;
+    using System.Linq.Expressions;
+    using Kent.Boogaart.PCLMock.ArgumentFilters;
+    using Kent.Boogaart.PCLMock.Visitors;
+    using Xunit;
+
     public sealed class ArgumentFilterVisitorFixture
     {
         [Fact]
@@ -37,13 +34,13 @@ namespace Kent.Boogaart.PCLMock.UnitTests.Visitors
         {
             var argumentFilter = ArgumentFilterVisitor.FindArgumentFilterWithin((Expression<Func<int>>)(() => 35));
             Assert.NotNull(argumentFilter);
-            Assert.IsType<It.IsArgumentFilter>(argumentFilter);
+            Assert.IsType<IsArgumentFilter>(argumentFilter);
             Assert.True(argumentFilter.Matches(35));
             Assert.False(argumentFilter.Matches(34));
 
             argumentFilter = ArgumentFilterVisitor.FindArgumentFilterWithin((Expression<Func<object>>)(() => 35));
             Assert.NotNull(argumentFilter);
-            Assert.IsType<It.IsArgumentFilter>(argumentFilter);
+            Assert.IsType<IsArgumentFilter>(argumentFilter);
             Assert.True(argumentFilter.Matches(35));
             Assert.False(argumentFilter.Matches(34));
         }

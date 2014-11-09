@@ -38,41 +38,38 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .NET Framework is automatically included -->
-    <Compile Include="Its\It.IsAny.cs" />
+    <Compile Include="ArgumentFilters\IsAnyArgumentFilter.cs" />
+    <Compile Include="ArgumentFilters\IsArgumentFilter.cs" />
+    <Compile Include="ArgumentFilters\IsBetweenArgumentFilter.cs" />
+    <Compile Include="ArgumentFilters\IsGreaterThanArgumentFilter.cs" />
+    <Compile Include="ArgumentFilters\IsGreaterThanOrEqualToArgumentFilter.cs" />
+    <Compile Include="ArgumentFilters\IsInArgumentFilter.cs" />
+    <Compile Include="ArgumentFilters\IsLikeArgumentFilter.cs" />
+    <Compile Include="ArgumentFilters\IsNullArgumentFilter.cs" />
+    <Compile Include="ArgumentFilters\IsOfTypeArgumentFilter.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\AssemblyInfoCommon.cs">
       <Link>Properties\AssemblyInfoCommon.cs</Link>
     </Compile>
+    <Compile Include="ArgumentFilters\LogicalNotArgumentFilter.cs" />
     <Compile Include="IArgumentFilter.cs" />
     <Compile Include="It.cs" />
-    <Compile Include="Its\It.Is.cs" />
-    <Compile Include="Its\It.IsBetween.cs" />
-    <Compile Include="Its\It.IsGreaterThan.cs" />
-    <Compile Include="Its\It.IsGreaterThanOrEqualTo.cs" />
-    <Compile Include="Its\It.IsIn.cs" />
-    <Compile Include="Its\It.IsLike.cs" />
-    <Compile Include="Its\It.IsNot.cs" />
-    <Compile Include="Its\It.IsNotBetween.cs" />
-    <Compile Include="Its\It.IsNotNull.cs" />
-    <Compile Include="Its\It.IsNotOfType.cs" />
-    <Compile Include="Its\It.IsNull.cs" />
-    <Compile Include="Its\It.IsOfType.cs" />
     <Compile Include="MockBase.cs" />
     <Compile Include="MockBehavior.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utility\ContinuationKey.cs" />
+    <Compile Include="Utility\ContinuationKeyType.cs" />
+    <Compile Include="Utility\FilteredContinuation.cs" />
+    <Compile Include="Utility\FilteredContinuationCollection.cs" />
+    <Compile Include="Utility\ObjectExtensions.cs" />
     <Compile Include="Visitors\ArgumentFiltersVisitor.cs" />
     <Compile Include="Visitors\ArgumentFilterVisitor.cs" />
     <Compile Include="Visitors\ArgumentsVisitor.cs" />
     <Compile Include="Visitors\ConstantVisitor.cs" />
     <Compile Include="WhenContinuation.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Its\It.IsLessThan.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Its\It.IsLessThanOrEqualTo.cs" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

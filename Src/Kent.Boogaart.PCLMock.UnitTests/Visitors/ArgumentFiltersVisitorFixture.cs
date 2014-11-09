@@ -1,8 +1,9 @@
 ﻿namespace Kent.Boogaart.PCLMock.UnitTests.Visitors
 {
-    using Kent.Boogaart.PCLMock.Visitors;
     using System;
     using System.Linq.Expressions;
+    using Kent.Boogaart.PCLMock.ArgumentFilters;
+    using Kent.Boogaart.PCLMock.Visitors;
     using Xunit;
 
     public sealed class ArgumentFiltersVisitorFixture
@@ -32,8 +33,8 @@
             var argumentFilters = ArgumentFiltersVisitor.FindArgumentFiltersWithin((Expression<Action>)(() => this.SomeMethod(ref i, out s)));
             Assert.NotNull(argumentFilters);
             Assert.Equal(2, argumentFilters.Length);
-            Assert.IsType<It.IsAnyArgumentFilter<object>>(argumentFilters[0]);
-            Assert.IsType<It.IsAnyArgumentFilter<object>>(argumentFilters[1]);
+            Assert.IsType<IsAnyArgumentFilter<object>>(argumentFilters[0]);
+            Assert.IsType<IsAnyArgumentFilter<object>>(argumentFilters[1]);
         }
 
         #region Supporting Members

@@ -4,6 +4,7 @@
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
+    using Kent.Boogaart.PCLMock.ArgumentFilters;
 
     // find a single argument filter at the root of the given expression
     internal sealed class ArgumentFilterVisitor : ExpressionVisitor
@@ -72,7 +73,7 @@
 
         protected override Expression VisitConstant(ConstantExpression node)
         {
-            this.argumentFilter = new It.IsArgumentFilter(node.Value);
+            this.argumentFilter = new IsArgumentFilter(node.Value);
             return node;
         }
     }

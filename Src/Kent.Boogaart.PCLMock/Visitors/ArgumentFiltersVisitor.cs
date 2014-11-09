@@ -2,6 +2,7 @@
 {
     using System.Diagnostics;
     using System.Linq.Expressions;
+    using Kent.Boogaart.PCLMock.ArgumentFilters;
 
     // find a set of argument filters for a method call
     internal sealed class ArgumentFiltersVisitor : ExpressionVisitor
@@ -53,7 +54,7 @@
             {
                 if (methodParameters[i].ParameterType.IsByRef || methodParameters[i].IsOut)
                 {
-                    this.argumentFilters[i] = It.IsAnyArgumentFilter<object>.Instance;
+                    this.argumentFilters[i] = IsAnyArgumentFilter<object>.Instance;
                 }
                 else
                 {
