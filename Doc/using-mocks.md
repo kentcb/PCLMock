@@ -24,7 +24,7 @@ mock.When(x => x.SomeMethod()).Return("foo");
 mock.When(x => x.SomeMethod(It.IsAny<int>(), It.IsAny<string>()).Return("foo");
 ```
 
-A callback can also be provided:
+A callback can also be provided so that the return value can be determined dynamically:
 
 ```C#
 var valueToReturn = "foo";
@@ -95,6 +95,25 @@ mock.When(x => x.SomeMethod(It.IsIn("foo", "bar")).Return(1);
 
 // accept values matching a regular expression
 mock.When(x => x.SomeMethod(It.IsLike("[Hh]ello")).Return(1);
+```
+
+Property setters are specified slightly differently:
+
+```C#
+// accept any string at all
+mock.WhenPropertySet(x => x.SomeProperty).Do(...);
+
+// accept only the specified string
+mock.WhenPropertySet(x => x.SomeProperty, It.Is("foo")).Do(...);
+
+// same as above
+mock.WhenPropertySet(x => x.SomeProperty, "foo").Do(...);
+
+// accept any of a set of values
+mock.WhenPropertySet(x => x.SomeProperty, It.IsIn("foo", "bar").Do(...);
+
+// accept values matching a regular expression
+mock.WhenPropertySet(x => x.SomeProperty, It.IsLike("[Hh]ello").Do(...);
 ```
 
 There are a whole range of methods on the `It` class to help you specify constraints against arguments:

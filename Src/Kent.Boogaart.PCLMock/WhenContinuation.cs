@@ -297,6 +297,8 @@
 
         internal override object Apply(object mockedObject, params object[] args)
         {
+            Debug.Assert(args != null);
+
             if (this.exception != null)
             {
                 throw this.exception;

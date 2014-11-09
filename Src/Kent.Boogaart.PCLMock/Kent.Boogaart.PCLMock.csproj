@@ -61,6 +61,10 @@
     <Compile Include="MockBase.cs" />
     <Compile Include="MockBehavior.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Visitors\ArgumentFiltersVisitor.cs" />
+    <Compile Include="Visitors\ArgumentFilterVisitor.cs" />
+    <Compile Include="Visitors\ArgumentsVisitor.cs" />
+    <Compile Include="Visitors\ConstantVisitor.cs" />
     <Compile Include="WhenContinuation.cs" />
   </ItemGroup>
   <ItemGroup>

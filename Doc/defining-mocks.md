@@ -50,7 +50,7 @@ public class AuthenticationServiceMock : MockBase<IAuthenticationService>, IAuth
     public ILogger Logger
     {
         get { return this.Apply(x => x.Logger); }
-        set { this.Apply(x => x.Logger, value); }
+        set { this.ApplyPropertySet(x => x.Logger, value); }
     }
     
     public bool Authenticate(string user, string password, TimeSpan? timeout = default(TimeSpan?))
@@ -60,23 +60,9 @@ public class AuthenticationServiceMock : MockBase<IAuthenticationService>, IAuth
 }
 ```
 
-As you can see, the basic approach is to implement each member to call `Apply()` on the `MockBase<T>` base class. The `MockBase<T>` implementation takes care of applying any expectations configured by the consumer of the mock, be they invoking callbacks, throwing exceptions, or returning values.
+As you can see, the basic approach is to implement each member to call `Apply()` or `ApplyPropertySet()` on the `MockBase<T>` base class. The `MockBase<T>` implementation takes care of applying any expectations configured by the consumer of the mock, be they invoking callbacks, throwing exceptions, or returning values.
 
 The `MockBehavior` passed into the base constructor is used to determine whether invocations against the mock *must* have expectations configured (`MockBehavior.Strict`) or can *optionally* specify expectations (`MockBehavior.Loose`). This is covered in more detail below. 
-
-Perhaps the least intuitive aspect of mock implementations is the need to pass parameters twice when calling `Apply`:
-
-```C#
-return this.Apply(x => x.Authenticate(user, password, timeout), user, password, timeout);
-```
-
-This is simply because the values of the parameters cannot be obtained from the lambda expression. In fact, the following would work equally well:
-
-```C#
-return this.Apply(x => x.Authenticate("", "", TimeSpan.Zero), user, password, timeout);
-```
-
-It is just easier to pass the parameters through to the lambda, and then pass them again so that those parameters can also be passed through to any callbacks expectations that require them.
 
 ## Advanced Mocking Techniques
 
@@ -213,4 +199,41 @@ public void SomeMethodWithRefParameter(ref string s)
     s = this.GetRefParameterValue<string>(x => x.SomeMethodWithRefParameter(ref sRef), parameterIndex: 0);
     this.Apply(x => x.SomeMethodWithRefParameter(ref sRef));
 }
+```
+
+Consumers can then specify what values should be assigned to the parameters as follows:
+
+```C#
+var mock = ...;
+string s;
+mock.When(x => x.SomeMethodWithOutParameter(out s)).AssignOutOrRefParameter(0, "value");
+
+mock.SomeMethodWithOutParameter(out s);
+Assert.Equals("value", s);
+```
+
+When calling `AssignOutOrRefParameter`, parameters must be identified by their index (`0` in the above example). Note that it is not possible to match on `out` and `ref` parameters - there is always an implicit "allow all" matcher for such parameters.
+
+
+### Mocking indexer properties
+
+Indexer properties can be mocked quite naturally:
+
+```C#
+public int this[int first, int second]
+{
+	get { return this.Apply(x => x[first, second]); }
+	set { this.ApplyPropertySet(x => x[first, second], value); }
+}
+```
+
+And consumers can use this as follows:
+
+```C#
+var mock = ...;
+mock.When(x => x[2, 3]).Return(48);
+mock.When(x => x[1, 13]).Return(190);
+
+Assert.Equal(190, mock[1, 13]);
+Assert.Equal(48, mock[2, 3]);
 ```

@@ -8,6 +8,26 @@
     public sealed class MockBaseFixture
     {
         [Fact]
+        public void indexer_properties_can_be_mocked()
+        {
+            var mock = new TestTargetMock();
+            mock.When(x => x[1]).Return(3);
+
+            Assert.Equal(3, mock[1]);
+        }
+
+        [Fact]
+        public void indexer_properties_with_multiple_indexes_can_be_mocked()
+        {
+            var mock = new TestTargetMock();
+            mock.When(x => x[1, 3]).Return(3);
+            mock.When(x => x[3, 1]).Return(5);
+
+            Assert.Equal(3, mock[1, 3]);
+            Assert.Equal(5, mock[3, 1]);
+        }
+        
+        [Fact]
         public void apply_throws_if_method_without_specifications_is_invoked_on_a_strict_mock()
         {
             var mock = new TestTargetMock();
@@ -72,7 +92,7 @@ Full mocked object type name: Kent.Boogaart.PCLMock.UnitTests.MockBaseFixture+Un
         {
             var mock = new TestTargetMock();
             var called = false;
-            mock.When(x => x.SomeProperty).Do<int>((_) => called = true);
+            mock.WhenPropertySet(x => x.SomeProperty).Do<int>((_) => called = true);
 
             mock.SomeProperty = 1;
             Assert.True(called);
@@ -123,15 +143,29 @@ Full mocked object type name: Kent.Boogaart.PCLMock.UnitTests.MockBaseFixture+Un
         }
 
         [Fact]
-        public void when_can_have_multiple_specifications()
+        public void when_property_set_can_be_used_to_specify_what_happens_when_a_property_is_set()
+        {
+            var mock = new TestTargetMock();
+            var called = false;
+            mock.WhenPropertySet(x => x.SomeProperty).Do(() => called = true);
+
+            mock.SomeProperty = 12;
+            Assert.True(called);
+        }
+
+        [Fact]
+        public void when_property_set_can_filter_arguments()
         {
             var mock = new TestTargetMock(MockBehavior.Loose);
-            mock.When(x => x.SomeMethodTakingStringWithReturnValue("foo")).Return(1);
-            mock.When(x => x.SomeMethodTakingStringWithReturnValue("bar")).Return(2);
+            var called = false;
+            mock.WhenPropertySet(x => x.SomeProperty, () => It.IsIn(1, 2, 3, 5, 8)).Do(() => called = true);
 
-            Assert.Equal(1, mock.SomeMethodTakingStringWithReturnValue("foo"));
-            Assert.Equal(2, mock.SomeMethodTakingStringWithReturnValue("bar"));
-            Assert.Equal(0, mock.SomeMethodTakingStringWithReturnValue("not specified"));
+            mock.SomeProperty = 12;
+            mock.SomeProperty = 11;
+            Assert.False(called);
+
+            mock.SomeProperty = 5;
+            Assert.True(called);
         }
 
         [Fact]
@@ -146,6 +180,17 @@ Full mocked object type name: Kent.Boogaart.PCLMock.UnitTests.MockBaseFixture+Un
             mock.SomeMethodWithReturnValue();
 
             Assert.Equal(2, counter);
+        }
+
+        [Fact]
+        public void do_can_take_parameters_when_specifying_a_property_set()
+        {
+            var mock = new TestTargetMock();
+            int capturedValue = 0;
+            mock.WhenPropertySet(x => x.SomeProperty).Do((int x) => capturedValue = x);
+
+            mock.SomeProperty = 35;
+            Assert.Equal(35, capturedValue);
         }
 
         [Fact]
@@ -169,7 +214,7 @@ Full mocked object type name: Kent.Boogaart.PCLMock.UnitTests.MockBaseFixture+Un
             var ex = Assert.Throws<InvalidOperationException>(() => mock.SomeMethod(1, 1f));
             Assert.Equal("Could not execute the Do action associated with this mocked member due to a parameter mismatch. Expected: (System.Int32) Received: (System.Int32, System.Single)", ex.Message);
 
-            mock.When(x => x.SomeProperty).Do((int i, float f) => { });
+            mock.WhenPropertySet(x => x.SomeProperty).Do((int i, float f) => { });
             ex = Assert.Throws<InvalidOperationException>(() => mock.SomeProperty = 31);
             Assert.Equal("Could not execute the Do action associated with this mocked member due to a parameter mismatch. Expected: (System.Int32, System.Single) Received: (System.Int32)", ex.Message);
         }
@@ -179,7 +224,7 @@ Full mocked object type name: Kent.Boogaart.PCLMock.UnitTests.MockBaseFixture+Un
         {
             var mock = new TestTargetMock();
 
-            mock.When(x => x.SomeProperty).Do((float f) => { });
+            mock.WhenPropertySet(x => x.SomeProperty).Do((float f) => { });
             var ex = Assert.Throws<InvalidOperationException>(() => mock.SomeProperty = 31);
             Assert.Equal("Could not execute the Do action associated with this mocked member due to a parameter mismatch. Expected: (System.Single) Received: (System.Int32)", ex.Message);
         }
@@ -189,7 +234,7 @@ Full mocked object type name: Kent.Boogaart.PCLMock.UnitTests.MockBaseFixture+Un
         {
             var mock = new TestTargetMock();
             var value = 0;
-            mock.When(x => x.SomeProperty).Do<int>(x => value = x);
+            mock.WhenPropertySet(x => x.SomeProperty).Do<int>(x => value = x);
 
             mock.SomeProperty = 31;
 
@@ -258,7 +303,7 @@ Full mocked object type name: Kent.Boogaart.PCLMock.UnitTests.MockBaseFixture+Un
         {
             var mock = new TestTargetMock();
             var called = false;
-            mock.When(x => x.SomeProperty).Do(() => called = true);
+            mock.WhenPropertySet(x => x.SomeProperty).Do(() => called = true);
 
             mock.SomeProperty = 21;
 
@@ -601,12 +646,13 @@ Full mocked object type name: Kent.Boogaart.PCLMock.UnitTests.MockBaseFixture+Un
         [Fact]
         public void it_is_in_can_be_used_to_specify_arguments()
         {
-            var mock = new TestTargetMock();
+            var mock = new TestTargetMock(MockBehavior.Loose);
             mock.When(x => x.SomeMethodTakingObjectWithReturnValue(It.IsIn(1, 2, 3, 5, 8, 13))).Return(30);
 
             Assert.Equal(30, mock.SomeMethodTakingObjectWithReturnValue(2));
             Assert.Equal(30, mock.SomeMethodTakingObjectWithReturnValue(8));
             Assert.Equal(30, mock.SomeMethodTakingObjectWithReturnValue(13));
+            Assert.Equal(0, mock.SomeMethodTakingObjectWithReturnValue(4));
         }
 
         [Fact]
@@ -629,6 +675,40 @@ Full mocked object type name: Kent.Boogaart.PCLMock.UnitTests.MockBaseFixture+Un
             Assert.Equal(30, mock.SomeMethodTakingStringWithReturnValue("HELLO WoRlD!"));
         }
 
+        [Fact]
+        public void argument_filters_can_be_used_to_differentiate_property_set_invocations()
+        {
+            var mock = new TestTargetMock();
+            var anyCalled = false;
+            var specificCalled = false;
+            mock.WhenPropertySet(x => x.SomeProperty).Do(() => anyCalled = true);
+            mock.WhenPropertySet(x => x.SomeProperty, () => 3).Do(() => specificCalled = true);
+
+            mock.SomeProperty = 30;
+            Assert.False(specificCalled);
+            Assert.True(anyCalled);
+
+            mock.SomeProperty = 3;
+            Assert.True(specificCalled);
+        }
+
+        [Fact]
+        public void argument_filters_can_be_used_to_differentiate_method_invocations()
+        {
+            var mock = new TestTargetMock();
+            mock.When(x => x.SomeMethodTakingStringWithReturnValue(It.IsAny<string>())).Return(1);
+            mock.When(x => x.SomeMethodTakingStringWithReturnValue(It.IsLike("[Bb].."))).Return(2);
+            mock.When(x => x.SomeMethodTakingStringWithReturnValue("foo")).Return(3);
+            mock.When(x => x.SomeMethodTakingStringWithReturnValue("bar")).Return(4);
+
+            Assert.Equal(4, mock.SomeMethodTakingStringWithReturnValue("bar"));
+            Assert.Equal(3, mock.SomeMethodTakingStringWithReturnValue("foo"));
+            Assert.Equal(2, mock.SomeMethodTakingStringWithReturnValue("biz"));
+            Assert.Equal(2, mock.SomeMethodTakingStringWithReturnValue("buz"));
+            Assert.Equal(2, mock.SomeMethodTakingStringWithReturnValue("Biz"));
+            Assert.Equal(1, mock.SomeMethodTakingStringWithReturnValue("whatever"));
+            Assert.Equal(1, mock.SomeMethodTakingStringWithReturnValue(null));
+        }
 
         #region Supporting Members
 
@@ -646,6 +726,18 @@ Full mocked object type name: Kent.Boogaart.PCLMock.UnitTests.MockBaseFixture+Un
         private interface ITestTarget
         {
             int SomeProperty
+            {
+                get;
+                set;
+            }
+
+            int this[int index]
+            {
+                get;
+                set;
+            }
+
+            int this[int first, int second]
             {
                 get;
                 set;
@@ -695,7 +787,19 @@ Full mocked object type name: Kent.Boogaart.PCLMock.UnitTests.MockBaseFixture+Un
             public int SomeProperty
             {
                 get { return this.Apply(x => x.SomeProperty); }
-                set { this.Apply(x => x.SomeProperty, value); }
+                set { this.ApplyPropertySet(x => x.SomeProperty, value); }
+            }
+
+            public int this[int index]
+            {
+                get { return this.Apply(x => x[index]); }
+                set { this.ApplyPropertySet(x => x[index], value); }
+            }
+
+            public int this[int first, int second]
+            {
+                get { return this.Apply(x => x[first, second]); }
+                set { this.ApplyPropertySet(x => x[first, second], value); }
             }
 
             public ITestSubTarget SomeComplexProperty
@@ -715,7 +819,7 @@ Full mocked object type name: Kent.Boogaart.PCLMock.UnitTests.MockBaseFixture+Un
 
             public void SomeMethod(int i, float f)
             {
-                this.Apply(x => x.SomeMethod(i, f), i, f);
+                this.Apply(x => x.SomeMethod(i, f));
             }
 
             public int SomeMethodWithReturnValue()
@@ -725,27 +829,27 @@ Full mocked object type name: Kent.Boogaart.PCLMock.UnitTests.MockBaseFixture+Un
 
             public int SomeMethodWithReturnValue(int i, float f)
             {
-                return this.Apply(x => x.SomeMethodWithReturnValue(i, f), i, f);
+                return this.Apply(x => x.SomeMethodWithReturnValue(i, f));
             }
 
             public void SomeMethodTakingString(string s)
             {
-                this.Apply(x => x.SomeMethodTakingString(s), s);
+                this.Apply(x => x.SomeMethodTakingString(s));
             }
 
             public int SomeMethodTakingStringWithReturnValue(string s)
             {
-                return this.Apply(x => x.SomeMethodTakingStringWithReturnValue(s), s);
+                return this.Apply(x => x.SomeMethodTakingStringWithReturnValue(s));
             }
 
             public void SomeMethodTakingObject(object o)
             {
-                this.Apply(x => x.SomeMethodTakingObject(o), o);
+                this.Apply(x => x.SomeMethodTakingObject(o));
             }
 
             public int SomeMethodTakingObjectWithReturnValue(object o)
             {
-                return this.Apply(x => x.SomeMethodTakingObjectWithReturnValue(o), o);
+                return this.Apply(x => x.SomeMethodTakingObjectWithReturnValue(o));
             }
 
             public void SomeMethodWithOutParameter(out string s)

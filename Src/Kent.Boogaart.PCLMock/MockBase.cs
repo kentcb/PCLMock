@@ -2,12 +2,12 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
+    using System.Collections.ObjectModel;
     using System.Diagnostics;
     using System.Globalization;
     using System.Linq.Expressions;
     using System.Reflection;
-    using System.Collections.ObjectModel;
+    using Kent.Boogaart.PCLMock.Visitors;
 
     /// <summary>
     /// A base class from which mock objects must be derived.
@@ -27,6 +27,9 @@ Full mock type name: {2}
 Full mocked object type name: {3}";
 
         private const string noContinuationErrorTemplate = @"{0} '{1}', for which no specifications have been configured, was invoked on a strict mock. You must either configure specifications via calls to When on the mock, or use a loose mock by passing in MockBehavior.Loose to the mock's constructor.";
+
+        private static readonly object[] emptyArgs = new object[0];
+        private static readonly IArgumentFilter[] emptyArgumentFilters = new IArgumentFilter[0];
 
         private readonly IDictionary<ContinuationKey, FilteredContinuationCollection> continuations;
         private readonly object continuationsSync;
@@ -89,8 +92,13 @@ Full mocked object type name: {3}";
         /// </returns>
         public WhenContinuation<TMock> When(Expression<Action<TMock>> selector)
         {
+            if (selector == null)
+            {
+                throw new ArgumentNullException("selector");
+            }
+
             var continuation = new WhenContinuation<TMock>();
-            this.RegisterContinuation(selector, continuation);
+            this.RegisterContinuation(selector, ArgumentFiltersVisitor.FindArgumentFiltersWithin(selector) ?? emptyArgumentFilters, continuation);
             return continuation;
         }
 
@@ -103,11 +111,47 @@ Full mocked object type name: {3}";
         /// <returns>
         /// A continuation object with which the actions to be performed can be configured.
         /// </returns>
-
         public WhenContinuation<TMock, TMember> When<TMember>(Expression<Func<TMock, TMember>> selector)
         {
+            if (selector == null)
+            {
+                throw new ArgumentNullException("selector");
+            }
+
             var continuation = new WhenContinuation<TMock, TMember>();
-            this.RegisterContinuation(selector, continuation);
+            this.RegisterContinuation(selector, ArgumentFiltersVisitor.FindArgumentFiltersWithin(selector) ?? emptyArgumentFilters, continuation);
+            return continuation;
+        }
+
+        /// <summary>
+        /// Begins the specification of what the mock should do when a given property is set.
+        /// </summary>
+        /// <typeparam name="TMember">
+        /// The type of the property.
+        /// </typeparam>
+        /// <param name="propertySelector">
+        /// An expression that resolves the property.
+        /// </param>
+        /// <param name="valueFilterSelector">
+        /// An optional expression that can provide filtering against the property value being set.
+        /// </param>
+        /// <returns>
+        /// A continuation object with which the actions to be performed can be configured.
+        /// </returns>
+        public WhenContinuation<TMock, TMember> WhenPropertySet<TMember>(Expression<Func<TMock, TMember>> propertySelector, Expression<Func<TMember>> valueFilterSelector = null)
+        {
+            if (propertySelector == null)
+            {
+                throw new ArgumentNullException("propertySelector");
+            }
+
+            if (valueFilterSelector == null)
+            {
+                valueFilterSelector = () => It.IsAny<TMember>();
+            }
+
+            var continuation = new WhenContinuation<TMock, TMember>();
+            this.RegisterContinuation(propertySelector, new List<IArgumentFilter>(new IArgumentFilter[] { ArgumentFilterVisitor.FindArgumentFilterWithin(valueFilterSelector) }), continuation);
             return continuation;
         }
 
@@ -117,11 +161,9 @@ Full mocked object type name: {3}";
         /// <param name="selector">
         /// An expression that resolves to the member.
         /// </param>
-        /// <param name="args">
-        /// Any arguments passed in when the member was invoked.
-        /// </param>
-        protected void Apply(Expression<Action<TMock>> selector, params object[] args)
+        protected void Apply(Expression<Action<TMock>> selector)
         {
+            var args = ArgumentsVisitor.FindArgumentsWithin(selector) ?? emptyArgs;
             var continuation = this.GetContinuation(selector, args);
 
             if (continuation == null)
@@ -138,11 +180,9 @@ Full mocked object type name: {3}";
         /// <param name="selector">
         /// An expression that resolves to the member.
         /// </param>
-        /// <param name="args">
-        /// Any arguments passed in when the member was invoked.
-        /// </param>
-        protected TMember Apply<TMember>(Expression<Func<TMock, TMember>> selector, params object[] args)
+        protected TMember Apply<TMember>(Expression<Func<TMock, TMember>> selector)
         {
+            var args = ArgumentsVisitor.FindArgumentsWithin(selector) ?? emptyArgs;
             var continuation = this.GetContinuation(selector, args);
 
             if (continuation == null)
@@ -151,6 +191,33 @@ Full mocked object type name: {3}";
             }
 
             return (TMember)continuation.Apply(this.MockedObject, args);
+        }
+
+        /// <summary>
+        /// Applies any specifications configured via <see cref="WhenPropertySet"/> for a given property setter.
+        /// </summary>
+        /// <param name="selector">
+        /// An expression that resolves to the property being set.
+        /// </param>
+        /// <param name="value">
+        /// The value being assigned to the property.
+        /// </param>
+        protected void ApplyPropertySet<TMember>(Expression<Func<TMock, TMember>> selector, object value)
+        {
+            // base arguments would be any indexers to the property
+            var indexerArgs = ArgumentsVisitor.FindArgumentsWithin(selector) ?? emptyArgs;
+            var args = new object[indexerArgs.Length + 1];
+            Array.Copy(indexerArgs, args, indexerArgs.Length);
+            args[args.Length - 1] = value;
+
+            var continuation = this.GetContinuation(selector, args);
+
+            if (continuation == null)
+            {
+                return;
+            }
+
+            continuation.Apply(this.MockedObject, args);
         }
 
         /// <summary>
@@ -198,7 +265,6 @@ Full mocked object type name: {3}";
         /// <returns>
         /// The value assigned to that <c>ref</c> parameter.
         /// </returns>
-
         protected T GetRefParameterValue<T>(Expression<Action<TMock>> selector, int parameterIndex, T defaultValue = default(T))
         {
             var continuation = this.GetContinuation(selector, null);
@@ -209,99 +275,6 @@ Full mocked object type name: {3}";
             }
 
             return continuation.GetRefParameterValue<T>(parameterIndex, defaultValue);
-        }
-
-        // determines and resolves an argument filter within the specified expression
-        // if an explicit filter argument is applied, this will be returned (e.g. <c>When(x => x.SomeMethod(It.IsAny<string>())</c>) would result in an appropriate argument filter)
-        // if, instead, a constant is applied (e.g. <c>When(x => x.SomeMethod("hello")</c>), this will be wrapped in an appropriate argument filter
-        private static IArgumentFilter FindArgumentFilterFor(Expression expression)
-        {
-            var argumentFilter = FindExplicitArgumentFilterFor(expression);
-
-            if (argumentFilter != null)
-            {
-                return argumentFilter;
-            }
-
-            object constant;
-
-            if (TryFindConstantWithin(expression, out constant))
-            {
-                return new It.IsArgumentFilter(constant);
-            }
-
-            // we never return null - instead, we return a filter that will always yield true
-            return It.IsAnyArgumentFilter<object>.Instance;
-        }
-
-        // determines and resolves any explicit argument filter within the specified expression
-        // for example, if the expression is It.Is("hello") then an appropriate argument filter will be returned
-        private static IArgumentFilter FindExplicitArgumentFilterFor(Expression expression)
-        {
-            var methodCallExpression = expression as MethodCallExpression;
-
-            if (methodCallExpression == null)
-            {
-                return null;
-            }
-
-            var filterMethod = methodCallExpression
-                .Method
-                .DeclaringType
-                .GetTypeInfo()
-                .GetDeclaredMethods(methodCallExpression.Method.Name + "Filter")
-                .Where(x => x.GetParameters().Length == methodCallExpression.Arguments.Count)
-                .FirstOrDefault();
-
-            if (filterMethod == null || filterMethod.ReturnType != typeof(IArgumentFilter))
-            {
-                return null;
-            }
-
-            if (methodCallExpression.Method.IsGenericMethod)
-            {
-                filterMethod = filterMethod.MakeGenericMethod(methodCallExpression.Method.GetGenericArguments());
-            }
-
-            var argumentsToFilterMethod = methodCallExpression
-                .Arguments
-                .Select(FindConstantWithin)
-                .ToArray();
-
-            return filterMethod.Invoke(null, argumentsToFilterMethod) as IArgumentFilter;
-        }
-
-        private static object FindConstantWithin(Expression expression)
-        {
-            object result;
-
-            if (!TryFindConstantWithin(expression, out result))
-            {
-                return null;
-            }
-
-            return result;
-        }
-
-        private static bool TryFindConstantWithin(Expression expression, out object constant)
-        {
-            var constantExpression = expression as ConstantExpression;
-
-            if (constantExpression != null)
-            {
-                constant = constantExpression.Value;
-                return true;
-            }
-
-            var memberExpression = expression as MemberExpression;
-
-            if (memberExpression != null)
-            {
-                return TryFindConstantWithin(memberExpression.Expression, out constant);
-            }
-
-            constant = null;
-            return false;
         }
 
         private static ContinuationKey GetContinuationKey(LambdaExpression selector)
@@ -333,58 +306,25 @@ Full mocked object type name: {3}";
             throw new InvalidOperationException("Unable to determine the details of the member being mocked.");
         }
 
-        private static IEnumerable<IList<IArgumentFilter>> GetContinuationFilters(LambdaExpression selector)
+        private void RegisterContinuation(LambdaExpression memberSelector, IList<IArgumentFilter> argumentFilters, WhenContinuation continuation)
         {
-            var methodCallExpression = selector.Body as MethodCallExpression;
-
-            if (methodCallExpression != null)
-            {
-                yield return methodCallExpression.Arguments
-                    .Select(FindArgumentFilterFor)
-                    .ToList();
-                yield break;
-            }
-
-            var memberExpression = selector.Body as MemberExpression;
-
-            if (memberExpression != null)
-            {
-                var propertyInfo = memberExpression.Member as PropertyInfo;
-
-                if (propertyInfo != null)
-                {
-                    // for properties, we need to register argument filters for both the getter and setter
-                    yield return new List<IArgumentFilter>();
-                    yield return new List<IArgumentFilter>(new IArgumentFilter[] { It.IsAnyArgumentFilter<object>.Instance });
-                }
-            }
-
-            yield return new List<IArgumentFilter>();
-        }
-
-        private void RegisterContinuation(LambdaExpression selector, WhenContinuation continuation)
-        {
-            var continuationKey = GetContinuationKey(selector);
-            var continuationFiltersSet = GetContinuationFilters(selector);
+            var continuationKey = GetContinuationKey(memberSelector);
 
             lock (this.continuationsSync)
             {
-                foreach (var continuationFilter in continuationFiltersSet)
+                var filteredContinuation = new FilteredContinuation(argumentFilters, continuation);
+
+                FilteredContinuationCollection filteredContinuationCollection;
+
+                if (!this.continuations.TryGetValue(continuationKey, out filteredContinuationCollection))
                 {
-                    var filteredContinuation = new FilteredContinuation(continuationFilter, continuation);
-
-                    FilteredContinuationCollection filteredContinuationCollection;
-
-                    if (!this.continuations.TryGetValue(continuationKey, out filteredContinuationCollection))
-                    {
-                        filteredContinuationCollection = new FilteredContinuationCollection();
-                        this.continuations[continuationKey] = filteredContinuationCollection;
-                    }
-
-                    // first remove any existing filtered continuation that matches the one we're trying to add to avoid memory leaks
-                    filteredContinuationCollection.Remove(filteredContinuation);
-                    filteredContinuationCollection.Add(filteredContinuation);
+                    filteredContinuationCollection = new FilteredContinuationCollection();
+                    this.continuations[continuationKey] = filteredContinuationCollection;
                 }
+
+                // first remove any existing filtered continuation that matches the one we're trying to add to avoid memory leaks
+                filteredContinuationCollection.Remove(filteredContinuation);
+                filteredContinuationCollection.Add(filteredContinuation);
             }
         }
 
