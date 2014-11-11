@@ -3,8 +3,8 @@ using System.Reflection;
 using System.Resources;
 
 // this is used to version artifacts. AssemblyInformationalVersion should use semantic versioning (http://semver.org/)
-[assembly: AssemblyInformationalVersion("0.0.3-alpha")]
-[assembly: AssemblyVersion("0.0.3.0")]
+[assembly: AssemblyInformationalVersion("0.0.4-alpha")]
+[assembly: AssemblyVersion("0.0.4.0")]
 
 [assembly: AssemblyCompany("Kent Boogaart")]
 [assembly: AssemblyProduct("PCLMock")]
