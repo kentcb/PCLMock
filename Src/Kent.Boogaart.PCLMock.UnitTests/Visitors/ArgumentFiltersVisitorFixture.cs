@@ -13,7 +13,7 @@
         {
             var argumentFilters = ArgumentFiltersVisitor.FindArgumentFiltersWithin((Expression<Action>)(() => Console.WriteLine(It.IsAny<string>(), 3, It.IsIn("foo", "bar"))));
             Assert.NotNull(argumentFilters);
-            Assert.Equal(3, argumentFilters.Length);
+            Assert.Equal(3, argumentFilters.Count);
             Assert.True(argumentFilters[0].Matches("foo"));
             Assert.True(argumentFilters[0].Matches("bar"));
             Assert.True(argumentFilters[0].Matches(null));
@@ -32,7 +32,7 @@
             string s;
             var argumentFilters = ArgumentFiltersVisitor.FindArgumentFiltersWithin((Expression<Action>)(() => this.SomeMethod(ref i, out s)));
             Assert.NotNull(argumentFilters);
-            Assert.Equal(2, argumentFilters.Length);
+            Assert.Equal(2, argumentFilters.Count);
             Assert.IsType<IsAnyArgumentFilter<object>>(argumentFilters[0]);
             Assert.IsType<IsAnyArgumentFilter<object>>(argumentFilters[1]);
         }

@@ -7,17 +7,50 @@
     using System.Linq;
     using System.Reflection;
     using System.Text;
+    using Kent.Boogaart.PCLMock.Utility;
 
     /// <summary>
-    /// Provides the ability to fluently write specifications against a <see cref="MockBase{T}"/>.
+    /// Facilitates the expression of specifications for what a <see cref="MockBase{T}"/> should do when a given member is invoked.
     /// </summary>
-    public abstract class WhenContinuation
+    public abstract class WhenContinuation : IEquatable<WhenContinuation>
     {
+        private readonly ArgumentFilterCollection filters;
         private readonly IDictionary<int, object> outAndRefAssignments;
 
-        internal WhenContinuation()
+        internal WhenContinuation(IEnumerable<IArgumentFilter> filters)
         {
+            Debug.Assert(filters != null);
+
+            this.filters = new ArgumentFilterCollection(filters);
             this.outAndRefAssignments = new Dictionary<int, object>();
+        }
+
+        internal ArgumentFilterCollection Filters
+        {
+            get { return this.filters; }
+        }
+
+        /// <inheritdoc/>
+        public bool Equals(WhenContinuation other)
+        {
+            if (other == null)
+            {
+                return false;
+            }
+
+            return this.filters.Equals(other.filters);
+        }
+
+        /// <inheritdoc/>
+        public override bool Equals(object obj)
+        {
+            return this.Equals(obj as WhenContinuation);
+        }
+
+        /// <inheritdoc/>
+        public override int GetHashCode()
+        {
+            throw new NotImplementedException();
         }
 
         internal abstract object Apply(object mockedObject, params object[] args);
@@ -166,7 +199,7 @@
     }
 
     /// <summary>
-    /// Provides the ability to fluently write specifications against a <see cref="MockBase{T}"/>.
+    /// Facilitates the expression of specifications for what a <see cref="MockBase{T}"/> should do when a given member is invoked.
     /// </summary>
     /// <typeparam name="TMock">
     /// The type of the object being mocked.
@@ -175,6 +208,11 @@
     {
         private Exception exception;
         private Delegate doAction;
+
+        internal WhenContinuation(IEnumerable<IArgumentFilter> filters)
+            : base(filters)
+        {
+        }
 
         /// <summary>
         /// Requests that an exception be thrown if the member is accessed.
@@ -325,7 +363,7 @@
     }
 
     /// <summary>
-    /// Provides the ability to fluently write specifications against a <see cref="MockBase{T}"/>.
+    /// Facilitates the expression of specifications for what a <see cref="MockBase{T}"/> should do when a given member is invoked.
     /// </summary>
     /// <typeparam name="TMock">
     /// The type of the object being mocked.
@@ -337,6 +375,11 @@
     {
         private TMember returnValue;
         private Delegate returnAction;
+
+        internal WhenContinuation(IEnumerable<IArgumentFilter> filters)
+            : base(filters)
+        {
+        }
 
         /// <inheritdoc />
         public new WhenContinuation<TMock, TMember> AssignOutOrRefParameter(int parameterIndex, object value)

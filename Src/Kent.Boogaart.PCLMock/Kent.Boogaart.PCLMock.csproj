@@ -58,11 +58,14 @@
     <Compile Include="MockBase.cs" />
     <Compile Include="MockBehavior.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utility\ArgumentFilterCollection.cs" />
     <Compile Include="Utility\ContinuationKey.cs" />
     <Compile Include="Utility\ContinuationKeyType.cs" />
-    <Compile Include="Utility\FilteredContinuation.cs" />
-    <Compile Include="Utility\FilteredContinuationCollection.cs" />
+    <Compile Include="Utility\WhenContinuationCollection.cs" />
+    <Compile Include="Utility\Invocation.cs" />
     <Compile Include="Utility\ObjectExtensions.cs" />
+    <Compile Include="VerificationException.cs" />
+    <Compile Include="VerifyContinuation.cs" />
     <Compile Include="Visitors\ArgumentFiltersVisitor.cs" />
     <Compile Include="Visitors\ArgumentFilterVisitor.cs" />
     <Compile Include="Visitors\ArgumentsVisitor.cs" />

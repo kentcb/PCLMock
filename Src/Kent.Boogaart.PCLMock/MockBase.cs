@@ -28,9 +28,9 @@ Full mocked object type name: {3}";
         private const string noContinuationErrorTemplate = @"{0} '{1}', for which no specifications have been configured, was invoked on a strict mock. You must either configure specifications via calls to When on the mock, or use a loose mock by passing in MockBehavior.Loose to the mock's constructor.";
 
         private static readonly object[] emptyArgs = new object[0];
-        private static readonly IArgumentFilter[] emptyArgumentFilters = new IArgumentFilter[0];
+        private static readonly ArgumentFilterCollection emptyArgumentFilters = new ArgumentFilterCollection();
 
-        private readonly IDictionary<ContinuationKey, FilteredContinuationCollection> continuations;
+        private readonly IDictionary<ContinuationKey, WhenContinuationCollection> continuations;
         private readonly object continuationsSync;
         private readonly MockBehavior behavior;
 
@@ -42,7 +42,7 @@ Full mocked object type name: {3}";
         /// </param>
         protected MockBase(MockBehavior behavior)
         {
-            this.continuations = new Dictionary<ContinuationKey, FilteredContinuationCollection>();
+            this.continuations = new Dictionary<ContinuationKey, WhenContinuationCollection>();
             this.continuationsSync = new object();
             this.behavior = behavior;
         }
@@ -96,8 +96,8 @@ Full mocked object type name: {3}";
                 throw new ArgumentNullException("selector");
             }
 
-            var continuation = new WhenContinuation<TMock>();
-            this.RegisterContinuation(selector, ArgumentFiltersVisitor.FindArgumentFiltersWithin(selector) ?? emptyArgumentFilters, continuation);
+            var continuation = new WhenContinuation<TMock>(ArgumentFiltersVisitor.FindArgumentFiltersWithin(selector) ?? emptyArgumentFilters);
+            this.AddOrReplaceWhenContinuation(selector, continuation);
             return continuation;
         }
 
@@ -117,8 +117,8 @@ Full mocked object type name: {3}";
                 throw new ArgumentNullException("selector");
             }
 
-            var continuation = new WhenContinuation<TMock, TMember>();
-            this.RegisterContinuation(selector, ArgumentFiltersVisitor.FindArgumentFiltersWithin(selector) ?? emptyArgumentFilters, continuation);
+            var continuation = new WhenContinuation<TMock, TMember>(ArgumentFiltersVisitor.FindArgumentFiltersWithin(selector) ?? emptyArgumentFilters);
+            this.AddOrReplaceWhenContinuation(selector, continuation);
             return continuation;
         }
 
@@ -149,9 +149,85 @@ Full mocked object type name: {3}";
                 valueFilterSelector = () => It.IsAny<TMember>();
             }
 
-            var continuation = new WhenContinuation<TMock, TMember>();
-            this.RegisterContinuation(propertySelector, new List<IArgumentFilter>(new IArgumentFilter[] { ArgumentFilterVisitor.FindArgumentFilterWithin(valueFilterSelector) }), continuation);
+            var filters = new ArgumentFilterCollection();
+            filters.Add(ArgumentFilterVisitor.FindArgumentFilterWithin(valueFilterSelector));
+            var continuation = new WhenContinuation<TMock, TMember>(filters);
+            this.AddOrReplaceWhenContinuation(propertySelector, continuation);
             return continuation;
+        }
+
+        /// <summary>
+        /// Begins a verification specification.
+        /// </summary>
+        /// <param name="selector">
+        /// An expression that resolves to the member being verified.
+        /// </param>
+        /// <returns>
+        /// A continuation object with which the verification can be specified.
+        /// </returns>
+        public VerifyContinuation Verify(Expression<Action<TMock>> selector)
+        {
+            if (selector == null)
+            {
+                throw new ArgumentNullException("selector");
+            }
+
+            var whenContinuationCollection = this.EnsureWhenContinuationCollection(selector);
+            return new VerifyContinuation(whenContinuationCollection, ArgumentFiltersVisitor.FindArgumentFiltersWithin(selector) ?? emptyArgumentFilters);
+        }
+
+        /// <summary>
+        /// Begins a verification specification.
+        /// </summary>
+        /// <typeparam name="TMember"></typeparam>
+        /// <param name="selector">
+        /// An expression that resolves to the member being verified.
+        /// </param>
+        /// <returns>
+        /// A continuation object with which the verification can be specified.
+        /// </returns>
+        public VerifyContinuation Verify<TMember>(Expression<Func<TMock, TMember>> selector)
+        {
+            if (selector == null)
+            {
+                throw new ArgumentNullException("selector");
+            }
+
+            var whenContinuationCollection = this.EnsureWhenContinuationCollection(selector);
+            return new VerifyContinuation(whenContinuationCollection, ArgumentFiltersVisitor.FindArgumentFiltersWithin(selector) ?? emptyArgumentFilters);
+        }
+
+        /// <summary>
+        /// Begins a verification specification for a property set.
+        /// </summary>
+        /// <typeparam name="TMember">
+        /// The type of the property.
+        /// </typeparam>
+        /// <param name="propertySelector">
+        /// An expression that resolves to the property being verified.
+        /// </param>
+        /// <param name="valueFilterSelector">
+        /// An optional expression that can provide filtering against the property value being set.
+        /// </param>
+        /// <returns>
+        /// A continuation object with which the verification can be specified.
+        /// </returns>
+        public VerifyContinuation VerifyPropertySet<TMember>(Expression<Func<TMock, TMember>> propertySelector, Expression<Func<TMember>> valueFilterSelector = null)
+        {
+            if (propertySelector == null)
+            {
+                throw new ArgumentNullException("propertySelector");
+            }
+
+            if (valueFilterSelector == null)
+            {
+                valueFilterSelector = () => It.IsAny<TMember>();
+            }
+
+            var whenContinuationCollection = this.EnsureWhenContinuationCollection(propertySelector);
+            var filters = new ArgumentFilterCollection();
+            filters.Add(ArgumentFilterVisitor.FindArgumentFilterWithin(valueFilterSelector));
+            return new VerifyContinuation(whenContinuationCollection, filters);
         }
 
         /// <summary>
@@ -163,7 +239,9 @@ Full mocked object type name: {3}";
         protected void Apply(Expression<Action<TMock>> selector)
         {
             var args = ArgumentsVisitor.FindArgumentsWithin(selector) ?? emptyArgs;
-            var continuation = this.GetContinuation(selector, args);
+            WhenContinuationCollection whenContinuationCollection;
+            var continuation = this.GetWhenContinuation(selector, args, out whenContinuationCollection);
+            whenContinuationCollection.AddInvocation(new Invocation(args));
 
             if (continuation == null)
             {
@@ -182,7 +260,9 @@ Full mocked object type name: {3}";
         protected TMember Apply<TMember>(Expression<Func<TMock, TMember>> selector)
         {
             var args = ArgumentsVisitor.FindArgumentsWithin(selector) ?? emptyArgs;
-            var continuation = this.GetContinuation(selector, args);
+            WhenContinuationCollection whenContinuationCollection;
+            var continuation = this.GetWhenContinuation(selector, args, out whenContinuationCollection);
+            whenContinuationCollection.AddInvocation(new Invocation(args));
 
             if (continuation == null)
             {
@@ -209,7 +289,9 @@ Full mocked object type name: {3}";
             Array.Copy(indexerArgs, args, indexerArgs.Length);
             args[args.Length - 1] = value;
 
-            var continuation = this.GetContinuation(selector, args);
+            WhenContinuationCollection whenContinuationCollection;
+            var continuation = this.GetWhenContinuation(selector, args, out whenContinuationCollection);
+            whenContinuationCollection.AddInvocation(new Invocation(args));
 
             if (continuation == null)
             {
@@ -236,7 +318,7 @@ Full mocked object type name: {3}";
         /// </returns>
         protected T GetOutParameterValue<T>(Expression<Action<TMock>> selector, int parameterIndex)
         {
-            var continuation = this.GetContinuation(selector, null);
+            var continuation = this.GetWhenContinuation(selector, null);
 
             if (continuation == null)
             {
@@ -266,7 +348,7 @@ Full mocked object type name: {3}";
         /// </returns>
         protected T GetRefParameterValue<T>(Expression<Action<TMock>> selector, int parameterIndex, T defaultValue = default(T))
         {
-            var continuation = this.GetContinuation(selector, null);
+            var continuation = this.GetWhenContinuation(selector, null);
 
             if (continuation == null)
             {
@@ -305,66 +387,58 @@ Full mocked object type name: {3}";
             throw new InvalidOperationException("Unable to determine the details of the member being mocked.");
         }
 
-        private void RegisterContinuation(LambdaExpression memberSelector, IList<IArgumentFilter> argumentFilters, WhenContinuation continuation)
+        private WhenContinuationCollection EnsureWhenContinuationCollection(LambdaExpression memberSelector)
         {
             var continuationKey = GetContinuationKey(memberSelector);
 
             lock (this.continuationsSync)
             {
-                var filteredContinuation = new FilteredContinuation(argumentFilters, continuation);
+                WhenContinuationCollection result;
 
-                FilteredContinuationCollection filteredContinuationCollection;
-
-                if (!this.continuations.TryGetValue(continuationKey, out filteredContinuationCollection))
+                if (!this.continuations.TryGetValue(continuationKey, out result))
                 {
-                    filteredContinuationCollection = new FilteredContinuationCollection();
-                    this.continuations[continuationKey] = filteredContinuationCollection;
+                    result = new WhenContinuationCollection();
+                    this.continuations[continuationKey] = result;
                 }
 
-                // first remove any existing filtered continuation that matches the one we're trying to add to avoid memory leaks
-                filteredContinuationCollection.Remove(filteredContinuation);
-                filteredContinuationCollection.Add(filteredContinuation);
+                return result;
             }
         }
 
-        private WhenContinuation GetContinuation(LambdaExpression selector, object[] args)
+        private void AddOrReplaceWhenContinuation(LambdaExpression memberSelector, WhenContinuation continuation)
         {
-            return this.GetContinuation(GetContinuationKey(selector), args);
+            lock (this.continuationsSync)
+            {
+                var whenContinuationCollection = this.EnsureWhenContinuationCollection(memberSelector);
+
+                // first remove any existing filtered continuation that matches the one we're trying to add to avoid memory leaks
+                whenContinuationCollection.Remove(continuation);
+                whenContinuationCollection.Add(continuation);
+            }
         }
 
-        private WhenContinuation GetContinuation(ContinuationKey continuationKey, object[] args)
+        private WhenContinuation GetWhenContinuation(LambdaExpression memberSelector, object[] args)
         {
-            FilteredContinuationCollection filteredContinuationCollection;
-            WhenContinuation continuation = null;
+            WhenContinuationCollection whenContinuationCollection;
+            return this.GetWhenContinuation(memberSelector, args, out whenContinuationCollection);
+        }
+
+        private WhenContinuation GetWhenContinuation(LambdaExpression memberSelector, object[] args, out WhenContinuationCollection whenContinuationCollection)
+        {
+            var continuationKey = GetContinuationKey(memberSelector);
 
             lock (this.continuationsSync)
             {
-                if (this.continuations.TryGetValue(continuationKey, out filteredContinuationCollection))
+                whenContinuationCollection = this.EnsureWhenContinuationCollection(memberSelector);
+                var whenContinuation = whenContinuationCollection.FindWhenContinuation(args);
+
+                if (whenContinuation == null && this.behavior == MockBehavior.Strict)
                 {
-                    // we loop backwards so that more recently registered continuations take a higher precedence
-                    for (var i = filteredContinuationCollection.Count - 1; i >= 0; --i)
-                    {
-                        var filteredContinuation = filteredContinuationCollection[i];
-
-                        if (args == null || filteredContinuation.Filters == null || filteredContinuation.Matches(args)){
-                            continuation = filteredContinuation.Continuation;
-                            break;
-                        }
-                    }
-                }
-
-                if (continuation == null)
-                {
-                    if (this.behavior == MockBehavior.Loose)
-                    {
-                        return null;
-                    }
-
                     throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, noContinuationErrorTemplate, continuationKey.Type, continuationKey.MemberInfo.Name));
                 }
-            }
 
-            return continuation;
+                return whenContinuation;
+            }
         }
     }
 }

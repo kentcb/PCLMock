@@ -154,3 +154,16 @@ mock.When(x => x.SomeMethod(It.IsAny<string>())).Return(2);
 // this will fail because 2 will be returned!
 Assert.Equals(1, mock.SomeMethod("foo"));
 ```
+
+## Verification
+
+Calls against mocks can be verified via the `Verify` and `VerifyPropertySet` methods:
+
+```C#
+mock.Verify(x => x.SomeMethod("foo")).WasCalledExactlyOnce();
+mock.Verify(x => x.SomeOtherMethod(It.IsIn("foo", "bar")).WasCalledAtLeast(times: 3);
+mock.VerifyPropertySet(x => x.SomeProperty, "foo").WasCalledExactly(times: 2);
+mock.VerifyPropertySet(x => x.SomeProperty, "bar").WasNotCalled();
+```
+
+If verification fails, a `VerificationException` is thrown.

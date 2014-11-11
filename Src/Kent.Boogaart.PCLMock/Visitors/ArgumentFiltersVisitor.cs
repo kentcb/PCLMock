@@ -3,17 +3,18 @@
     using System.Diagnostics;
     using System.Linq.Expressions;
     using Kent.Boogaart.PCLMock.ArgumentFilters;
+    using Kent.Boogaart.PCLMock.Utility;
 
     // find a set of argument filters for a method call
     internal sealed class ArgumentFiltersVisitor : ExpressionVisitor
     {
-        private IArgumentFilter[] argumentFilters;
+        private ArgumentFilterCollection argumentFilters;
 
         private ArgumentFiltersVisitor()
         {
         }
 
-        public static bool TryFindArgumentFiltersWithin(Expression expression, out IArgumentFilter[] argumentFilters)
+        public static bool TryFindArgumentFiltersWithin(Expression expression, out ArgumentFilterCollection argumentFilters)
         {
             Debug.Assert(expression != null);
 
@@ -23,9 +24,9 @@
             return argumentFilters != null;
         }
 
-        public static IArgumentFilter[] FindArgumentFiltersWithin(Expression expression)
+        public static ArgumentFilterCollection FindArgumentFiltersWithin(Expression expression)
         {
-            IArgumentFilter[] argumentFilters;
+            ArgumentFilterCollection argumentFilters;
 
             if (!TryFindArgumentFiltersWithin(expression, out argumentFilters))
             {
@@ -47,18 +48,18 @@
 
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
-            this.argumentFilters = new IArgumentFilter[node.Arguments.Count];
+            this.argumentFilters = new ArgumentFilterCollection();
             var methodParameters = node.Method.GetParameters();
 
-            for (var i = 0; i < argumentFilters.Length; ++i)
+            for (var i = 0; i < methodParameters.Length; ++i)
             {
                 if (methodParameters[i].ParameterType.IsByRef || methodParameters[i].IsOut)
                 {
-                    this.argumentFilters[i] = IsAnyArgumentFilter<object>.Instance;
+                    this.argumentFilters.Add(IsAnyArgumentFilter<object>.Instance);
                 }
                 else
                 {
-                    this.argumentFilters[i] = ArgumentFilterVisitor.FindArgumentFilterWithin(node.Arguments[i]);
+                    this.argumentFilters.Add(ArgumentFilterVisitor.FindArgumentFilterWithin(node.Arguments[i]));
                 }
             }
 

@@ -710,6 +710,325 @@ Full mocked object type name: Kent.Boogaart.PCLMock.UnitTests.MockBaseFixture+Un
             Assert.Equal(1, mock.SomeMethodTakingStringWithReturnValue(null));
         }
 
+        [Fact]
+        public void verify_was_not_called_does_not_throw_if_the_member_was_not_invoked()
+        {
+            var mock = new TestTargetMock();
+            mock.Verify(x => x.SomeMethod()).WasNotCalled();
+            mock.Verify(x => x.SomeMethodTakingString("foo")).WasNotCalled();
+            mock.Verify(x => x.SomeMethodTakingString(It.IsAny<string>())).WasNotCalled();
+            mock.VerifyPropertySet(x => x.SomeProperty).WasNotCalled();
+            mock.VerifyPropertySet(x => x.SomeProperty, () => It.IsAny<int>()).WasNotCalled();
+        }
+
+        [Fact]
+        public void verify_was_not_called_throws_if_the_member_was_invoked()
+        {
+            var mock = new TestTargetMock();
+            mock.When(x => x.SomeMethod());
+            mock.SomeMethod();
+
+            Assert.Throws<VerificationException>(() => mock.Verify(x => x.SomeMethod()).WasNotCalled());
+        }
+
+        [Fact]
+        public void verify_was_not_called_includes_a_detailed_explanation_message()
+        {
+            var mock = new TestTargetMock(MockBehavior.Loose);
+            mock.SomeMethod();
+
+            var ex = Assert.Throws<VerificationException>(() => mock.Verify(x => x.SomeMethod()).WasNotCalled());
+            Assert.Equal("Member was called 1 time, so verification has failed.", ex.Message);
+
+            mock.SomeMethod();
+            mock.SomeMethod();
+
+            ex = Assert.Throws<VerificationException>(() => mock.Verify(x => x.SomeMethod()).WasNotCalled());
+            Assert.Equal("Member was called 3 times, so verification has failed.", ex.Message);
+        }
+
+        [Fact]
+        public void verify_was_called_exactly_once_does_not_throw_if_the_member_was_called_once()
+        {
+            var mock = new TestTargetMock(MockBehavior.Loose);
+            mock.SomeMethod();
+            mock.SomeMethodTakingString("foo");
+            mock.SomeProperty = 30;
+
+            mock.Verify(x => x.SomeMethod()).WasCalledExactlyOnce();
+            mock.Verify(x => x.SomeMethodTakingString("foo")).WasCalledExactlyOnce();
+            mock.Verify(x => x.SomeMethodTakingString(It.IsAny<string>())).WasCalledExactlyOnce();
+            mock.VerifyPropertySet(x => x.SomeProperty).WasCalledExactlyOnce();
+            mock.VerifyPropertySet(x => x.SomeProperty, () => 30).WasCalledExactlyOnce();
+        }
+
+        [Fact]
+        public void verify_was_called_exactly_once_throws_if_the_member_was_not_invoked()
+        {
+            var mock = new TestTargetMock();
+            Assert.Throws<VerificationException>(() => mock.Verify(x => x.SomeMethod()).WasCalledExactlyOnce());
+        }
+
+        [Fact]
+        public void verify_was_called_exactly_once_includes_a_detailed_explanation_message()
+        {
+            var mock = new TestTargetMock(MockBehavior.Loose);
+
+            var ex = Assert.Throws<VerificationException>(() => mock.Verify(x => x.SomeMethod()).WasCalledExactlyOnce());
+            Assert.Equal("Member was not called, so verification has failed.", ex.Message);
+
+            mock.SomeMethod();
+            mock.SomeMethod();
+
+            ex = Assert.Throws<VerificationException>(() => mock.Verify(x => x.SomeMethod()).WasCalledExactlyOnce());
+            Assert.Equal("Member was called 2 times, so verification has failed.", ex.Message);
+        }
+
+        [Fact]
+        public void verify_was_called_at_least_once_does_not_throw_if_the_member_was_called_one_or_more_times()
+        {
+            var mock = new TestTargetMock(MockBehavior.Loose);
+            mock.SomeMethod();
+            mock.SomeMethodTakingString("foo");
+            mock.SomeProperty = 30;
+
+            mock.Verify(x => x.SomeMethod()).WasCalledAtLeastOnce();
+            mock.Verify(x => x.SomeMethodTakingString("foo")).WasCalledAtLeastOnce();
+            mock.Verify(x => x.SomeMethodTakingString(It.IsAny<string>())).WasCalledAtLeastOnce();
+            mock.VerifyPropertySet(x => x.SomeProperty).WasCalledAtLeastOnce();
+            mock.VerifyPropertySet(x => x.SomeProperty, () => 30).WasCalledAtLeastOnce();
+
+            mock.SomeMethod();
+            mock.SomeMethodTakingString("foo");
+            mock.SomeProperty = 30;
+            mock.SomeMethod();
+            mock.SomeMethodTakingString("foo");
+            mock.SomeProperty = 30;
+
+            mock.Verify(x => x.SomeMethod()).WasCalledAtLeastOnce();
+            mock.Verify(x => x.SomeMethodTakingString("foo")).WasCalledAtLeastOnce();
+            mock.Verify(x => x.SomeMethodTakingString(It.IsAny<string>())).WasCalledAtLeastOnce();
+            mock.VerifyPropertySet(x => x.SomeProperty).WasCalledAtLeastOnce();
+            mock.VerifyPropertySet(x => x.SomeProperty, () => 30).WasCalledAtLeastOnce();
+        }
+
+        [Fact]
+        public void verify_was_called_at_least_once_throws_if_the_member_was_not_invoked()
+        {
+            var mock = new TestTargetMock();
+            Assert.Throws<VerificationException>(() => mock.Verify(x => x.SomeMethod()).WasCalledAtLeastOnce());
+        }
+
+        [Fact]
+        public void verify_was_called_at_least_once_includes_a_detailed_explanation_message()
+        {
+            var mock = new TestTargetMock(MockBehavior.Loose);
+
+            var ex = Assert.Throws<VerificationException>(() => mock.Verify(x => x.SomeMethod()).WasCalledAtLeastOnce());
+            Assert.Equal("Member was not called, so verification has failed.", ex.Message);
+        }
+
+        [Fact]
+        public void verify_was_called_at_most_once_does_not_throw_if_the_member_was_called_zero_or_one_times()
+        {
+            var mock = new TestTargetMock(MockBehavior.Loose);
+
+            mock.Verify(x => x.SomeMethod()).WasCalledAtMostOnce();
+            mock.Verify(x => x.SomeMethodTakingString("foo")).WasCalledAtMostOnce();
+            mock.Verify(x => x.SomeMethodTakingString(It.IsAny<string>())).WasCalledAtMostOnce();
+            mock.VerifyPropertySet(x => x.SomeProperty).WasCalledAtMostOnce();
+            mock.VerifyPropertySet(x => x.SomeProperty, () => 30).WasCalledAtMostOnce();
+
+            mock.SomeMethod();
+            mock.SomeMethodTakingString("foo");
+            mock.SomeProperty = 30;
+
+            mock.Verify(x => x.SomeMethod()).WasCalledAtMostOnce();
+            mock.Verify(x => x.SomeMethodTakingString("foo")).WasCalledAtMostOnce();
+            mock.Verify(x => x.SomeMethodTakingString(It.IsAny<string>())).WasCalledAtMostOnce();
+            mock.VerifyPropertySet(x => x.SomeProperty).WasCalledAtMostOnce();
+            mock.VerifyPropertySet(x => x.SomeProperty, () => 30).WasCalledAtMostOnce();
+        }
+
+        [Fact]
+        public void verify_was_called_at_most_once_throws_if_the_member_was_invoked_more_than_once()
+        {
+            var mock = new TestTargetMock(MockBehavior.Loose);
+            mock.SomeMethod();
+            mock.SomeMethod();
+            Assert.Throws<VerificationException>(() => mock.Verify(x => x.SomeMethod()).WasCalledAtMostOnce());
+        }
+
+        [Fact]
+        public void verify_was_called_at_most_once_includes_a_detailed_explanation_message()
+        {
+            var mock = new TestTargetMock(MockBehavior.Loose);
+            mock.SomeMethod();
+            mock.SomeMethod();
+
+            var ex = Assert.Throws<VerificationException>(() => mock.Verify(x => x.SomeMethod()).WasCalledAtMostOnce());
+            Assert.Equal("Member was called 2 times, so verification has failed.", ex.Message);
+        }
+
+        [Fact]
+        public void verify_was_called_exactly_n_times_does_not_throw_if_the_member_was_called_the_correct_number_of_times()
+        {
+            var mock = new TestTargetMock(MockBehavior.Loose);
+            mock.SomeMethod();
+            mock.SomeMethodTakingString("foo");
+            mock.SomeMethodTakingString("foo");
+            mock.SomeProperty = 30;
+
+            mock.Verify(x => x.SomeMethod()).WasCalledExactly(times: 1);
+            mock.Verify(x => x.SomeMethodTakingString("foo")).WasCalledExactly(times: 2);
+            mock.Verify(x => x.SomeMethodTakingString(It.IsAny<string>())).WasCalledExactly(times: 2);
+            mock.VerifyPropertySet(x => x.SomeProperty).WasCalledExactly(times: 1);
+            mock.VerifyPropertySet(x => x.SomeProperty, () => 30).WasCalledExactly(times: 1);
+        }
+
+        [Fact]
+        public void verify_was_called_exactly_n_times_throws_if_the_member_was_not_invoked_exactly_that_number_of_times()
+        {
+            var mock = new TestTargetMock(MockBehavior.Loose);
+            mock.SomeMethod();
+            mock.SomeMethod();
+            mock.SomeMethod();
+            Assert.Throws<VerificationException>(() => mock.Verify(x => x.SomeMethod()).WasCalledExactly(times: 2));
+            Assert.Throws<VerificationException>(() => mock.Verify(x => x.SomeMethod()).WasCalledExactly(times: 4));
+        }
+
+        [Fact]
+        public void verify_was_called_exactly_n_times_includes_a_detailed_explanation_message()
+        {
+            var mock = new TestTargetMock(MockBehavior.Loose);
+
+            var ex = Assert.Throws<VerificationException>(() => mock.Verify(x => x.SomeMethod()).WasCalledExactly(times: 1));
+            Assert.Equal("Member was not called, so verification has failed.", ex.Message);
+
+            mock.SomeMethod();
+
+            ex = Assert.Throws<VerificationException>(() => mock.Verify(x => x.SomeMethod()).WasCalledExactly(times: 2));
+            Assert.Equal("Member was called 1 time, so verification has failed.", ex.Message);
+
+            mock.SomeMethod();
+
+            ex = Assert.Throws<VerificationException>(() => mock.Verify(x => x.SomeMethod()).WasCalledExactly(times: 3));
+            Assert.Equal("Member was called 2 times, so verification has failed.", ex.Message);
+        }
+
+        [Fact]
+        public void verify_was_called_at_least_n_times_does_not_throw_if_the_member_was_called_that_number_of_times_or_more()
+        {
+            var mock = new TestTargetMock(MockBehavior.Loose);
+            mock.SomeMethod();
+            mock.SomeMethodTakingString("foo");
+            mock.SomeProperty = 30;
+
+            mock.Verify(x => x.SomeMethod()).WasCalledAtLeast(times: 1);
+            mock.Verify(x => x.SomeMethodTakingString("foo")).WasCalledAtLeast(times: 1);
+            mock.Verify(x => x.SomeMethodTakingString(It.IsAny<string>())).WasCalledAtLeast(times: 1);
+            mock.VerifyPropertySet(x => x.SomeProperty).WasCalledAtLeast(times: 1);
+            mock.VerifyPropertySet(x => x.SomeProperty, () => 30).WasCalledAtLeast(times: 1);
+
+            mock.SomeMethod();
+            mock.SomeMethodTakingString("foo");
+            mock.SomeProperty = 30;
+            mock.SomeMethod();
+            mock.SomeMethodTakingString("foo");
+            mock.SomeProperty = 30;
+
+            mock.Verify(x => x.SomeMethod()).WasCalledAtLeast(times: 2);
+            mock.Verify(x => x.SomeMethodTakingString("foo")).WasCalledAtLeast(times: 3);
+            mock.Verify(x => x.SomeMethodTakingString(It.IsAny<string>())).WasCalledAtLeast(times: 2);
+            mock.VerifyPropertySet(x => x.SomeProperty).WasCalledAtLeast(times: 3);
+            mock.VerifyPropertySet(x => x.SomeProperty, () => 30).WasCalledAtLeast(times: 2);
+        }
+
+        [Fact]
+        public void verify_was_called_at_least_n_times_throws_if_the_member_was_not_invoked_that_number_of_times_or_more()
+        {
+            var mock = new TestTargetMock(MockBehavior.Loose);
+            Assert.Throws<VerificationException>(() => mock.Verify(x => x.SomeMethod()).WasCalledAtLeast(times: 1));
+
+            mock.SomeMethod();
+            Assert.Throws<VerificationException>(() => mock.Verify(x => x.SomeMethod()).WasCalledAtLeast(times: 2));
+        }
+
+        [Fact]
+        public void verify_was_called_at_least_n_times_includes_a_detailed_explanation_message()
+        {
+            var mock = new TestTargetMock(MockBehavior.Loose);
+            mock.SomeMethod();
+
+            var ex = Assert.Throws<VerificationException>(() => mock.Verify(x => x.SomeMethod()).WasCalledAtLeast(times: 2));
+            Assert.Equal("Member was called 1 time, so verification has failed.", ex.Message);
+
+            mock.SomeMethod();
+
+            ex = Assert.Throws<VerificationException>(() => mock.Verify(x => x.SomeMethod()).WasCalledAtLeast(times: 3));
+            Assert.Equal("Member was called 2 times, so verification has failed.", ex.Message);
+        }
+
+        [Fact]
+        public void verify_was_called_at_most_n_times_does_not_throw_if_the_member_was_called_fewer_or_equal_to_that_number_of_times()
+        {
+            var mock = new TestTargetMock(MockBehavior.Loose);
+
+            mock.Verify(x => x.SomeMethod()).WasCalledAtMost(times: 1);
+            mock.Verify(x => x.SomeMethodTakingString("foo")).WasCalledAtMost(times: 1);
+            mock.Verify(x => x.SomeMethodTakingString(It.IsAny<string>())).WasCalledAtMost(times: 1);
+            mock.VerifyPropertySet(x => x.SomeProperty).WasCalledAtMost(times: 1);
+            mock.VerifyPropertySet(x => x.SomeProperty, () => 30).WasCalledAtMost(times: 1);
+
+            mock.SomeMethod();
+            mock.SomeMethodTakingString("foo");
+            mock.SomeProperty = 30;
+
+            mock.Verify(x => x.SomeMethod()).WasCalledAtMost(times: 1);
+            mock.Verify(x => x.SomeMethodTakingString("foo")).WasCalledAtMost(times: 1);
+            mock.Verify(x => x.SomeMethodTakingString(It.IsAny<string>())).WasCalledAtMost(times: 1);
+            mock.VerifyPropertySet(x => x.SomeProperty).WasCalledAtMost(times: 1);
+            mock.VerifyPropertySet(x => x.SomeProperty, () => 30).WasCalledAtMost(times: 1);
+        }
+
+        [Fact]
+        public void verify_was_called_at_most_n_times_throws_if_the_member_was_invoked_more_than_that_number_of_times()
+        {
+            var mock = new TestTargetMock(MockBehavior.Loose);
+            mock.SomeMethod();
+            mock.SomeMethod();
+            mock.SomeMethod();
+            Assert.Throws<VerificationException>(() => mock.Verify(x => x.SomeMethod()).WasCalledAtMost(times: 2));
+        }
+
+        [Fact]
+        public void verify_was_called_at_most_n_times_includes_a_detailed_explanation_message()
+        {
+            var mock = new TestTargetMock(MockBehavior.Loose);
+            mock.SomeMethod();
+
+            var ex = Assert.Throws<VerificationException>(() => mock.Verify(x => x.SomeMethod()).WasCalledAtMost(times: 0));
+            Assert.Equal("Member was called 1 time, so verification has failed.", ex.Message);
+
+            mock.SomeMethod();
+
+            ex = Assert.Throws<VerificationException>(() => mock.Verify(x => x.SomeMethod()).WasCalledAtMost(times: 1));
+            Assert.Equal("Member was called 2 times, so verification has failed.", ex.Message);
+        }
+
+        [Fact]
+        public void verification_takes_into_account_any_argument_filters()
+        {
+            var mock = new TestTargetMock(MockBehavior.Loose);
+            mock.SomeMethodTakingString("foo");
+            mock.SomeMethodTakingString("bar");
+            mock.SomeMethodTakingString("bar");
+
+            mock.Verify(x => x.SomeMethodTakingString("foo")).WasCalledExactlyOnce();
+            mock.Verify(x => x.SomeMethodTakingString("bar")).WasCalledExactly(times: 2);
+            mock.Verify(x => x.SomeMethodTakingString(It.IsAny<string>())).WasCalledExactly(times: 3);
+        }
+
         #region Supporting Members
 
         private interface ITestSubTarget
