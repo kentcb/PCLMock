@@ -22,7 +22,7 @@ Existing mocking frameworks, such as [Moq](https://github.com/Moq/moq4), do not 
 The easiest way to get PCLMock is via [NuGet](http://www.nuget.org/packages/Kent.Boogaart.PCLMock/):
 
 ```PowerShell
-Install-Package Kent.Boogaart.PCLMock -Pre
+Install-Package Kent.Boogaart.PCLMock
 ```
 
 ## How?
