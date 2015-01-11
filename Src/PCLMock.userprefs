@@ -1,0 +1,24 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Kent.Boogaart.PCLMock/MockBase.cs">
+    <Files>
+      <File FileName="Kent.Boogaart.PCLMock/VerifyContinuation.cs" Line="43" Column="43" />
+      <File FileName="Kent.Boogaart.PCLMock/Utility/WhenContinuationCollection.cs" Line="5" Column="5" />
+      <File FileName="Kent.Boogaart.PCLMock/MockBase.cs" Line="18" Column="18" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State expanded="True">
+          <Node name="Kent.Boogaart.PCLMock" expanded="True">
+            <Node name="Utility" expanded="True" />
+            <Node name="MockBase.cs" selected="True" />
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>
