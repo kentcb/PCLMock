@@ -71,6 +71,34 @@
             return node;
         }
 
+        protected override Expression VisitMember(MemberExpression node)
+        {
+            var expression = Visit(node.Expression);
+
+            if (expression is ConstantExpression)
+            {
+                var container = ((ConstantExpression)expression).Value;
+                var member = node.Member;
+
+                if (member is FieldInfo)
+                {
+                    var value = ((FieldInfo)member).GetValue(container);
+                    this.argumentFilter = new IsArgumentFilter(value);
+
+                    return Expression.Constant(value);
+                }
+                
+                if (member is PropertyInfo)
+                {
+                    var value = ((PropertyInfo)member).GetValue(container, null);
+                    this.argumentFilter = new IsArgumentFilter(value);
+
+                    return Expression.Constant(value);
+                }
+            }
+            return base.VisitMember(node);
+        }
+
         protected override Expression VisitConstant(ConstantExpression node)
         {
             this.argumentFilter = new IsArgumentFilter(node.Value);

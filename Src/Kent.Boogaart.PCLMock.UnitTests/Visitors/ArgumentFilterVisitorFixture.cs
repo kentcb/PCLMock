@@ -43,6 +43,31 @@
             Assert.IsType<IsArgumentFilter>(argumentFilter);
             Assert.True(argumentFilter.Matches(35));
             Assert.False(argumentFilter.Matches(34));
+
+            argumentFilter = ArgumentFilterVisitor.FindArgumentFilterWithin((Expression<Func<string>>)(() => "foo"));
+            Assert.NotNull(argumentFilter);
+            Assert.IsType<IsArgumentFilter>(argumentFilter);
+            Assert.True(argumentFilter.Matches("foo"));
+            Assert.False(argumentFilter.Matches("bar"));
+
+            argumentFilter = ArgumentFilterVisitor.FindArgumentFilterWithin((Expression<Func<object>>)(() => "foo"));
+            Assert.NotNull(argumentFilter);
+            Assert.IsType<IsArgumentFilter>(argumentFilter);
+            Assert.True(argumentFilter.Matches("foo"));
+            Assert.False(argumentFilter.Matches("bar"));
+
+            argumentFilter = ArgumentFilterVisitor.FindArgumentFilterWithin((Expression<Func<ArgumentFilterVisitorFixture>>)(() => this));
+            Assert.NotNull(argumentFilter);
+            Assert.IsType<IsArgumentFilter>(argumentFilter);
+            Assert.True(argumentFilter.Matches(this));
+            Assert.False(argumentFilter.Matches(new ArgumentFilterVisitorFixture()));
+
+            var obj = new object();
+            argumentFilter = ArgumentFilterVisitor.FindArgumentFilterWithin((Expression<Func<object>>)(() => obj));
+            Assert.NotNull(argumentFilter);
+            Assert.IsType<IsArgumentFilter>(argumentFilter);
+            Assert.True(argumentFilter.Matches(obj));
+            Assert.False(argumentFilter.Matches(new object()));
         }
 
         [Fact]
