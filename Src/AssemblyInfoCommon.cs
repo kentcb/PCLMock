@@ -11,6 +11,5 @@ using System.Resources;
 [assembly: AssemblyCopyrightAttribute("© Copyright. Kent Boogaart.")]
 [assembly: AssemblyTrademarkAttribute("")]
 [assembly: AssemblyCultureAttribute("")]
-[assembly: CLSCompliantAttribute(true)]
 [assembly: NeutralResourcesLanguageAttribute("en-US")]
 [assembly: AssemblyInformationalVersionAttribute("0.0.4")]

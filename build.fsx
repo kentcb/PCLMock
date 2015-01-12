@@ -43,7 +43,6 @@ Target "Build" (fun _ ->
             Attribute.Copyright "© Copyright. Kent Boogaart."
             Attribute.Trademark ""
             Attribute.Culture ""
-            Attribute.CLSCompliant true
             Attribute.StringAttribute("NeutralResourcesLanguage", "en-US", "System.Resources")
             Attribute.StringAttribute("AssemblyInformationalVersion", semanticVersion, "System.Reflection")
         ]
