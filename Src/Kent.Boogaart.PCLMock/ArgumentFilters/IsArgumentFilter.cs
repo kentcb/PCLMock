@@ -19,7 +19,7 @@
 
         public override string ToString()
         {
-            return "Is " + this.expected.ToDebugString();
+            return "It.Is(" + this.expected.ToDebugString() + ")";
         }
 
         public bool Equals(IsArgumentFilter other)

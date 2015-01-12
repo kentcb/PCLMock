@@ -33,10 +33,10 @@
         public void has_a_nice_string_representation()
         {
             // being that a HashSet is used as the underlying storage mechanism, the order of items isn't really predictable here
-            Assert.Equal("Is in [\"hello\", \"world\"]", new IsInArgumentFilter<string>("hello", "world").ToString());
-            Assert.Equal("Is in [3, 5, 10]", new IsInArgumentFilter<int>(3, 5, 10).ToString());
-            Assert.Equal("Is in [15.182M, 2.812M]", new IsInArgumentFilter<decimal>(15.182m, 2.812M).ToString());
-            Assert.Equal("Is in [\"foo\", null]", new IsInArgumentFilter<string>("foo", null).ToString());
+            Assert.Equal("It.IsIn(\"hello\", \"world\")", new IsInArgumentFilter<string>("hello", "world").ToString());
+            Assert.Equal("It.IsIn(3, 5, 10)", new IsInArgumentFilter<int>(3, 5, 10).ToString());
+            Assert.Equal("It.IsIn(15.182M, 2.812M)", new IsInArgumentFilter<decimal>(15.182m, 2.812M).ToString());
+            Assert.Equal("It.IsIn(\"foo\", null)", new IsInArgumentFilter<string>("foo", null).ToString());
         }
 
         [Fact]

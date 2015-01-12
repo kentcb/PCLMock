@@ -38,7 +38,7 @@
 
         public override string ToString()
         {
-            return "Is between " + this.minimum.ToDebugString() + " and " + this.maximum.ToDebugString();
+            return "It.IsBetween(" + this.minimum.ToDebugString() + ", " + this.maximum.ToDebugString() + ")";
         }
 
         public bool Equals(IsBetweenArgumentFilter<T> other)

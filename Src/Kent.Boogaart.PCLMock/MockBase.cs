@@ -173,7 +173,7 @@ Full mocked object type name: {3}";
             }
 
             var whenContinuationCollection = this.EnsureWhenContinuationCollection(selector);
-            return new VerifyContinuation(whenContinuationCollection, ArgumentFiltersVisitor.FindArgumentFiltersWithin(selector) ?? emptyArgumentFilters);
+            return new VerifyContinuation(selector, whenContinuationCollection, ArgumentFiltersVisitor.FindArgumentFiltersWithin(selector) ?? emptyArgumentFilters);
         }
 
         /// <summary>
@@ -194,7 +194,7 @@ Full mocked object type name: {3}";
             }
 
             var whenContinuationCollection = this.EnsureWhenContinuationCollection(selector);
-            return new VerifyContinuation(whenContinuationCollection, ArgumentFiltersVisitor.FindArgumentFiltersWithin(selector) ?? emptyArgumentFilters);
+            return new VerifyContinuation(selector, whenContinuationCollection, ArgumentFiltersVisitor.FindArgumentFiltersWithin(selector) ?? emptyArgumentFilters);
         }
 
         /// <summary>
@@ -227,7 +227,7 @@ Full mocked object type name: {3}";
             var whenContinuationCollection = this.EnsureWhenContinuationCollection(propertySelector);
             var filters = new ArgumentFilterCollection();
             filters.Add(ArgumentFilterVisitor.FindArgumentFilterWithin(valueFilterSelector));
-            return new VerifyContinuation(whenContinuationCollection, filters);
+            return new VerifyContinuation(propertySelector, whenContinuationCollection, filters);
         }
 
         /// <summary>

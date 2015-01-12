@@ -3,6 +3,7 @@
     using Xunit;
     using Kent.Boogaart.PCLMock;
     using Kent.Boogaart.PCLMock.ArgumentFilters;
+    using Xunit.Extensions;
 
     public sealed class IsAnyArgumentFilterFixture
     {
@@ -12,27 +13,30 @@
             Assert.True(IsAnyArgumentFilter<string>.Instance.Matches(null));
         }
 
-        [Fact]
-        public void matches_returns_true_for_any_value()
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData("hello")]
+        [InlineData("world")]
+        [InlineData(0)]
+        [InlineData(1)]
+        [InlineData(-1)]
+        [InlineData(38)]
+        [InlineData(int.MaxValue)]
+        [InlineData(int.MinValue)]
+        public void matches_returns_true_for_any_value(object value)
         {
-            Assert.True(IsAnyArgumentFilter<string>.Instance.Matches("hello"));
-            Assert.True(IsAnyArgumentFilter<string>.Instance.Matches("world"));
-            Assert.True(IsAnyArgumentFilter<string>.Instance.Matches(""));
-
-            Assert.True(IsAnyArgumentFilter<string>.Instance.Matches(0));
-            Assert.True(IsAnyArgumentFilter<string>.Instance.Matches(1));
-            Assert.True(IsAnyArgumentFilter<string>.Instance.Matches(-1));
-            Assert.True(IsAnyArgumentFilter<string>.Instance.Matches(int.MaxValue));
-            Assert.True(IsAnyArgumentFilter<string>.Instance.Matches(int.MinValue));
-            Assert.True(IsAnyArgumentFilter<string>.Instance.Matches(38));
+            Assert.True(IsAnyArgumentFilter<string>.Instance.Matches(value));
+            Assert.True(IsAnyArgumentFilter<int>.Instance.Matches(value));
+            Assert.True(IsAnyArgumentFilter<int?>.Instance.Matches(value));
         }
 
         [Fact]
         public void has_a_nice_string_representation()
         {
-            Assert.Equal("Is any System.String", IsAnyArgumentFilter<string>.Instance.ToString());
-            Assert.Equal("Is any System.Int32", IsAnyArgumentFilter<int>.Instance.ToString());
-            Assert.Equal("Is any System.Nullable`1[System.Int32]", IsAnyArgumentFilter<int?>.Instance.ToString());
+            Assert.Equal("It.IsAny<string>()", IsAnyArgumentFilter<string>.Instance.ToString());
+            Assert.Equal("It.IsAny<int>()", IsAnyArgumentFilter<int>.Instance.ToString());
+            Assert.Equal("It.IsAny<int?>()", IsAnyArgumentFilter<int?>.Instance.ToString());
         }
 
         [Fact]

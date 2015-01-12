@@ -1,5 +1,6 @@
 ﻿namespace Kent.Boogaart.PCLMock.ArgumentFilters
 {
+    using Kent.Boogaart.PCLMock.Utility;
     using System;
 
     internal sealed class IsNullArgumentFilter<T> : IArgumentFilter, IEquatable<IsNullArgumentFilter<T>>
@@ -17,7 +18,7 @@
 
         public override string ToString()
         {
-            return "Is null " + typeof(T).FullName;
+            return "It.IsNull<" + typeof(T).ToDebugString() + ">()";
         }
 
         public bool Equals(IsNullArgumentFilter<T> other)

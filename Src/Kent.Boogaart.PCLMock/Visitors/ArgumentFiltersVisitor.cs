@@ -1,6 +1,7 @@
 ﻿namespace Kent.Boogaart.PCLMock.Visitors
 {
     using System.Diagnostics;
+    using System.Linq;
     using System.Linq.Expressions;
     using Kent.Boogaart.PCLMock.ArgumentFilters;
     using Kent.Boogaart.PCLMock.Utility;
@@ -21,7 +22,7 @@
             var visitor = new ArgumentFiltersVisitor();
             visitor.Visit(expression);
             argumentFilters = visitor.argumentFilters;
-            return argumentFilters != null;
+            return argumentFilters != null && argumentFilters.All(x => x != null);
         }
 
         public static ArgumentFilterCollection FindArgumentFiltersWithin(Expression expression)

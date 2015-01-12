@@ -27,7 +27,7 @@
 
         public override string ToString()
         {
-            return "Is like " + this.expression.ToString().ToDebugString();
+            return "It.IsLike(" + this.expression.ToString().ToDebugString() + ")";
         }
 
         public bool Equals(IsLikeArgumentFilter other)

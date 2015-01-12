@@ -27,7 +27,7 @@
 
         public override string ToString()
         {
-            return "Is greater than or equal to " + this.value.ToDebugString();
+            return "It.IsGreaterThanOrEqualTo(" + this.value.ToDebugString() + ")";
         }
 
         public bool Equals(IsGreaterThanOrEqualToArgumentFilter<T> other)

@@ -25,7 +25,7 @@
         [Fact]
         public void has_a_nice_string_representation()
         {
-            Assert.Equal("Is like \"[hH]ello\"", new IsLikeArgumentFilter("[hH]ello", RegexOptions.None).ToString());
+            Assert.Equal("It.IsLike(\"[hH]ello\")", new IsLikeArgumentFilter("[hH]ello", RegexOptions.None).ToString());
         }
 
         [Fact]

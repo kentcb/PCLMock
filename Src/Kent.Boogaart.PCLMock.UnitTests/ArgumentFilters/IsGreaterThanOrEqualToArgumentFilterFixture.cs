@@ -33,9 +33,9 @@
         [Fact]
         public void has_a_nice_string_representation()
         {
-            Assert.Equal("Is greater than or equal to 10", new IsGreaterThanOrEqualToArgumentFilter<int>(10).ToString());
-            Assert.Equal("Is greater than or equal to 15.182M", new IsGreaterThanOrEqualToArgumentFilter<decimal>(15.182m).ToString());
-            Assert.Equal("Is greater than or equal to null", new IsGreaterThanOrEqualToArgumentFilter<string>(null).ToString());
+            Assert.Equal("It.IsGreaterThanOrEqualTo(10)", new IsGreaterThanOrEqualToArgumentFilter<int>(10).ToString());
+            Assert.Equal("It.IsGreaterThanOrEqualTo(15.182M)", new IsGreaterThanOrEqualToArgumentFilter<decimal>(15.182m).ToString());
+            Assert.Equal("It.IsGreaterThanOrEqualTo(null)", new IsGreaterThanOrEqualToArgumentFilter<string>(null).ToString());
         }
 
         [Fact]
