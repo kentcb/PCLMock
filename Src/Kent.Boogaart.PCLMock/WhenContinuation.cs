@@ -8,19 +8,24 @@
     using System.Reflection;
     using System.Text;
     using Kent.Boogaart.PCLMock.Utility;
+    using System.Linq.Expressions;
+    using Kent.Boogaart.PCLMock.Visitors;
 
     /// <summary>
     /// Facilitates the expression of specifications for what a <see cref="MockBase{T}"/> should do when a given member is invoked.
     /// </summary>
     public abstract class WhenContinuation : IEquatable<WhenContinuation>
     {
+        private readonly Expression selector;
         private readonly ArgumentFilterCollection filters;
         private readonly IDictionary<int, object> outAndRefAssignments;
 
-        internal WhenContinuation(IEnumerable<IArgumentFilter> filters)
+        internal WhenContinuation(Expression selector, IEnumerable<IArgumentFilter> filters)
         {
+            Debug.Assert(selector != null);
             Debug.Assert(filters != null);
 
+            this.selector = selector;
             this.filters = new ArgumentFilterCollection(filters);
             this.outAndRefAssignments = new Dictionary<int, object>();
         }
@@ -135,6 +140,13 @@
             return received;
         }
 
+        internal string GetSelectorString()
+        {
+            var visitor = new SelectorStringVisitor();
+            visitor.Visit(this.selector);
+            return visitor.ToString();
+        }
+
         /// <summary>
         /// Assigns a specified value to an <c>out</c> or <c>ref</c> parameter, so that invocations against the member being specified will result in
         /// the corresponding <c>out</c> or <c>ref</c> parameter being set to the specified value.
@@ -209,8 +221,8 @@
         private Exception exception;
         private Delegate doAction;
 
-        internal WhenContinuation(IEnumerable<IArgumentFilter> filters)
-            : base(filters)
+        internal WhenContinuation(Expression selector, IEnumerable<IArgumentFilter> filters)
+            : base(selector, filters)
         {
         }
 
@@ -222,7 +234,7 @@
         /// </remarks>
         public void Throw()
         {
-            this.Throw(new InvalidOperationException());
+            this.Throw(new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, "Mock has been configured to throw when accessing {0}.", this.GetSelectorString())));
         }
 
         /// <summary>
@@ -376,8 +388,8 @@
         private TMember returnValue;
         private Delegate returnAction;
 
-        internal WhenContinuation(IEnumerable<IArgumentFilter> filters)
-            : base(filters)
+        internal WhenContinuation(Expression selector, IEnumerable<IArgumentFilter> filters)
+            : base(selector, filters)
         {
         }
 

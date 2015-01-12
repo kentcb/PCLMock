@@ -96,7 +96,7 @@ Full mocked object type name: {3}";
                 throw new ArgumentNullException("selector");
             }
 
-            var continuation = new WhenContinuation<TMock>(ArgumentFiltersVisitor.FindArgumentFiltersWithin(selector) ?? emptyArgumentFilters);
+            var continuation = new WhenContinuation<TMock>(selector, ArgumentFiltersVisitor.FindArgumentFiltersWithin(selector) ?? emptyArgumentFilters);
             this.AddOrReplaceWhenContinuation(selector, continuation);
             return continuation;
         }
@@ -117,7 +117,7 @@ Full mocked object type name: {3}";
                 throw new ArgumentNullException("selector");
             }
 
-            var continuation = new WhenContinuation<TMock, TMember>(ArgumentFiltersVisitor.FindArgumentFiltersWithin(selector) ?? emptyArgumentFilters);
+            var continuation = new WhenContinuation<TMock, TMember>(selector, ArgumentFiltersVisitor.FindArgumentFiltersWithin(selector) ?? emptyArgumentFilters);
             this.AddOrReplaceWhenContinuation(selector, continuation);
             return continuation;
         }
@@ -151,7 +151,7 @@ Full mocked object type name: {3}";
 
             var filters = new ArgumentFilterCollection();
             filters.Add(ArgumentFilterVisitor.FindArgumentFilterWithin(valueFilterSelector));
-            var continuation = new WhenContinuation<TMock, TMember>(filters);
+            var continuation = new WhenContinuation<TMock, TMember>(propertySelector, filters);
             this.AddOrReplaceWhenContinuation(propertySelector, continuation);
             return continuation;
         }

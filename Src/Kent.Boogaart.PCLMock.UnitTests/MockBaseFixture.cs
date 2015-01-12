@@ -345,6 +345,20 @@ Full mocked object type name: Kent.Boogaart.PCLMock.UnitTests.MockBaseFixture+Un
         }
 
         [Fact]
+        public void throw_throws_an_invalid_operation_exception_by_default()
+        {
+            var mock = new TestTargetMock();
+            mock.When(x => x.SomeProperty).Throw();
+            mock.When(x => x.SomeMethodTakingString("abc")).Throw();
+
+            var ex = Assert.Throws<InvalidOperationException>(() => mock.SomeProperty);
+            Assert.Equal("Mock has been configured to throw when accessing SomeProperty.", ex.Message);
+
+            ex = Assert.Throws<InvalidOperationException>(() => mock.SomeMethodTakingString("abc"));
+            Assert.Equal("Mock has been configured to throw when accessing SomeMethodTakingString(It.Is(\"abc\")).", ex.Message);
+        }
+
+        [Fact]
         public void throw_can_specify_an_exception_to_throw_on_property_access()
         {
             var mock = new TestTargetMock();
