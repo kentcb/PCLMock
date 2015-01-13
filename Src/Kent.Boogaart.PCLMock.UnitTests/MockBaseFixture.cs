@@ -691,6 +691,19 @@ Full mocked object type name: Kent.Boogaart.PCLMock.UnitTests.MockBaseFixture+Un
         }
 
         [Fact]
+        public void it_matches_can_be_used_to_specify_arguments()
+        {
+            var mock = new TestTargetMock();
+            mock.When(x => x.SomeMethodTakingStringWithReturnValue(It.Matches<string>(y => y.StartsWith("K")))).Return(30);
+            mock.When(x => x.SomeMethodTakingStringWithReturnValue(It.Matches<string>(y => y.StartsWith("B")))).Return(29);
+
+            Assert.Equal(30, mock.SomeMethodTakingStringWithReturnValue("Kent"));
+            Assert.Equal(30, mock.SomeMethodTakingStringWithReturnValue("Kart"));
+            Assert.Equal(29, mock.SomeMethodTakingStringWithReturnValue("Belinda"));
+            Assert.Equal(29, mock.SomeMethodTakingStringWithReturnValue("Batman"));
+        }
+
+        [Fact]
         public void argument_filters_can_be_used_to_differentiate_property_set_invocations()
         {
             var mock = new TestTargetMock();

@@ -308,6 +308,23 @@
             return default(T);
         }
 
+        /// <summary>
+        /// Specifies that only values for which the given predicate returns <see langword="true"/> are to be accepted.
+        /// </summary>
+        /// <typeparam name="T">
+        /// The type of the expected value.
+        /// </typeparam>
+        /// <param name="predicate">
+        /// The predicate that will be invoked to check the value.
+        /// </param>
+        /// <returns>
+        /// A default instance of type <c>T</c>.
+        /// </returns>
+        public static T Matches<T>(Func<T, bool> predicate)
+        {
+            return default(T);
+        }
+
         internal static IArgumentFilter IsAnyFilter<T>()
         {
             return IsAnyArgumentFilter<T>.Instance;
@@ -424,6 +441,16 @@
         internal static IArgumentFilter IsNotOfTypeFilter<T>()
         {
             return new LogicalNotArgumentFilter(IsOfTypeArgumentFilter<T>.Instance);
+        }
+
+        internal static IArgumentFilter MatchesFilter<T>(Func<T, bool> predicate)
+        {
+            if (predicate == null)
+            {
+                throw new ArgumentNullException("predicate");
+            }
+
+            return new MatchesArgumentFilter<T>(predicate);
         }
     }
 }

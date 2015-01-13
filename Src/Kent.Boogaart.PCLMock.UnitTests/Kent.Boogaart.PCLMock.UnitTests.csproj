@@ -60,6 +60,7 @@
     <Compile Include="ArgumentFilters\IsNullArgumentFilterFixture.cs" />
     <Compile Include="ArgumentFilters\IsOfTypeArgumentFilterFixture.cs" />
     <Compile Include="ArgumentFilters\LogicalNotArgumentFilterFixture.cs" />
+    <Compile Include="ArgumentFilters\MatchesArgumentFilterFixture.cs" />
     <Compile Include="MockBaseFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utility\ObjectExtensionsFixture.cs" />

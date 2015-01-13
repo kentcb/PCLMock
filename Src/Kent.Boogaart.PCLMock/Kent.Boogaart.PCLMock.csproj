@@ -53,6 +53,7 @@
       <Link>Properties\AssemblyInfoCommon.cs</Link>
     </Compile>
     <Compile Include="ArgumentFilters\LogicalNotArgumentFilter.cs" />
+    <Compile Include="ArgumentFilters\MatchesArgumentFilter.cs" />
     <Compile Include="IArgumentFilter.cs" />
     <Compile Include="It.cs" />
     <Compile Include="MockBase.cs" />
