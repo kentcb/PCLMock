@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 
 [assembly: AssemblyTitle("Kent.Boogaart.PCLMock.UnitTests")]
 [assembly: AssemblyDescription("Contains unit tests for PCLMock.")]
+[assembly: CLSCompliantAttribute(false)]

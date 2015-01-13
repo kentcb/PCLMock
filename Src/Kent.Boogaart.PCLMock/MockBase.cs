@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Globalization;
     using System.Linq.Expressions;
     using Kent.Boogaart.PCLMock.Utility;
@@ -96,7 +95,7 @@ Full mocked object type name: {3}";
                 throw new ArgumentNullException("selector");
             }
 
-            var continuation = new WhenContinuation<TMock>(ArgumentFiltersVisitor.FindArgumentFiltersWithin(selector) ?? emptyArgumentFilters);
+            var continuation = new WhenContinuation<TMock>(selector, ArgumentFiltersVisitor.FindArgumentFiltersWithin(selector.Body) ?? emptyArgumentFilters);
             this.AddOrReplaceWhenContinuation(selector, continuation);
             return continuation;
         }
@@ -117,7 +116,7 @@ Full mocked object type name: {3}";
                 throw new ArgumentNullException("selector");
             }
 
-            var continuation = new WhenContinuation<TMock, TMember>(ArgumentFiltersVisitor.FindArgumentFiltersWithin(selector) ?? emptyArgumentFilters);
+            var continuation = new WhenContinuation<TMock, TMember>(selector, ArgumentFiltersVisitor.FindArgumentFiltersWithin(selector.Body) ?? emptyArgumentFilters);
             this.AddOrReplaceWhenContinuation(selector, continuation);
             return continuation;
         }
@@ -150,8 +149,8 @@ Full mocked object type name: {3}";
             }
 
             var filters = new ArgumentFilterCollection();
-            filters.Add(ArgumentFilterVisitor.FindArgumentFilterWithin(valueFilterSelector));
-            var continuation = new WhenContinuation<TMock, TMember>(filters);
+            filters.Add(ArgumentFilterVisitor.FindArgumentFilterWithin(valueFilterSelector.Body));
+            var continuation = new WhenContinuation<TMock, TMember>(propertySelector, filters);
             this.AddOrReplaceWhenContinuation(propertySelector, continuation);
             return continuation;
         }
@@ -173,7 +172,7 @@ Full mocked object type name: {3}";
             }
 
             var whenContinuationCollection = this.EnsureWhenContinuationCollection(selector);
-            return new VerifyContinuation(whenContinuationCollection, ArgumentFiltersVisitor.FindArgumentFiltersWithin(selector) ?? emptyArgumentFilters);
+            return new VerifyContinuation(selector, whenContinuationCollection, ArgumentFiltersVisitor.FindArgumentFiltersWithin(selector.Body) ?? emptyArgumentFilters);
         }
 
         /// <summary>
@@ -194,7 +193,7 @@ Full mocked object type name: {3}";
             }
 
             var whenContinuationCollection = this.EnsureWhenContinuationCollection(selector);
-            return new VerifyContinuation(whenContinuationCollection, ArgumentFiltersVisitor.FindArgumentFiltersWithin(selector) ?? emptyArgumentFilters);
+            return new VerifyContinuation(selector, whenContinuationCollection, ArgumentFiltersVisitor.FindArgumentFiltersWithin(selector.Body) ?? emptyArgumentFilters);
         }
 
         /// <summary>
@@ -226,8 +225,8 @@ Full mocked object type name: {3}";
 
             var whenContinuationCollection = this.EnsureWhenContinuationCollection(propertySelector);
             var filters = new ArgumentFilterCollection();
-            filters.Add(ArgumentFilterVisitor.FindArgumentFilterWithin(valueFilterSelector));
-            return new VerifyContinuation(whenContinuationCollection, filters);
+            filters.Add(ArgumentFilterVisitor.FindArgumentFilterWithin(valueFilterSelector.Body));
+            return new VerifyContinuation(propertySelector, whenContinuationCollection, filters);
         }
 
         /// <summary>
@@ -238,7 +237,7 @@ Full mocked object type name: {3}";
         /// </param>
         protected void Apply(Expression<Action<TMock>> selector)
         {
-            var args = ArgumentsVisitor.FindArgumentsWithin(selector) ?? emptyArgs;
+            var args = ArgumentsVisitor.FindArgumentsWithin(selector.Body) ?? emptyArgs;
             WhenContinuationCollection whenContinuationCollection;
             var continuation = this.GetWhenContinuation(selector, args, out whenContinuationCollection);
             whenContinuationCollection.AddInvocation(new Invocation(args));
@@ -259,7 +258,7 @@ Full mocked object type name: {3}";
         /// </param>
         protected TMember Apply<TMember>(Expression<Func<TMock, TMember>> selector)
         {
-            var args = ArgumentsVisitor.FindArgumentsWithin(selector) ?? emptyArgs;
+            var args = ArgumentsVisitor.FindArgumentsWithin(selector.Body) ?? emptyArgs;
             WhenContinuationCollection whenContinuationCollection;
             var continuation = this.GetWhenContinuation(selector, args, out whenContinuationCollection);
             whenContinuationCollection.AddInvocation(new Invocation(args));
@@ -284,7 +283,7 @@ Full mocked object type name: {3}";
         protected void ApplyPropertySet<TMember>(Expression<Func<TMock, TMember>> selector, object value)
         {
             // base arguments would be any indexers to the property
-            var indexerArgs = ArgumentsVisitor.FindArgumentsWithin(selector) ?? emptyArgs;
+            var indexerArgs = ArgumentsVisitor.FindArgumentsWithin(selector.Body) ?? emptyArgs;
             var args = new object[indexerArgs.Length + 1];
             Array.Copy(indexerArgs, args, indexerArgs.Length);
             args[args.Length - 1] = value;

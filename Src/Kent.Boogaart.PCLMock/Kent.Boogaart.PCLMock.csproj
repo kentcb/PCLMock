@@ -53,6 +53,7 @@
       <Link>Properties\AssemblyInfoCommon.cs</Link>
     </Compile>
     <Compile Include="ArgumentFilters\LogicalNotArgumentFilter.cs" />
+    <Compile Include="ArgumentFilters\MatchesArgumentFilter.cs" />
     <Compile Include="IArgumentFilter.cs" />
     <Compile Include="It.cs" />
     <Compile Include="MockBase.cs" />
@@ -69,7 +70,8 @@
     <Compile Include="Visitors\ArgumentFiltersVisitor.cs" />
     <Compile Include="Visitors\ArgumentFilterVisitor.cs" />
     <Compile Include="Visitors\ArgumentsVisitor.cs" />
-    <Compile Include="Visitors\ConstantVisitor.cs" />
+    <Compile Include="Visitors\ValueExtractor.cs" />
+    <Compile Include="Visitors\SelectorStringVisitor.cs" />
     <Compile Include="WhenContinuation.cs" />
   </ItemGroup>
   <ItemGroup />

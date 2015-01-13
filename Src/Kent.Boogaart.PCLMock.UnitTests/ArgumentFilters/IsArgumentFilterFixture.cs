@@ -1,8 +1,8 @@
 ﻿namespace Kent.Boogaart.PCLMock.ArgumentFilters.UnitTests
 {
-    using Xunit;
-    using Kent.Boogaart.PCLMock;
     using Kent.Boogaart.PCLMock.ArgumentFilters;
+    using Xunit;
+    using Xunit.Extensions;
 
     public sealed class IsArgumentFilterFixture
     {
@@ -12,29 +12,28 @@
             Assert.True(new IsArgumentFilter(null).Matches(null));
         }
 
-        [Fact]
-        public void matches_returns_false_if_values_do_not_match()
+        [Theory]
+        [InlineData("hello", "world", false)]
+        [InlineData("hello", null, false)]
+        [InlineData(null, "hello", false)]
+        [InlineData(1, 2, false)]
+        [InlineData(1, 1f, false)]
+        [InlineData("hello", "hello", true)]
+        [InlineData(null, null, true)]
+        [InlineData(13, 13, true)]
+        [InlineData(56f, 56f, true)]
+        public void matches_returns_correct_value(object firstValue, object secondValue, bool expectedResult)
         {
-            Assert.False(new IsArgumentFilter("hello").Matches("world"));
-            Assert.False(new IsArgumentFilter("hello").Matches(null));
-            Assert.False(new IsArgumentFilter(null).Matches("hello"));
-            Assert.False(new IsArgumentFilter(1).Matches(2));
-        }
-
-        [Fact]
-        public void matches_returns_true_if_values_match()
-        {
-            Assert.True(new IsArgumentFilter("hello").Matches("hello"));
-            Assert.True(new IsArgumentFilter(1).Matches(1));
+            Assert.Equal(expectedResult, new IsArgumentFilter(firstValue).Matches(secondValue));
         }
 
         [Fact]
         public void has_a_nice_string_representation()
         {
-            Assert.Equal("Is \"hello\"", new IsArgumentFilter("hello").ToString());
-            Assert.Equal("Is 10", new IsArgumentFilter(10).ToString());
-            Assert.Equal("Is 15.182M", new IsArgumentFilter(15.182m).ToString());
-            Assert.Equal("Is null", new IsArgumentFilter(null).ToString());
+            Assert.Equal("It.Is(\"hello\")", new IsArgumentFilter("hello").ToString());
+            Assert.Equal("It.Is(10)", new IsArgumentFilter(10).ToString());
+            Assert.Equal("It.Is(15.182M)", new IsArgumentFilter(15.182m).ToString());
+            Assert.Equal("It.Is(null)", new IsArgumentFilter(null).ToString());
         }
 
         [Fact]

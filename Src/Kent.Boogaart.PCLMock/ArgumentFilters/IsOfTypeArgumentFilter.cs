@@ -1,6 +1,7 @@
 ﻿namespace Kent.Boogaart.PCLMock.ArgumentFilters
 {
     using System;
+    using Kent.Boogaart.PCLMock.Utility;
 
     internal sealed class IsOfTypeArgumentFilter<T> : IArgumentFilter, IEquatable<IsOfTypeArgumentFilter<T>>
     {
@@ -17,7 +18,7 @@
 
         public override string ToString()
         {
-            return "Is of type " + typeof(T).FullName;
+            return "It.IsOfType<" + typeof(T).ToDebugString() + ">()";
         }
 
         public bool Equals(IsOfTypeArgumentFilter<T> other)

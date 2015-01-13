@@ -1,6 +1,5 @@
 ﻿namespace Kent.Boogaart.PCLMock.ArgumentFilters.UnitTests
 {
-    using System;
     using Kent.Boogaart.PCLMock.ArgumentFilters;
     using Xunit;
 
@@ -22,7 +21,7 @@
             var child = new IsArgumentFilter("foo");
             var argumentFilter = new LogicalNotArgumentFilter(child);
 
-            Assert.Equal("NOT(Is \"foo\")", argumentFilter.ToString());
+            Assert.Equal("NOT(It.Is(\"foo\"))", argumentFilter.ToString());
         }
 
         [Fact]

@@ -1,8 +1,7 @@
 ﻿namespace Kent.Boogaart.PCLMock.ArgumentFilters.UnitTests
 {
-    using Xunit;
-    using Kent.Boogaart.PCLMock;
     using Kent.Boogaart.PCLMock.ArgumentFilters;
+    using Xunit;
 
     public sealed class IsBetweenArgumentFilterFixture
     {
@@ -48,9 +47,9 @@
         [Fact]
         public void has_a_nice_string_representation()
         {
-            Assert.Equal("Is between 5 and 10", new IsBetweenArgumentFilter<int>(5, 10).ToString());
-            Assert.Equal("Is between 12.36M and 15.182M", new IsBetweenArgumentFilter<decimal>(12.36m, 15.182m).ToString());
-            Assert.Equal("Is between null and \"abc\"", new IsBetweenArgumentFilter<string>(null, "abc").ToString());
+            Assert.Equal("It.IsBetween(5, 10)", new IsBetweenArgumentFilter<int>(5, 10).ToString());
+            Assert.Equal("It.IsBetween(12.36M, 15.182M)", new IsBetweenArgumentFilter<decimal>(12.36m, 15.182m).ToString());
+            Assert.Equal("It.IsBetween(null, \"abc\")", new IsBetweenArgumentFilter<string>(null, "abc").ToString());
         }
 
         [Fact]

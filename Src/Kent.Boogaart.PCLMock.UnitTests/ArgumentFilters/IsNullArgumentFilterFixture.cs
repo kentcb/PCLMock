@@ -1,5 +1,6 @@
 ﻿namespace Kent.Boogaart.PCLMock.ArgumentFilters.UnitTests
 {
+    using System;
     using System.Text;
     using Kent.Boogaart.PCLMock.ArgumentFilters;
     using Xunit;
@@ -22,7 +23,9 @@
         [Fact]
         public void has_a_nice_string_representation()
         {
-            Assert.Equal("Is null System.String", IsNullArgumentFilter<string>.Instance.ToString());
+            Assert.Equal("It.IsNull<string>()", IsNullArgumentFilter<string>.Instance.ToString());
+            Assert.Equal("It.IsNull<object>()", IsNullArgumentFilter<object>.Instance.ToString());
+            Assert.Equal("It.IsNull<System.Type>()", IsNullArgumentFilter<Type>.Instance.ToString());
         }
 
         [Fact]

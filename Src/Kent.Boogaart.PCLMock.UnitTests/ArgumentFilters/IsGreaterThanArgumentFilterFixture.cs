@@ -1,8 +1,7 @@
 ﻿namespace Kent.Boogaart.PCLMock.ArgumentFilters.UnitTests
 {
-    using Xunit;
-    using Kent.Boogaart.PCLMock;
     using Kent.Boogaart.PCLMock.ArgumentFilters;
+    using Xunit;
 
     public sealed class IsGreaterThanArgumentFilterFixture
     {
@@ -33,9 +32,9 @@
         [Fact]
         public void has_a_nice_string_representation()
         {
-            Assert.Equal("Is greater than 10", new IsGreaterThanArgumentFilter<int>(10).ToString());
-            Assert.Equal("Is greater than 15.182M", new IsGreaterThanArgumentFilter<decimal>(15.182m).ToString());
-            Assert.Equal("Is greater than null", new IsGreaterThanArgumentFilter<string>(null).ToString());
+            Assert.Equal("It.IsGreaterThan(10)", new IsGreaterThanArgumentFilter<int>(10).ToString());
+            Assert.Equal("It.IsGreaterThan(15.182M)", new IsGreaterThanArgumentFilter<decimal>(15.182m).ToString());
+            Assert.Equal("It.IsGreaterThan(null)", new IsGreaterThanArgumentFilter<string>(null).ToString());
         }
 
         [Fact]

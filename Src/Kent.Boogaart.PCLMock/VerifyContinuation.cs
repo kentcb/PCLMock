@@ -4,21 +4,26 @@
     using System.Diagnostics;
     using System.Globalization;
     using System.Linq;
+    using System.Linq.Expressions;
     using Kent.Boogaart.PCLMock.Utility;
+    using Kent.Boogaart.PCLMock.Visitors;
 
     /// <summary>
     /// Facilitates the expression of verifications against a member in a <see cref="MockBase{T}"/>.
     /// </summary>
     public sealed class VerifyContinuation
     {
+        private readonly Expression selector;
         private readonly WhenContinuationCollection whenContinuationCollection;
         private readonly ArgumentFilterCollection filters;
 
-        internal VerifyContinuation(WhenContinuationCollection whenContinuationCollection, ArgumentFilterCollection filters)
+        internal VerifyContinuation(Expression selector, WhenContinuationCollection whenContinuationCollection, ArgumentFilterCollection filters)
         {
+            Debug.Assert(selector != null);
             Debug.Assert(whenContinuationCollection != null);
             Debug.Assert(filters != null);
 
+            this.selector = selector;
             this.whenContinuationCollection = whenContinuationCollection;
             this.filters = filters;
         }
@@ -32,7 +37,11 @@
 
             if (invocations.Count > 0)
             {
-                ThrowVerificationException(invocations.Count);
+                ThrowVerificationException(
+                    "Verification that {0} was not called failed because it was called {1} time{2}.",
+                    this.GetSelectorString(),
+                    invocations.Count,
+                    invocations.Count == 1 ? string.Empty : "s");
             }
         }
 
@@ -45,7 +54,11 @@
 
             if (invocations.Count != 1)
             {
-                ThrowVerificationException(invocations.Count);
+                ThrowVerificationException(
+                    "Verification that {0} was called exactly once failed because it was called {1} time{2}.",
+                    this.GetSelectorString(),
+                    invocations.Count,
+                    invocations.Count == 1 ? string.Empty : "s");
             }
         }
 
@@ -58,7 +71,9 @@
 
             if (invocations.Count == 0)
             {
-                ThrowVerificationException(invocations.Count);
+                ThrowVerificationException(
+                    "Verification that {0} was called at least once failed because it was called 0 times.",
+                    this.GetSelectorString());
             }
         }
 
@@ -71,7 +86,10 @@
 
             if (invocations.Count > 1)
             {
-                ThrowVerificationException(invocations.Count);
+                ThrowVerificationException(
+                    "Verification that {0} was called at most once failed because it was called {1} times.",
+                    this.GetSelectorString(),
+                    invocations.Count);
             }
         }
 
@@ -87,7 +105,13 @@
 
             if (invocations.Count != times)
             {
-                ThrowVerificationException(invocations.Count);
+                ThrowVerificationException(
+                    "Verification that {0} was called exactly {1} time{2} failed because it was called {3} time{4}.",
+                    this.GetSelectorString(),
+                    times,
+                    times == 1 ? string.Empty : "s",
+                    invocations.Count,
+                    invocations.Count == 1 ? string.Empty : "s");
             }
         }
 
@@ -103,7 +127,13 @@
 
             if (invocations.Count < times)
             {
-                ThrowVerificationException(invocations.Count);
+                ThrowVerificationException(
+                    "Verification that {0} was called at least {1} time{2} failed because it was called {3} time{4}.",
+                    this.GetSelectorString(),
+                    times,
+                    times == 1 ? string.Empty : "s",
+                    invocations.Count,
+                    invocations.Count == 1 ? string.Empty : "s");
             }
         }
 
@@ -119,20 +149,26 @@
 
             if (invocations.Count > times)
             {
-                ThrowVerificationException(invocations.Count);
+                ThrowVerificationException(
+                    "Verification that {0} was called at most {1} time{2} failed because it was called {3} time{4}.",
+                    this.GetSelectorString(),
+                    times,
+                    times == 1 ? string.Empty : "s",
+                    invocations.Count,
+                    invocations.Count == 1 ? string.Empty : "s");
             }
         }
 
-        private static void ThrowVerificationException(int invocationCount)
+        private string GetSelectorString()
         {
-            if (invocationCount == 0)
-            {
-                throw new VerificationException("Member was not called, so verification has failed.");
-            }
-            else
-            {
-                throw new VerificationException(string.Format(CultureInfo.InvariantCulture, "Member was called {0} time{1}, so verification has failed.", invocationCount, invocationCount == 1 ? string.Empty : "s"));
-            }
+            var visitor = new SelectorStringVisitor();
+            visitor.Visit(this.selector);
+            return visitor.ToString();
+        }
+
+        private static void ThrowVerificationException(string format, params object[] args)
+        {
+            throw new VerificationException(string.Format(CultureInfo.InvariantCulture, format, args));
         }
 
         private IList<Invocation> GetMatchingInvocations()

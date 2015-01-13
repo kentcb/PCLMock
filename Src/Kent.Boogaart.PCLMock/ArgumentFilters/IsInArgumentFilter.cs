@@ -29,7 +29,7 @@
         public override string ToString()
         {
             var sb = new StringBuilder();
-            sb.Append("Is in [");
+            sb.Append("It.IsIn(");
             var first = true;
 
             this.expected.Aggregate(
@@ -46,7 +46,7 @@
                     return sb;
                 });
 
-            sb.Append("]");
+            sb.Append(")");
 
             return sb.ToString();
         }

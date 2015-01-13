@@ -1,9 +1,8 @@
 ﻿namespace Kent.Boogaart.PCLMock.ArgumentFilters.UnitTests
 {
-    using Kent.Boogaart.PCLMock;
-    using Kent.Boogaart.PCLMock.ArgumentFilters;
     using System;
     using System.Text;
+    using Kent.Boogaart.PCLMock.ArgumentFilters;
     using Xunit;
 
     public sealed class IsOfTypeArgumentFilterFixture
@@ -25,7 +24,7 @@
         [Fact]
         public void has_a_nice_string_representation()
         {
-            Assert.Equal("Is of type System.String", IsOfTypeArgumentFilter<string>.Instance.ToString());
+            Assert.Equal("It.IsOfType<string>()", IsOfTypeArgumentFilter<string>.Instance.ToString());
         }
 
         [Fact]
