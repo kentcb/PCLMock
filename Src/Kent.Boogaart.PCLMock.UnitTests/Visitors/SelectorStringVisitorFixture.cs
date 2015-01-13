@@ -1,8 +1,8 @@
 ﻿namespace Kent.Boogaart.PCLMock.UnitTests.Visitors
 {
-    using Kent.Boogaart.PCLMock.Visitors;
     using System;
     using System.Linq.Expressions;
+    using Kent.Boogaart.PCLMock.Visitors;
     using Xunit;
 
     public sealed class SelectorStringVisitorFixture
@@ -11,7 +11,7 @@
         public void accessing_a_read_only_property_yields_the_correct_string_representation()
         {
             var visitor = new SelectorStringVisitor();
-            var expression = (Expression<Func<ITestTarget<int>, int>>)(x => x.ReadOnlyProperty);
+            var expression = GetExpression(x => x.ReadOnlyProperty);
             
             visitor.Visit(expression);
 
@@ -22,7 +22,7 @@
         public void accessing_a_read_write_property_yields_the_correct_string_representation()
         {
             var visitor = new SelectorStringVisitor();
-            var expression = (Expression<Func<ITestTarget<int>, int>>)(x => x.ReadWriteProperty);
+            var expression = GetExpression(x => x.ReadWriteProperty);
 
             visitor.Visit(expression);
 
@@ -33,14 +33,7 @@
         public void accessing_a_method_without_arguments_yields_the_correct_string_representation()
         {
             var visitor = new SelectorStringVisitor();
-            var expression = (Expression<Action<ITestTarget<int>>>)(x => x.MethodWithoutArguments());
-
-            visitor.Visit(expression);
-
-            Assert.Equal("MethodWithoutArguments()", visitor.ToString());
-
-            visitor = new SelectorStringVisitor();
-            expression = (Expression<Action<ITestTarget<int>>>)(x => x.MethodWithoutArguments());
+            var expression = GetExpression(x => x.MethodWithoutArguments());
 
             visitor.Visit(expression);
 
@@ -51,14 +44,14 @@
         public void accessing_a_method_with_arguments_yields_the_correct_string_representation()
         {
             var visitor = new SelectorStringVisitor();
-            var expression = (Expression<Action<ITestTarget<int>>>)(x => x.MethodWithArguments(3, It.IsAny<string>(), null));
+            var expression = GetExpression(x => x.MethodWithArguments(3, It.IsAny<string>(), null));
 
             visitor.Visit(expression);
 
             Assert.Equal("MethodWithArguments(It.Is(3), It.IsAny<string>(), It.Is(null))", visitor.ToString());
 
             visitor = new SelectorStringVisitor();
-            expression = (Expression<Action<ITestTarget<int>>>)(x => x.MethodWithArguments(3, It.IsAny<string>(), "abc"));
+            expression = GetExpression(x => x.MethodWithArguments(3, It.IsAny<string>(), "abc"));
 
             visitor.Visit(expression);
 
@@ -66,7 +59,7 @@
 
             visitor = new SelectorStringVisitor();
             var value = TimeSpan.FromSeconds(1);
-            expression = (Expression<Action<ITestTarget<int>>>)(x => x.MethodWithArguments(3, It.IsAny<string>(), value));
+            expression = GetExpression(x => x.MethodWithArguments(3, It.IsAny<string>(), value));
 
             visitor.Visit(expression);
 
@@ -75,22 +68,32 @@
 
         #region Supporting Members
 
-        private interface ITestTarget<T>
+        private static Expression GetExpression(Expression<Action<ITestTarget>> root)
         {
-            T ReadOnlyProperty
+            return root.Body;
+        }
+
+        private static Expression GetExpression(Expression<Func<ITestTarget, int>> root)
+        {
+            return root.Body;
+        }
+
+        private interface ITestTarget
+        {
+            int ReadOnlyProperty
             {
                 get;
             }
 
-            T ReadWriteProperty
+            int ReadWriteProperty
             {
                 get;
                 set;
             }
 
-            T MethodWithoutArguments();
+            int MethodWithoutArguments();
 
-            T MethodWithArguments(int i, string s, object o);
+            int MethodWithArguments(int i, string s, object o);
         }
 
         #endregion

@@ -9,12 +9,10 @@
     // find a single argument filter at the root of the given expression
     internal sealed class ArgumentFilterVisitor : ExpressionVisitor
     {
-        private readonly ConstantVisitor constantVisitor;
         private IArgumentFilter argumentFilter;
 
         private ArgumentFilterVisitor()
         {
-            this.constantVisitor = new ConstantVisitor();
         }
 
         public static bool TryFindArgumentFilterWithin(Expression expression, out IArgumentFilter argumentFilter)
@@ -60,48 +58,39 @@
 
                 for (var i = 0; i < argumentsToFilterMethod.Length; ++i)
                 {
-                    var constantExpression = this.constantVisitor.Visit(node.Arguments[i]) as ConstantExpression;
-                    argumentsToFilterMethod[i] = constantExpression == null ? null : constantExpression.Value;
+                    argumentsToFilterMethod[i] = ValueExtractor.FindValueWithin(node.Arguments[i]);
                 }
 
                 this.argumentFilter = filterMethod.Invoke(null, argumentsToFilterMethod) as IArgumentFilter;
             }
+            else
+            {
+                object value;
 
-            // we don't visit any further than the top level call
+                if (ValueExtractor.TryFindValueWithin(node, out value))
+                {
+                    this.argumentFilter = new IsArgumentFilter(value);
+                }
+            }
+
             return node;
         }
 
-        protected override Expression VisitMember(MemberExpression node)
+        public override Expression Visit(Expression node)
         {
-            var expression = Visit(node.Expression);
-
-            if (expression is ConstantExpression)
+            if (node.NodeType == ExpressionType.Convert || node.NodeType == ExpressionType.Call)
             {
-                var container = ((ConstantExpression)expression).Value;
-                var member = node.Member;
-
-                if (member is FieldInfo)
-                {
-                    var value = ((FieldInfo)member).GetValue(container);
-                    this.argumentFilter = new IsArgumentFilter(value);
-
-                    return Expression.Constant(value);
-                }
-                
-                if (member is PropertyInfo)
-                {
-                    var value = ((PropertyInfo)member).GetValue(container, null);
-                    this.argumentFilter = new IsArgumentFilter(value);
-
-                    return Expression.Constant(value);
-                }
+                return base.Visit(node);
             }
-            return base.VisitMember(node);
-        }
 
-        protected override Expression VisitConstant(ConstantExpression node)
-        {
-            this.argumentFilter = new IsArgumentFilter(node.Value);
+            object value;
+
+            if (ValueExtractor.TryFindValueWithin(node, out value))
+            {
+                this.argumentFilter = new IsArgumentFilter(value);
+                return node;
+            }
+
             return node;
         }
     }

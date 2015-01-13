@@ -1,5 +1,6 @@
 ﻿namespace Kent.Boogaart.PCLMock.Visitors
 {
+    using System;
     using System.Diagnostics;
     using System.Linq;
     using System.Linq.Expressions;
@@ -20,9 +21,19 @@
             Debug.Assert(expression != null);
 
             var visitor = new ArgumentFiltersVisitor();
-            visitor.Visit(expression);
-            argumentFilters = visitor.argumentFilters;
-            return argumentFilters != null && argumentFilters.All(x => x != null);
+
+            try
+            {
+                visitor.Visit(expression);
+                argumentFilters = visitor.argumentFilters;
+                return argumentFilters != null && argumentFilters.All(x => x != null);
+            }
+            catch (Exception)
+            {
+            }
+
+            argumentFilters = null;
+            return false;
         }
 
         public static ArgumentFilterCollection FindArgumentFiltersWithin(Expression expression)
@@ -35,16 +46,6 @@
             }
 
             return argumentFilters;
-        }
-
-        protected override Expression VisitLambda<T>(Expression<T> node)
-        {
-            if (node.Body.NodeType == ExpressionType.Call)
-            {
-                return this.Visit(node.Body);
-            }
-
-            return null;
         }
 
         protected override Expression VisitMethodCall(MethodCallExpression node)
@@ -64,8 +65,17 @@
                 }
             }
 
-            // we don't recurse down beyond the top-level method call
-            return node;
+            return Expression.Constant(this.argumentFilters);
+        }
+
+        public override Expression Visit(Expression node)
+        {
+            if (node is MethodCallExpression)
+            {
+                return base.Visit(node);
+            }
+
+            throw new InvalidOperationException("Root-level node must be a method call.");
         }
     }
 }

@@ -69,7 +69,7 @@
     <Compile Include="Visitors\ArgumentFiltersVisitor.cs" />
     <Compile Include="Visitors\ArgumentFilterVisitor.cs" />
     <Compile Include="Visitors\ArgumentsVisitor.cs" />
-    <Compile Include="Visitors\ConstantVisitor.cs" />
+    <Compile Include="Visitors\ValueExtractor.cs" />
     <Compile Include="Visitors\SelectorStringVisitor.cs" />
     <Compile Include="WhenContinuation.cs" />
   </ItemGroup>

@@ -66,7 +66,7 @@
     <Compile Include="Visitors\ArgumentFiltersVisitorFixture.cs" />
     <Compile Include="Visitors\ArgumentFilterVisitorFixture.cs" />
     <Compile Include="Visitors\ArgumentsVisitorFixture.cs" />
-    <Compile Include="Visitors\ConstantVisitorFixture.cs" />
+    <Compile Include="Visitors\ValueExtractorFixture.cs" />
     <Compile Include="Visitors\SelectorStringVisitorFixture.cs" />
   </ItemGroup>
   <ItemGroup>
