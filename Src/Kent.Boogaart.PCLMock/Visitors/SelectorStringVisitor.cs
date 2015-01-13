@@ -1,8 +1,8 @@
 ﻿namespace Kent.Boogaart.PCLMock.Visitors
 {
-    using Kent.Boogaart.PCLMock.Utility;
     using System.Linq.Expressions;
     using System.Text;
+    using Kent.Boogaart.PCLMock.Utility;
 
     // converts the given expression into a string that can be used for debugging purposes
     internal sealed class SelectorStringVisitor : ExpressionVisitor

@@ -1,7 +1,7 @@
 ﻿namespace Kent.Boogaart.PCLMock.ArgumentFilters.UnitTests
 {
-    using Kent.Boogaart.PCLMock.ArgumentFilters;
     using System;
+    using Kent.Boogaart.PCLMock.ArgumentFilters;
     using Xunit;
     using Xunit.Extensions;
 

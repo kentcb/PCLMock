@@ -1,6 +1,5 @@
 ﻿namespace Kent.Boogaart.PCLMock.ArgumentFilters.UnitTests
 {
-    using System;
     using System.Text.RegularExpressions;
     using Kent.Boogaart.PCLMock.ArgumentFilters;
     using Xunit;

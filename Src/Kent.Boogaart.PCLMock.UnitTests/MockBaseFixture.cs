@@ -1,8 +1,8 @@
 ﻿namespace Kent.Boogaart.PCLMock.UnitTests
 {
-    using Kent.Boogaart.PCLMock;
     using System;
     using System.Text.RegularExpressions;
+    using Kent.Boogaart.PCLMock;
     using Xunit;
     using Xunit.Extensions;
 

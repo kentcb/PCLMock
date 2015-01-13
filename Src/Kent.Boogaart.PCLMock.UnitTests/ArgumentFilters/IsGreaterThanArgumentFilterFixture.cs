@@ -1,8 +1,7 @@
 ﻿namespace Kent.Boogaart.PCLMock.ArgumentFilters.UnitTests
 {
-    using Xunit;
-    using Kent.Boogaart.PCLMock;
     using Kent.Boogaart.PCLMock.ArgumentFilters;
+    using Xunit;
 
     public sealed class IsGreaterThanArgumentFilterFixture
     {

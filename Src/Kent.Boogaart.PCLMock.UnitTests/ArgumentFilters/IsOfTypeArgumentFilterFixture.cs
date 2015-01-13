@@ -1,9 +1,8 @@
 ﻿namespace Kent.Boogaart.PCLMock.ArgumentFilters.UnitTests
 {
-    using Kent.Boogaart.PCLMock;
-    using Kent.Boogaart.PCLMock.ArgumentFilters;
     using System;
     using System.Text;
+    using Kent.Boogaart.PCLMock.ArgumentFilters;
     using Xunit;
 
     public sealed class IsOfTypeArgumentFilterFixture

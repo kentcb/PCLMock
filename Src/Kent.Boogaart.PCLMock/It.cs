@@ -1,8 +1,8 @@
 ﻿namespace Kent.Boogaart.PCLMock
 {
     using System;
-    using Kent.Boogaart.PCLMock.ArgumentFilters;
     using System.Text.RegularExpressions;
+    using Kent.Boogaart.PCLMock.ArgumentFilters;
 
     /// <summary>
     /// Provides a simple means of obtaining a value of any type. Useful when configuring expectations against method calls where the methods take arguments.

@@ -1,7 +1,7 @@
 ﻿namespace Kent.Boogaart.PCLMock.UnitTests.Utility
 {
-    using Kent.Boogaart.PCLMock.Utility;
     using System;
+    using Kent.Boogaart.PCLMock.Utility;
     using Xunit;
     using Xunit.Extensions;
 

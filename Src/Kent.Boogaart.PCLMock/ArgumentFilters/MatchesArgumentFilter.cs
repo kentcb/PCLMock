@@ -1,8 +1,8 @@
 ﻿namespace Kent.Boogaart.PCLMock.ArgumentFilters
 {
-    using Kent.Boogaart.PCLMock.Utility;
     using System;
     using System.Diagnostics;
+    using Kent.Boogaart.PCLMock.Utility;
 
     internal sealed class MatchesArgumentFilter<T> : IArgumentFilter, IEquatable<MatchesArgumentFilter<T>>
     {

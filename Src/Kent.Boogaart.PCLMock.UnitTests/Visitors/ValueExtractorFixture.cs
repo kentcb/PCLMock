@@ -1,8 +1,8 @@
 ﻿namespace Kent.Boogaart.PCLMock.UnitTests.Visitors
 {
-    using Kent.Boogaart.PCLMock.Visitors;
     using System;
     using System.Linq.Expressions;
+    using Kent.Boogaart.PCLMock.Visitors;
     using Xunit;
     using Xunit.Extensions;
 

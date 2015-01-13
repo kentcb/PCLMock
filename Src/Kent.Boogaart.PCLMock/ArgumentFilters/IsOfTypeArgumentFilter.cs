@@ -1,7 +1,7 @@
 ﻿namespace Kent.Boogaart.PCLMock.ArgumentFilters
 {
-    using Kent.Boogaart.PCLMock.Utility;
     using System;
+    using Kent.Boogaart.PCLMock.Utility;
 
     internal sealed class IsOfTypeArgumentFilter<T> : IArgumentFilter, IEquatable<IsOfTypeArgumentFilter<T>>
     {

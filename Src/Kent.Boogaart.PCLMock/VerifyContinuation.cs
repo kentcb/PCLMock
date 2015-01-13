@@ -4,8 +4,8 @@
     using System.Diagnostics;
     using System.Globalization;
     using System.Linq;
-    using Kent.Boogaart.PCLMock.Utility;
     using System.Linq.Expressions;
+    using Kent.Boogaart.PCLMock.Utility;
     using Kent.Boogaart.PCLMock.Visitors;
 
     /// <summary>
