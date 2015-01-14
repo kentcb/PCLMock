@@ -57,6 +57,9 @@ Full mocked object type name: {3}";
         /// <summary>
         /// Gets the mocked object.
         /// </summary>
+        /// <remarks>
+        /// It is not typically necessary to override this property unless mocking a class.
+        /// </remarks>
         public virtual TMock MockedObject
         {
             get

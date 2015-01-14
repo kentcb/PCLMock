@@ -5,8 +5,33 @@
     using Kent.Boogaart.PCLMock.ArgumentFilters;
 
     /// <summary>
-    /// Provides a simple means of obtaining a value of any type. Useful when configuring expectations against method calls where the methods take arguments.
+    /// Facilitates the filtering of arguments when interacting with mocks.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This class provides a number of methods that can be used to filter arguments in calls to <see cref="MockBase{T}.When"/> or <see cref="MockBase{T}.Verify"/>.
+    /// Consider the following example:
+    /// </para>
+    /// <para>
+    /// <example>
+    /// <code>
+    /// <![CDATA[
+    /// someMock
+    ///     .When(x => x.SomeMethod("abc", It.IsAny<int>(), It.IsNotNull()))
+    ///     .Return(50);
+    /// ]]>
+    /// </code>
+    /// </example>
+    /// </para>
+    /// <para>
+    /// In this case, the specification will only match if the first argument to <c>SomeMethod</c> is <c>"abc"</c> and the third argument is not <see langword="null"/>.
+    /// The second argument can be anything.
+    /// </para>
+    /// <para>
+    /// Note that the implementation of all <c>public</c> methods is simply to return a default instance of <c>T</c>. The actual implementation is resolved and applied
+    /// at run-time.
+    /// </para>
+    /// </remarks>
     public static class It
     {
         /// <summary>
@@ -324,6 +349,10 @@
         {
             return default(T);
         }
+
+        // the internal methods below must:
+        //  1. have the same name as their public counterpart above, but with a "Filter" suffix
+        //  2. return an implementation of IArgumentFilter that encapsulates the logic for the filter
 
         internal static IArgumentFilter IsAnyFilter<T>()
         {

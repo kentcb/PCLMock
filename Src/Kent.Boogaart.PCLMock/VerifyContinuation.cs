@@ -159,16 +159,16 @@
             }
         }
 
+        private static void ThrowVerificationException(string format, params object[] args)
+        {
+            throw new VerificationException(string.Format(CultureInfo.InvariantCulture, format, args));
+        }
+
         private string GetSelectorString()
         {
             var visitor = new SelectorStringVisitor();
             visitor.Visit(this.selector);
             return visitor.ToString();
-        }
-
-        private static void ThrowVerificationException(string format, params object[] args)
-        {
-            throw new VerificationException(string.Format(CultureInfo.InvariantCulture, format, args));
         }
 
         private IList<Invocation> GetMatchingInvocations()

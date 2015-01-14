@@ -1,4 +1,4 @@
-![Logo](Logo150x150.png "Logo")
+![Logo](Art/Logo150x150.png "Logo")
 
 # PCLMock
 
@@ -45,7 +45,8 @@ Test code can utilize the defined mocks in various ways. Here is a typical examp
 public void some_test()
 {
     var mockService = new SomeServiceMock();
-	mockService.When(x => x.Login(It.IsAny<string>(), "123456")).Return(true);
+	mockService.When(x => x.Login(It.IsAny<string>(), "123456"))
+	           .Return(true);
 
     var sut = new Foo(mockService);
 

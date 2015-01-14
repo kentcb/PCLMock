@@ -90,7 +90,7 @@
 
             if (!this.outAndRefAssignments.TryGetValue(parameterIndex, out value))
             {
-                // ref parameters need not be specified in the expectations, in which case the caller can provide the default value to assign
+                // ref parameters need not be included in the specifications, in which case the caller can provide the default value to assign
                 return defaultValue;
             }
 

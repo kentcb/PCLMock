@@ -60,11 +60,35 @@ public class AuthenticationServiceMock : MockBase<IAuthenticationService>, IAuth
 }
 ```
 
-As you can see, the basic approach is to implement each member to call `Apply()` or `ApplyPropertySet()` on the `MockBase<T>` base class. The `MockBase<T>` implementation takes care of applying any expectations configured by the consumer of the mock, be they invoking callbacks, throwing exceptions, or returning values.
+As you can see, the basic approach is to implement each member to call `Apply()` or `ApplyPropertySet()` on the `MockBase<T>` base class. The `MockBase<T>` implementation takes care of applying any specifications configured by the consumer of the mock, be they invoking callbacks, throwing exceptions, or returning values.
 
-The `MockBehavior` passed into the base constructor is used to determine whether invocations against the mock *must* have expectations configured (`MockBehavior.Strict`) or can *optionally* specify expectations (`MockBehavior.Loose`). This is covered in more detail below. 
+The `MockBehavior` passed into the base constructor is used to determine whether invocations against the mock *must* have specifications configured (`MockBehavior.Strict`) or can *optionally* provide specifications (`MockBehavior.Loose`). This is covered in more detail below. 
 
 ## Advanced Mocking Techniques
+
+### Mock Behavior
+
+The `MockBase<T>` constructor takes a `MockBehavior` that dictates what it does if an invocation is made against a member for which no specifications have been configured. Using `MockBehavior.Strict` will *require* that specifications be configured, otherwise an exception will be thrown when accessing any member for which a specification has not been configured. Using `MockBehavior.Loose` won't require any specifications be provided. If an invocation is made against a loose mock for which no return value has been specified, a default value is instead returned. That is, if the member returns type `T`, the invocation will return `default(T)`.
+
+Often it is desirable for one's loose mocks to take on some default behavior that reduces the need for configuring rote specifications within your test suite. This can be achieved using this pattern:
+
+```C#
+public class SomeMock : MockBase<ISomeInterface>, ISomeInterface
+{
+    public SomeMock(MockBehavior behavior = MockBehavior.Strict)
+        : base(behavior)
+    {
+        if (behavior == MockBehavior.Loose)
+        {
+            // configure some default specifications here
+            this.When(x => x.Foo)
+                .Return("bar");
+        }
+    }
+    
+    // other code here
+}
+```
 
 ### Mocking Classes
 
@@ -156,29 +180,6 @@ Finally, note that consumers of the mock need to dereference `MockedObject` to c
 ```C#
 var mock = new AuthenticationServiceMock();
 mock.MockedObject.When(x => x.IsAuthenticated).Return(true);
-```
-
-### Mock Behavior
-
-The `MockBase<T>` constructor takes a `MockBehavior` that dictates what it does if an invocation is made against a member for which no expectations have been configured. Using `MockBehavior.Strict` will require that expectations be configured, or else `MockBase<T>` will throw an exception. Using `MockBehavior.Loose` won't require any expectations be configured. If an invocation is made against a loose mock for which no return value has been configured, a default value is instead returned. That is, if the member returns type `T`, the invocation will return `default(T)`.
-
-Often it is desirable for one's loose mocks to take on some default behavior that reduces the need for configurating rote expections within your test suite. This can be achieved using this pattern:
-
-```C#
-public class SomeMock : MockBase<ISomeInterface>, ISomeInterface
-{
-    public SomeMock(MockBehavior behavior = MockBehavior.Strict)
-        : base(behavior)
-    {
-        if (behavior == MockBehavior.Loose)
-        {
-            // configure some default expectations here
-            this.When(x => x.Foo).Return("bar");
-        }
-    }
-    
-    // other code here
-}
 ```
 
 ### Mocking `ref` and `out` Parameters

@@ -11,4 +11,4 @@ using System.Resources;
 [assembly: AssemblyTrademarkAttribute("")]
 [assembly: AssemblyCultureAttribute("")]
 [assembly: NeutralResourcesLanguageAttribute("en-US")]
-[assembly: AssemblyInformationalVersionAttribute("1.0.0-alpha")]
+[assembly: AssemblyInformationalVersionAttribute("1.0.0")]
