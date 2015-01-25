@@ -275,7 +275,7 @@ Full mocked object type name: {3}";
         }
 
         /// <summary>
-        /// Applies any specifications configured via <see cref="WhenPropertySet"/> for a given property setter.
+        /// Applies any specifications configured via <see cref="WhenPropertySet{TMember}"/> for a given property setter.
         /// </summary>
         /// <param name="selector">
         /// An expression that resolves to the property being set.
