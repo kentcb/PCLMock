@@ -11,7 +11,7 @@ PCLMock is a simple mocking framework in a Portable Class Library. The PCL targe
 * Windows Store
 * Windows Phone 8
 * Xamarin iOS
-* Xamarin Android.
+* Xamarin Android
 
 ## Why?
 
@@ -27,7 +27,7 @@ Install-Package Kent.Boogaart.PCLMock
 
 ## How?
 
-Mocks must be created manually (or by code generation). Mocks are created by subclassing `MockBase<T>`, where `T` is the interface or non-`sealed` class being mocked. For example:
+Mocks must be created manually (or by code generation). Mocks are created by subclassing `MockBase<T>`, where `T` is the interface or non-sealed class being mocked. For example:
 
 ```C#
 public class SomeServiceMock : MockBase<ISomeService>, ISomeService
@@ -45,12 +45,17 @@ Test code can utilize the defined mocks in various ways. Here is a typical examp
 public void some_test()
 {
     var mockService = new SomeServiceMock();
-	mockService.When(x => x.Login(It.IsAny<string>(), "123456"))
-	           .Return(true);
+	mockService
+	    .When(x => x.Login(It.IsAny<string>(), "123456"))
+	    .Return(true);
 
     var sut = new Foo(mockService);
 
-    // other test code follows
+    // some test code here
+    
+    mockService
+        .Verify(x => x.Login("me", "123456"))
+        .WasNotCalled();
 }
 ```
 
