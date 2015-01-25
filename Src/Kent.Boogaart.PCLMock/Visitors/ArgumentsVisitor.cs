@@ -55,15 +55,5 @@
 
             return Expression.Constant(this.arguments);
         }
-
-        public override Expression Visit(Expression node)
-        {
-            if (node is MethodCallExpression)
-            {
-                return base.Visit(node);
-            }
-
-            throw new InvalidOperationException("Root-level node must be a method call.");
-        }
     }
 }
