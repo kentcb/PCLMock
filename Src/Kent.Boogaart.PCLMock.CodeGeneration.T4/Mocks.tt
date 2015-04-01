@@ -1,0 +1,50 @@
+﻿<#@ template debug="true" hostspecific="true" language="C#" #>
+<#@ CleanupBehavior processor="T4VSHost" CleanupAfterProcessingtemplate="true" #>
+<#@ assembly name="$(ProjectDir)$(OutDir)Kent.Boogaart.PCLMock.CodeGeneration.T4.dll" #>
+<#@ assembly name="EnvDTE" #>
+<#@ import namespace="Kent.Boogaart.PCLMock.CodeGeneration.T4" #>
+<#@ import namespace="EnvDTE" #>
+<#
+// set this to either "CSharp" or "VisualBasic"
+var language = "CSharp";
+
+this.SetFileExtensionForLanguage(language);
+var solutionPath = this.DTE.Solution.FileName;
+var xmlPath = this.Host.ResolvePath("Mocks.xml");
+var result = XmlBasedGenerator.GenerateMocks(solutionPath, xmlPath, "CSharp");
+
+this.WriteLine(result);
+#>
+<#+
+private DTE dte;
+
+private DTE DTE
+{
+    get
+    {
+        if (this.dte == null)
+        {
+            var hostServiceProvider = (IServiceProvider)this.Host;
+            this.dte = (DTE)hostServiceProvider.GetService(typeof(DTE));
+        }
+
+        return this.dte;
+    }
+}
+
+private void SetFileExtensionForLanguage(string language)
+{
+    switch (language)
+    {
+        case "CSharp":
+            this.Host.SetFileExtension(".g.cs");
+            break;
+        case "VisualBasic":
+            this.Host.SetFileExtension(".g.vb");
+            break;
+        default:
+            this.Host.SetFileExtension(".g");
+            break;
+    }
+}
+#>

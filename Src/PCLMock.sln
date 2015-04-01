@@ -19,6 +19,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{A1B3C179
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kent.Boogaart.PCLMock.CodeGeneration", "Kent.Boogaart.PCLMock.CodeGeneration\Kent.Boogaart.PCLMock.CodeGeneration.csproj", "{6E077796-0241-4191-A866-0EA52B9BD946}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kent.Boogaart.PCLMock.CodeGeneration.T4", "Kent.Boogaart.PCLMock.CodeGeneration.T4\Kent.Boogaart.PCLMock.CodeGeneration.T4.csproj", "{F482A52C-3D60-429D-9152-3FFB5D35CBFF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,6 +39,10 @@ Global
 		{6E077796-0241-4191-A866-0EA52B9BD946}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6E077796-0241-4191-A866-0EA52B9BD946}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6E077796-0241-4191-A866-0EA52B9BD946}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F482A52C-3D60-429D-9152-3FFB5D35CBFF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F482A52C-3D60-429D-9152-3FFB5D35CBFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F482A52C-3D60-429D-9152-3FFB5D35CBFF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F482A52C-3D60-429D-9152-3FFB5D35CBFF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
