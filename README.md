@@ -22,23 +22,16 @@ Existing mocking frameworks, such as [Moq](https://github.com/Moq/moq4), do not 
 The easiest way to get PCLMock is via [NuGet](http://www.nuget.org/packages/Kent.Boogaart.PCLMock/):
 
 ```PowerShell
-Install-Package Kent.Boogaart.PCLMock -Pre
+Install-Package Kent.Boogaart.PCLMock
 ```
+
+There are also packages specific to [code generation](Doc/generating-mocks.md).
 
 ## How?
 
-Mocks must be created manually (or by code generation). Mocks are created by subclassing `MockBase<T>`, where `T` is the interface or non-sealed class being mocked. For example:
+Mocks can be created manually or by [code generation](Doc/generating-mocks.md). Generally speaking, you will want to use one of the code generation packages to generate the bulk of your mock implementation. If, instead, you want to define mocks manually, read the documentation on [defining mocks](Doc/defining-mocks.md).
 
-```C#
-public class SomeServiceMock : MockBase<ISomeService>, ISomeService
-{
-    // implementation code goes here
-}
-```
-
-For a detailed discussion, read the documentation on [defining mocks](Doc/defining-mocks.md).
-
-Test code can utilize the defined mocks in various ways. Here is a typical example:
+Test code can utilize the mocks in various ways. Here is a typical example:
 
 ```C#
 [Fact]
