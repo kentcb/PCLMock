@@ -102,6 +102,10 @@
     </Compile>
     <Compile Include="Language.cs" />
     <Compile Include="LanguageExtensions.cs" />
+    <Compile Include="Models\Configuration.cs" />
+    <Compile Include="Models\Filter.cs" />
+    <Compile Include="Models\FilterType.cs" />
+    <Compile Include="Models\Transformation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Generator.cs" />
   </ItemGroup>

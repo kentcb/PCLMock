@@ -1,18 +1,25 @@
-﻿<#@ template debug="false" hostspecific="true" language="C#" #>
+﻿<#@ template debug="true" hostspecific="true" language="C#" #>
+<#@ CleanupBehavior processor="T4VSHost" CleanupAfterProcessingtemplate="true" #>
+<#@ assembly name="System.Core" #>
 <#@ assembly name="$(ProjectDir)$(OutDir)Kent.Boogaart.PCLMock.CodeGeneration.T4.dll" #>
 <#@ assembly name="EnvDTE" #>
-<#@ import namespace="Kent.Boogaart.PCLMock.CodeGeneration.T4" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Reflection" #>
 <#@ import namespace="EnvDTE" #>
 <#
 // set this to either "CSharp" or "VisualBasic"
 var language = "CSharp";
 
 this.SetFileExtensionForLanguage(language);
+this.HookAssemblyResolution();
 var solutionPath = this.DTE.Solution.FileName;
 var xmlPath = this.Host.ResolvePath("Mocks.xml");
-var result = XmlBasedGenerator.GenerateMocks(solutionPath, xmlPath, "CSharp");
+var xmlBasedGenerator = Type.GetType("Kent.Boogaart.PCLMock.CodeGeneration.T4.XmlBasedGenerator, Kent.Boogaart.PCLMock.CodeGeneration.T4");
+var generateMethod = xmlBasedGenerator.GetMethod("GenerateMocks", BindingFlags.Static | BindingFlags.Public);
+var result = (string)generateMethod.Invoke(null, new[] { solutionPath, xmlPath, language });
 
-this.WriteLine(result);
+//this.WriteLine(result);
 #>
 <#+
 private DTE dte;
@@ -45,5 +52,83 @@ private void SetFileExtensionForLanguage(string language)
             this.Host.SetFileExtension(".g");
             break;
     }
+}
+
+private void HookAssemblyResolution()
+{
+    var templateDirectory = Path.GetDirectoryName(this.Host.TemplateFile);
+    var currentDirectory = templateDirectory;
+    string packagesDirectory = null;
+
+    while (Path.GetPathRoot(currentDirectory) != currentDirectory)
+    {
+        var packagesDirectories = Directory.GetDirectories(currentDirectory, "packages");
+
+        if (packagesDirectories.Length == 0)
+        {
+            currentDirectory = Path.GetDirectoryName(currentDirectory);
+            continue;
+        }
+        else if (packagesDirectories.Length > 1)
+        {
+            throw new InvalidOperationException("More than one packages directory detected - aborting.");
+        }
+        else
+        {
+            packagesDirectory = packagesDirectories[0];
+            break;
+        }
+    }
+
+    if (packagesDirectory == null)
+    {
+        throw new InvalidOperationException("Could not find packages directory relative to the template's directory (" + templateDirectory + ").");
+    }
+
+    this.Debug("packages directory: {0}", packagesDirectory);
+
+    AppDomain.CurrentDomain.AssemblyResolve += (s, e) =>
+    {
+        this.Debug("resolve: {0}", e.Name);
+
+        var potentialMatches = Directory.GetFiles(packagesDirectory, e.Name + ".dll", SearchOption.AllDirectories);
+
+        if (potentialMatches.Length == 0)
+        {
+            this.Debug("Failed to find assembly in packages directory ({0}) named '{1}'.", packagesDirectory, e.Name);
+            return null;
+        }
+
+        var bestMatch = potentialMatches
+            .Select(x => new { Path = x, Platform = GetPlatformFromAssemblyPath(x) })
+            .OrderBy(x => x.Platform)
+            .First();
+
+        this.Debug("best match: {0}", bestMatch);
+
+        return Assembly.LoadFrom(bestMatch.Path);
+    };
+}
+
+private Platform GetPlatformFromAssemblyPath(string path)
+{
+    switch (new DirectoryInfo(Path.GetDirectoryName(path)).Name)
+    {
+        case "net45":
+            return Platform.Net45;
+        default:
+            return Platform.Other;
+    }
+}
+
+private void Debug(string format, params object[] args)
+{
+    this.WriteLine("// " + string.Format(format, args));
+}
+
+private enum Platform
+{
+    Net45,
+    Other
 }
 #>
