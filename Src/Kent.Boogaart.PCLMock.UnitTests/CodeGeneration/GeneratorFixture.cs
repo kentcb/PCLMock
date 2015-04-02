@@ -9,24 +9,19 @@
 
     public sealed class GeneratorFixture
     {
-        [Theory]
+        [Theory(Skip = "Waiting for Roslyn RC2")]
         [InlineData(nameof(ISimpleInterface), Language.CSharp, ExpectedCSharpISimpleInterface)]
         [InlineData(nameof(IInterfaceWithGenericMethods), Language.CSharp, ExpectedCSharpIInterfaceWithGenericMethods)]
         [InlineData("IGenericInterface", Language.CSharp, ExpectedCSharpIGenericInterface)]
         [InlineData(nameof(IInterfaceWithNonMockableMembers), Language.CSharp, ExpectedCSharpIInterfaceWithNonMockableMembers)]
         [InlineData(nameof(IPartialInterface), Language.CSharp, ExpectedCSharpIPartialInterface)]
         [InlineData(nameof(IInheritingInterface), Language.CSharp, ExpectedCSharpIInheritingInterface)]
-
-        // TODO: I can't be bothered with VB until Roslyn is in a better state and at least C# works. I immediately hit a problem
-        // whereby VB's SyntaxGenerator assumes a Sub if returnType is null, but a Function if non-null. The method symbols being
-        // passed in have System.Void as their return type, so VB's syntax generator is generating an invalid Function instead of
-        // a Sub. May submit another PR when I get time
-        //[InlineData(nameof(ISimpleInterface), Language.VisualBasic, ExpectedVisualBasicISimpleInterface)]
-        //[InlineData(nameof(IInterfaceWithGenericMethods), Language.VisualBasic, ExpectedVisualBasicIInterfaceWithGenericMethods)]
-        //[InlineData("IGenericInterface", Language.VisualBasic, ExpectedVisualBasicIGenericInterface)]
-        //[InlineData(nameof(IInterfaceWithNonMockableMembers), Language.VisualBasic, ExpectedVisualBasicIInterfaceWithNonMockableMembers)]
-        //[InlineData(nameof(IPartialInterface), Language.VisualBasic, ExpectedVisualBasicIPartialInterface)]
-        //[InlineData(nameof(IInheritingInterface), Language.VisualBasic, ExpectedVisualBasicIInheritingInterface)]
+        [InlineData(nameof(ISimpleInterface), Language.VisualBasic, ExpectedVisualBasicISimpleInterface)]
+        [InlineData(nameof(IInterfaceWithGenericMethods), Language.VisualBasic, ExpectedVisualBasicIInterfaceWithGenericMethods)]
+        [InlineData("IGenericInterface", Language.VisualBasic, ExpectedVisualBasicIGenericInterface)]
+        [InlineData(nameof(IInterfaceWithNonMockableMembers), Language.VisualBasic, ExpectedVisualBasicIInterfaceWithNonMockableMembers)]
+        [InlineData(nameof(IPartialInterface), Language.VisualBasic, ExpectedVisualBasicIPartialInterface)]
+        [InlineData(nameof(IInheritingInterface), Language.VisualBasic, ExpectedVisualBasicIInheritingInterface)]
         public async Task can_generate_simple_mock(string interfaceName, Language language, string expectedGeneratedCode)
         {
             var result =

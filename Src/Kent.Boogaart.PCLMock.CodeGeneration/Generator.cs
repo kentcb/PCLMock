@@ -10,6 +10,7 @@
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Editing;
     using Microsoft.CodeAnalysis.MSBuild;
+    using VB = Microsoft.CodeAnalysis.VisualBasic.Syntax;
 
     public static class Generator
     {
@@ -51,7 +52,7 @@
                         .SyntaxTree
                         .GetRoot()
                         .DescendantNodes()
-                        .Where(y => y is InterfaceDeclarationSyntax)
+                        .Where(y => y is InterfaceDeclarationSyntax || y is VB.InterfaceBlockSyntax)
                         .Select(y =>
                             new
                             {
@@ -76,13 +77,13 @@
             Language language)
         {
             var syntaxGenerator = SyntaxGenerator.GetGenerator(project.Solution.Workspace, language.ToSyntaxGeneratorLanguageName());
-            var namespaceSyntax = GetNamespaceDeclarationSyntax(syntaxGenerator, semanticModel, mockNamespace);
-            var classSyntax = GetClassDeclarationSyntax(syntaxGenerator, semanticModel, mockName, interfaceSymbol);
+            var namespaceSyntax = GetNamespaceDeclarationSyntax(syntaxGenerator, semanticModel, mockNamespace, language);
+            var classSyntax = GetClassDeclarationSyntax(syntaxGenerator, semanticModel, mockName, interfaceSymbol, language);
 
             classSyntax = syntaxGenerator
-                .AddAttributes(classSyntax, GetClassAttributesSyntax(syntaxGenerator, semanticModel));
+                .AddAttributes(classSyntax, GetClassAttributesSyntax(syntaxGenerator, semanticModel, language));
             classSyntax = syntaxGenerator
-                .AddMembers(classSyntax, GetMemberDeclarations(syntaxGenerator, semanticModel, mockName, interfaceSymbol));
+                .AddMembers(classSyntax, GetMemberDeclarations(syntaxGenerator, semanticModel, mockName, interfaceSymbol, language));
             namespaceSyntax = syntaxGenerator
                 .AddMembers(namespaceSyntax, classSyntax);
 
@@ -94,7 +95,8 @@
         private static SyntaxNode GetNamespaceDeclarationSyntax(
             SyntaxGenerator syntaxGenerator,
             SemanticModel semanticModel,
-            string @namespace)
+            string @namespace,
+            Language language)
         {
             return syntaxGenerator.NamespaceDeclaration(@namespace);
         }
@@ -103,7 +105,8 @@
             SyntaxGenerator syntaxGenerator,
             SemanticModel semanticModel,
             string name,
-            INamedTypeSymbol interfaceSymbol)
+            INamedTypeSymbol interfaceSymbol,
+            Language language)
         {
             var interfaceType = syntaxGenerator.TypeExpression(interfaceSymbol);
             var mockBaseType = semanticModel
@@ -152,26 +155,28 @@
 
         private static IEnumerable<SyntaxNode> GetClassAttributesSyntax(
             SyntaxGenerator syntaxGenerator,
-            SemanticModel semanticModel)
+            SemanticModel semanticModel,
+            Language language)
         {
             // GENERATED CODE:
             //
-            //     [global::System.CodeDom.Compiler.GeneratedCode("PCLMock", "[version]")]
-            //     [global::System.Runtime.CompilerServices.CompilerGenerated)]
+            //     [System.CodeDom.Compiler.GeneratedCode("PCLMock", "[version]")]
+            //     [System.Runtime.CompilerServices.CompilerGenerated)]
             yield return syntaxGenerator
                 .Attribute(
-                    "global::System.CodeDom.Compiler.GeneratedCode",
+                    "System.CodeDom.Compiler.GeneratedCode",
                     syntaxGenerator.LiteralExpression("PCLMock"),
                     syntaxGenerator.LiteralExpression(typeof(MockBase<>).Assembly.GetName().Version.ToString()));
             yield return syntaxGenerator
                 .Attribute(
-                    "global::System.Runtime.CompilerServices.CompilerGenerated");
+                    "System.Runtime.CompilerServices.CompilerGenerated");
         }
 
         private static SyntaxNode GetConstructorDeclarationSyntax(
             SyntaxGenerator syntaxGenerator,
             SemanticModel semanticModel,
-            string name)
+            string name,
+            Language language)
         {
             // GENERATED CODE:
             //
@@ -217,13 +222,15 @@
 
         private static SyntaxNode GetInitializationMethodSyntax(
             SyntaxGenerator syntaxGenerator,
-            SemanticModel semanticModel)
+            SemanticModel semanticModel,
+            Language language)
         {
             // GENERATED CODE:
             //
             //     partial void ConfigureLooseBehavior();
             return syntaxGenerator.MethodDeclaration(
                 "ConfigureLooseBehavior",
+                accessibility: language == Language.VisualBasic ? Accessibility.Private : Accessibility.NotApplicable,
                 modifiers: DeclarationModifiers.Partial);
         }
 
@@ -231,18 +238,20 @@
             SyntaxGenerator syntaxGenerator,
             SemanticModel semanticModel,
             string name,
-            INamedTypeSymbol interfaceSymbol)
+            INamedTypeSymbol interfaceSymbol,
+            Language language)
         {
             return
                 new SyntaxNode[]
                 {
-                    GetConstructorDeclarationSyntax(syntaxGenerator, semanticModel, name),
-                    GetInitializationMethodSyntax(syntaxGenerator, semanticModel)
+                    GetConstructorDeclarationSyntax(syntaxGenerator, semanticModel, name, language),
+                    GetInitializationMethodSyntax(syntaxGenerator, semanticModel, language)
                 }
                 .Concat(
                     GetMembersRecursive(interfaceSymbol)
-                        .Select(x => GetMemberDeclarationSyntax(syntaxGenerator, semanticModel, x))
-                        .Where(x => x != null));
+                        .Select(x => GetMemberDeclarationSyntax(syntaxGenerator, semanticModel, x, language))
+                        .Where(x => x != null)
+                        .Select(x => syntaxGenerator.AsPublicInterfaceImplementation(x, syntaxGenerator.TypeExpression(interfaceSymbol))));
         }
 
         private static IEnumerable<ISymbol> GetMembersRecursive(INamedTypeSymbol interfaceSymbol)
@@ -264,20 +273,21 @@
         private static SyntaxNode GetMemberDeclarationSyntax(
             SyntaxGenerator syntaxGenerator,
             SemanticModel semanticModel,
-            ISymbol symbol)
+            ISymbol symbol,
+            Language language)
         {
             var propertySymbol = symbol as IPropertySymbol;
 
             if (propertySymbol != null)
             {
-                return GetPropertyDeclarationSyntax(syntaxGenerator, semanticModel, propertySymbol);
+                return GetPropertyDeclarationSyntax(syntaxGenerator, semanticModel, propertySymbol, language);
             }
 
             var methodSymbol = symbol as IMethodSymbol;
 
             if (methodSymbol != null)
             {
-                return GetMethodDeclarationSyntax(syntaxGenerator, semanticModel, methodSymbol);
+                return GetMethodDeclarationSyntax(syntaxGenerator, semanticModel, methodSymbol, language);
             }
 
             // unsupported symbol type, but we don't error - the user can supplement our code as necessary because it's a partial class
@@ -287,10 +297,11 @@
         private static SyntaxNode GetPropertyDeclarationSyntax(
             SyntaxGenerator syntaxGenerator,
             SemanticModel semanticModel,
-            IPropertySymbol propertySymbol)
+            IPropertySymbol propertySymbol,
+            Language language)
         {
-            var getAccessorStatements = GetPropertyGetAccessorsSyntax(syntaxGenerator, semanticModel, propertySymbol).ToList();
-            var setAccessorStatements = GetPropertySetAccessorsSyntax(syntaxGenerator, semanticModel, propertySymbol).ToList();
+            var getAccessorStatements = GetPropertyGetAccessorsSyntax(syntaxGenerator, semanticModel, propertySymbol, language).ToList();
+            var setAccessorStatements = GetPropertySetAccessorsSyntax(syntaxGenerator, semanticModel, propertySymbol, language).ToList();
             var declarationModifiers = DeclarationModifiers.None;
 
             // TODO: requires Roslyn RC2
@@ -335,7 +346,8 @@
         private static IEnumerable<SyntaxNode> GetPropertyGetAccessorsSyntax(
             SyntaxGenerator syntaxGenerator,
             SemanticModel semanticModel,
-            IPropertySymbol propertySymbol)
+            IPropertySymbol propertySymbol,
+            Language language)
         {
             if (propertySymbol.GetMethod == null)
             {
@@ -386,7 +398,8 @@
         private static IEnumerable<SyntaxNode> GetPropertySetAccessorsSyntax(
             SyntaxGenerator syntaxGenerator,
             SemanticModel semanticModel,
-            IPropertySymbol propertySymbol)
+            IPropertySymbol propertySymbol,
+            Language language)
         {
             if (propertySymbol.SetMethod == null)
             {
@@ -437,7 +450,8 @@
         private static SyntaxNode GetMethodDeclarationSyntax(
             SyntaxGenerator syntaxGenerator,
             SemanticModel semanticModel,
-            IMethodSymbol methodSymbol)
+            IMethodSymbol methodSymbol,
+            Language language)
         {
             if (methodSymbol.MethodKind != MethodKind.Ordinary)
             {
@@ -455,7 +469,7 @@
             methodDeclaration = syntaxGenerator
                 .WithStatements(
                     methodDeclaration,
-                    GetMethodStatementsSyntax(syntaxGenerator, semanticModel, methodSymbol));
+                    GetMethodStatementsSyntax(syntaxGenerator, semanticModel, methodSymbol, language));
 
             var csharpMethodDeclaration = methodDeclaration as MethodDeclarationSyntax;
 
@@ -471,7 +485,8 @@
         private static IEnumerable<SyntaxNode> GetMethodStatementsSyntax(
             SyntaxGenerator syntaxGenerator,
             SemanticModel semanticModel,
-            IMethodSymbol methodSymbol)
+            IMethodSymbol methodSymbol,
+            Language language)
         {
             // GENERATED CODE (for every ref or out parameter):
             //
