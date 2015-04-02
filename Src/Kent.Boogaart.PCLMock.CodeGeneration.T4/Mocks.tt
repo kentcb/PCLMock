@@ -1,7 +1,6 @@
 ﻿<#@ template debug="true" hostspecific="true" language="C#" #>
 <#@ CleanupBehavior processor="T4VSHost" CleanupAfterProcessingtemplate="true" #>
 <#@ assembly name="System.Core" #>
-<#@ assembly name="$(ProjectDir)$(OutDir)Kent.Boogaart.PCLMock.CodeGeneration.T4.dll" #>
 <#@ assembly name="EnvDTE" #>
 <#@ import namespace="System.IO" #>
 <#@ import namespace="System.Linq" #>
@@ -19,7 +18,7 @@ var xmlBasedGenerator = Type.GetType("Kent.Boogaart.PCLMock.CodeGeneration.T4.Xm
 var generateMethod = xmlBasedGenerator.GetMethod("GenerateMocks", BindingFlags.Static | BindingFlags.Public);
 var result = (string)generateMethod.Invoke(null, new[] { solutionPath, xmlPath, language });
 
-//this.WriteLine(result);
+this.WriteLine(result);
 #>
 <#+
 private DTE dte;
@@ -87,48 +86,54 @@ private void HookAssemblyResolution()
 
     this.Debug("packages directory: {0}", packagesDirectory);
 
+    var packageDirectories = Directory.GetDirectories(packagesDirectory, "Kent.Boogaart.PCLMock.CodeGeneration.T4.*");
+
+    if (packageDirectories.Length == 0)
+    {
+        throw new InvalidOperationException("Could not find Kent.Boogaart.PCLMock.CodeGeneration.T4 package in packages directory (" + packagesDirectory + ").");
+    }
+    else if (packageDirectories.Length > 1)
+    {
+        throw new InvalidOperationException("More than 1 version of the Kent.Boogaart.PCLMock.CodeGeneration.T4 package was found in the packages directory (" + packagesDirectory + "). You must choose 1 version and remove the others.");
+    }
+
+    var packageDirectory = packageDirectories.First();
+    this.Debug("package directory: {0}", packageDirectory);
+
+    var assembliesDirectory = Path.Combine(packageDirectory, "tools");
+    this.Debug("assemblies directory: {0}", assembliesDirectory);
+
+    if (!Directory.Exists(assembliesDirectory))
+    {
+        throw new InvalidOperationException("Package directory " + packageDirectory + " was found but no 'tools' subdirectory was found within.");
+    }
+
     AppDomain.CurrentDomain.AssemblyResolve += (s, e) =>
     {
         this.Debug("resolve: {0}", e.Name);
 
-        var potentialMatches = Directory.GetFiles(packagesDirectory, e.Name + ".dll", SearchOption.AllDirectories);
+        var matches = Directory.GetFiles(assembliesDirectory, e.Name + ".dll", SearchOption.TopDirectoryOnly);
 
-        if (potentialMatches.Length == 0)
+        if (matches.Length == 0)
         {
-            this.Debug("Failed to find assembly in packages directory ({0}) named '{1}'.", packagesDirectory, e.Name);
+            this.Debug("Failed to find assembly in assemblies directory ({0}) named '{1}'.", assembliesDirectory, e.Name);
+            return null;
+        }
+        else if (matches.Length > 1)
+        {
+            this.Debug("Found more than one potential match for '{0}' in assemblies directory ({0}). Bailing.", e.Name, assembliesDirectory);
             return null;
         }
 
-        var bestMatch = potentialMatches
-            .Select(x => new { Path = x, Platform = GetPlatformFromAssemblyPath(x) })
-            .OrderBy(x => x.Platform)
-            .First();
+        var match = matches.First();
+        this.Debug("match: {0}", match);
 
-        this.Debug("best match: {0}", bestMatch);
-
-        return Assembly.LoadFrom(bestMatch.Path);
+        return Assembly.LoadFrom(match);
     };
-}
-
-private Platform GetPlatformFromAssemblyPath(string path)
-{
-    switch (new DirectoryInfo(Path.GetDirectoryName(path)).Name)
-    {
-        case "net45":
-            return Platform.Net45;
-        default:
-            return Platform.Other;
-    }
 }
 
 private void Debug(string format, params object[] args)
 {
-    this.WriteLine("// " + string.Format(format, args));
-}
-
-private enum Platform
-{
-    Net45,
-    Other
+    //this.WriteLine("// " + string.Format(format, args));
 }
 #>

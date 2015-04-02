@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Kent.Boogaart.PCLMock</id>
+    <version>@build.number@</version>
+    <authors>Kent Boogaart</authors>
+    <owners>Kent Boogaart</owners>
+    <licenseUrl>https://github.com/kentcb/PCLMock/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/kentcb/PCLMock</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/kentcb/PCLMock/master/Art/Logo150x150.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>
+        PCLMock is mocking framework in a PCL, making it usable on platforms such as iOS and Android.
+    </description>
+    <tags>.NET mono portable pcl mocking ios android xamarin</tags>
+    @dependencies@
+    @references@
+  </metadata>
+</package>

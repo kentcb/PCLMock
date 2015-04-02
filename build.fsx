@@ -78,6 +78,7 @@ Target "CreateArchives" (fun _ ->
     !! "**/*.*"
         -- ".git/**"
         -- (genDir @@ "**")
+        -- (srcDir @@ "**/.vs/**")
         -- (srcDir @@ "packages/**/*")
         -- (srcDir @@ "**/*.suo")
         -- (srcDir @@ "**/*.csproj.user")
@@ -94,12 +95,20 @@ Target "CreateArchives" (fun _ ->
 )
 
 Target "CreateNuGetPackages" (fun _ ->
-    // copy binaries to lib
+    // copy files required in the various NuGets
     !! (srcDir @@ "Kent.Boogaart.PCLMock/bin" @@ configuration @@ "Kent.Boogaart.PCLMock.*")
-        |> CopyFiles (nugetDir @@ "lib/portable-net45+netcore45+win8+wp8+MonoAndroid1+MonoTouch1")
+        |> CopyFiles (nugetDir @@ "Kent.Boogaart.PCLMock/lib/portable-net45+netcore45+win8+wp8+MonoAndroid1+MonoTouch1")
+    !! (srcDir @@ "Kent.Boogaart.PCLMock.CodeGeneration/bin" @@ configuration @@ "Kent.Boogaart.PCLMock.CodeGeneration.*")
+        |> CopyFiles (nugetDir @@ "Kent.Boogaart.PCLMock.CodeGeneration/lib/net45")
+    !! (srcDir @@ "Kent.Boogaart.PCLMock.CodeGeneration.T4/bin" @@ configuration @@ "Mocks.*")
+        |> CopyFiles (nugetDir @@ "Kent.Boogaart.PCLMock.CodeGeneration.T4/content")
+    !! (srcDir @@ "Kent.Boogaart.PCLMock.CodeGeneration.T4/bin" @@ configuration @@ "*.*")
+        |> CopyFiles (nugetDir @@ "Kent.Boogaart.PCLMock.CodeGeneration.T4/tools")
 
-    // copy source to src
+    // copy source
     [!! (srcDir @@ "**/*.*")
+        -- ".git/**"
+        -- (srcDir @@ "**/.vs/**")
         -- (srcDir @@ "packages/**/*")
         -- (srcDir @@ "**/*.suo")
         -- (srcDir @@ "**/*.csproj.user")
@@ -114,11 +123,41 @@ Target "CreateNuGetPackages" (fun _ ->
             Project = "Kent.Boogaart.PCLMock"
             Version = semanticVersion
             OutputPath = nugetDir
-            WorkingDir = nugetDir
+            WorkingDir = nugetDir @@ "Kent.Boogaart.PCLMock"
             SymbolPackage = NugetSymbolPackage.Nuspec
             Publish = System.Convert.ToBoolean(deployToNuGet)
         })
-        (srcDir @@ "PCLMock.nuspec")
+        (srcDir @@ "Kent.Boogaart.PCLMock.nuspec")
+
+    NuGet (fun p ->
+        {p with
+            Project = "Kent.Boogaart.PCLMock.CodeGeneration"
+            Version = semanticVersion
+            OutputPath = nugetDir
+            WorkingDir = nugetDir @@ "Kent.Boogaart.PCLMock.CodeGeneration"
+            SymbolPackage = NugetSymbolPackage.Nuspec
+            Dependencies =
+                [
+                    "Kent.Boogaart.PCLMock", semanticVersion
+                ]
+            Publish = System.Convert.ToBoolean(deployToNuGet)
+        })
+        (srcDir @@ "Kent.Boogaart.PCLMock.CodeGeneration.nuspec")
+
+    NuGet (fun p ->
+        {p with
+            Project = "Kent.Boogaart.PCLMock.CodeGeneration.T4"
+            Version = semanticVersion
+            OutputPath = nugetDir
+            WorkingDir = nugetDir @@ "Kent.Boogaart.PCLMock.CodeGeneration.T4"
+            SymbolPackage = NugetSymbolPackage.Nuspec
+            Dependencies =
+                [
+                    "Kent.Boogaart.PCLMock", semanticVersion
+                ]
+            Publish = System.Convert.ToBoolean(deployToNuGet)
+        })
+        (srcDir @@ "Kent.Boogaart.PCLMock.CodeGeneration.T4.nuspec")
 )
 
 // build order

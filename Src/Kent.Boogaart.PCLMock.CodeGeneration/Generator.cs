@@ -107,10 +107,17 @@
             INamedTypeSymbol interfaceSymbol)
         {
             var interfaceType = syntaxGenerator.TypeExpression(interfaceSymbol);
+            var mockBaseType = semanticModel
+                .Compilation
+                .GetTypeByMetadataName("Kent.Boogaart.PCLMock.MockBase`1");
+
+            if (mockBaseType == null)
+            {
+                throw new InvalidOperationException("Failed to find type in PCLMock assembly. Are you sure this project has a reference to Kent.Boogaart.PCLMock?");
+            }
+
             var baseType = syntaxGenerator.TypeExpression(
-                semanticModel
-                    .Compilation
-                    .GetTypeByMetadataName("Kent.Boogaart.PCLMock.MockBase`1")
+                mockBaseType
                     .Construct(interfaceSymbol));
 
             var classDeclaration = syntaxGenerator.ClassDeclaration(

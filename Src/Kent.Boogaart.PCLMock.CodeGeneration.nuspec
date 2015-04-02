@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Kent.Boogaart.PCLMock.CodeGeneration</id>
+    <version>@build.number@</version>
+    <authors>Kent Boogaart</authors>
+    <owners>Kent Boogaart</owners>
+    <licenseUrl>https://github.com/kentcb/PCLMock/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/kentcb/PCLMock</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/kentcb/PCLMock/master/Art/Logo150x150.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>
+        Provides infrastructural support for PCLMock's code generation layers. 
+        NOTE: you probably don't want to add a direct dependency on this package. Instead, add a dependency on one of the other
+        more specific code generation packages.
+    </description>
+    <tags>.NET mocking codegen</tags>
+    @dependencies@
+    @references@
+  </metadata>
+</package>
