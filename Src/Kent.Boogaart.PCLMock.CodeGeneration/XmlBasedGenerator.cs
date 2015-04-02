@@ -1,4 +1,4 @@
-﻿namespace Kent.Boogaart.PCLMock.CodeGeneration.T4
+﻿namespace Kent.Boogaart.PCLMock.CodeGeneration
 {
     using System;
     using System.Collections.Immutable;
@@ -7,7 +7,6 @@
     using System.Text;
     using System.Threading.Tasks;
     using System.Xml.Linq;
-    using Kent.Boogaart.PCLMock.CodeGeneration;
     using Kent.Boogaart.PCLMock.CodeGeneration.Models;
     using Microsoft.CodeAnalysis;
 
@@ -19,7 +18,15 @@
             string language)
         {
             var castLanguage = (Language)Enum.Parse(typeof(Language), language);
-            return GenerateMocksAsync(solutionPath, xmlPath, castLanguage)
+            return GenerateMocks(solutionPath, xmlPath, castLanguage);
+        }
+
+        public static string GenerateMocks(
+            string solutionPath,
+            string xmlPath,
+            Language language)
+        {
+            return GenerateMocksAsync(solutionPath, xmlPath, language)
                 .Result
                 .Select(x => x.ToFullString())
                 .Aggregate(new StringBuilder(), (current, next) => current.AppendLine(next), x => x.ToString());

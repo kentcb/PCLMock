@@ -108,6 +108,7 @@
     <Compile Include="Models\Transformation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Generator.cs" />
+    <Compile Include="XmlBasedGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

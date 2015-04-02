@@ -4,7 +4,7 @@ using System.Resources;
 
 [assembly: AssemblyVersionAttribute("1.0.0.0")]
 [assembly: AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: AssemblyConfigurationAttribute("Release")]
+[assembly: AssemblyConfigurationAttribute("Debug")]
 [assembly: AssemblyCompanyAttribute("Kent Boogaart")]
 [assembly: AssemblyProductAttribute("PCLMock")]
 [assembly: AssemblyCopyrightAttribute("© Copyright. Kent Boogaart.")]

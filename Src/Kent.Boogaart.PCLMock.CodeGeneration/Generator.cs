@@ -28,6 +28,8 @@
                     .Select(async x =>
                         {
                             var compilation = await x.GetCompilationAsync();
+                            // make sure the compilation has a reference to PCLMock
+                            compilation = compilation.AddReferences(MetadataReference.CreateFromAssembly(typeof(MockBase<>).Assembly));
                             return new { Project = x, Compilation = compilation };
                         }));
 
@@ -73,9 +75,6 @@
             string mockName,
             Language language)
         {
-            // make sure the project to which we're adding the mock has a reference to PCLMock
-            project = project.AddMetadataReference(MetadataReference.CreateFromAssembly(typeof(MockBase<>).Assembly));
-
             var syntaxGenerator = SyntaxGenerator.GetGenerator(project.Solution.Workspace, language.ToSyntaxGeneratorLanguageName());
             var namespaceSyntax = GetNamespaceDeclarationSyntax(syntaxGenerator, semanticModel, mockNamespace);
             var classSyntax = GetClassDeclarationSyntax(syntaxGenerator, semanticModel, mockName, interfaceSymbol);
