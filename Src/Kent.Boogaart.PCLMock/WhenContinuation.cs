@@ -76,7 +76,7 @@
                     throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, "Out parameter at index {0} has a value of type '{1}' but type '{2}' was expected.", parameterIndex, value.GetType().FullName, typeof(T).FullName));
                 }
             }
-            else if (typeof(T).GetTypeInfo().IsValueType)
+            else if (typeof(T).IsValueType)
             {
                 throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, "Out parameter at index {0} has a null value specified but it is a value type ('{1}') so cannot be null.", parameterIndex, typeof(T).FullName));
             }
@@ -101,7 +101,7 @@
                     throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, "Ref parameter at index {0} has a value of type '{1}' but type '{2}' was expected.", parameterIndex, value.GetType().FullName, typeof(T).FullName));
                 }
             }
-            else if (typeof(T).GetTypeInfo().IsValueType)
+            else if (typeof(T).IsValueType)
             {
                 throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, "Ref parameter at index {0} has a null value specified but it is a value type ('{1}') so cannot be null.", parameterIndex, typeof(T).FullName));
             }
@@ -200,7 +200,7 @@
                     return true;
                 }
 
-                return expectedType.GetTypeInfo().IsAssignableFrom(receivedType.GetTypeInfo());
+                return expectedType.IsAssignableFrom(receivedType);
             }
 
             public int GetHashCode(Type obj)
@@ -356,7 +356,7 @@
 
             if (this.doAction != null)
             {
-                args = this.ValidateActionArgs("Do", this.doAction.GetMethodInfo().GetParameters().Select(x => x.ParameterType).ToArray(), args);
+                args = this.ValidateActionArgs("Do", this.doAction.Method.GetParameters().Select(x => x.ParameterType).ToArray(), args);
                 this.doAction.DynamicInvoke(args);
             }
 
@@ -525,7 +525,7 @@
 
             if (this.returnAction != null)
             {
-                args = this.ValidateActionArgs("Return", this.returnAction.GetMethodInfo().GetParameters().Select(x => x.ParameterType).ToArray(), args);
+                args = this.ValidateActionArgs("Return", this.returnAction.Method.GetParameters().Select(x => x.ParameterType).ToArray(), args);
                 return this.returnAction.DynamicInvoke(args);
             }
 
