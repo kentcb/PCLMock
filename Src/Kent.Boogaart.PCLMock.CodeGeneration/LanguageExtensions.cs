@@ -1,6 +1,7 @@
 ﻿namespace Kent.Boogaart.PCLMock.CodeGeneration
 {
     using System;
+    using Microsoft.CodeAnalysis;
 
     internal static class LanguageExtensions
     {
@@ -9,9 +10,9 @@
             switch (@this)
             {
                 case Language.CSharp:
-                    return "C#";
+                    return LanguageNames.CSharp;
                 case Language.VisualBasic:
-                    return "Visual Basic";
+                    return LanguageNames.VisualBasic;
                 default:
                     throw new NotSupportedException();
             }
