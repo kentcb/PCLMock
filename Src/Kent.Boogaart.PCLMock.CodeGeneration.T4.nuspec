@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Kent.Boogaart.PCLMock.CodeGeneration.T4</id>
+    <version>@build.number@</version>
+    <authors>Kent Boogaart</authors>
+    <owners>Kent Boogaart</owners>
+    <licenseUrl>https://github.com/kentcb/PCLMock/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/kentcb/PCLMock</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/kentcb/PCLMock/master/Art/Logo150x150.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>
+        Provides T4 code generation support for PCLMock.
+    </description>
+    <tags>.NET mocking codegen t4</tags>
+    @dependencies@
+    @references@
+  </metadata>
+</package>

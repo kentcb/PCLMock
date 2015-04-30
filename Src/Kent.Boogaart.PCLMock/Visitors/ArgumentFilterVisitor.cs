@@ -42,9 +42,8 @@
             var filterMethod = node
                 .Method
                 .DeclaringType
-                .GetTypeInfo()
-                .GetDeclaredMethods(node.Method.Name + "Filter")
-                .Where(x => x.GetParameters().Length == node.Arguments.Count)
+                .GetMethods(BindingFlags.Static | BindingFlags.NonPublic)
+                .Where(x => x.Name == node.Method.Name + "Filter" && x.GetParameters().Length == node.Arguments.Count)
                 .FirstOrDefault();
 
             if (filterMethod != null && filterMethod.ReturnType == typeof(IArgumentFilter))

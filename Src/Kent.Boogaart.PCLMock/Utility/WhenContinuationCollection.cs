@@ -15,7 +15,7 @@
             this.sync = new object();
         }
 
-        public IReadOnlyList<Invocation> Invocations
+        public IEnumerable<Invocation> Invocations
         {
             get { return this.invocations; }
         }

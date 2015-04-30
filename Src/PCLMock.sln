@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.22823.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kent.Boogaart.PCLMock", "Kent.Boogaart.PCLMock\Kent.Boogaart.PCLMock.csproj", "{A02C0394-4DAD-4422-97BB-4A90D89CEE66}"
 EndProject
@@ -12,10 +12,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{4E283F
 		.nuget\packages.config = .nuget\packages.config
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{A1B3C179-EFB2-437F-A9FF-16BD29DE2292}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".build", ".build", "{A1B3C179-EFB2-437F-A9FF-16BD29DE2292}"
 	ProjectSection(SolutionItems) = preProject
+		..\build.bat = ..\build.bat
 		..\build.fsx = ..\build.fsx
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kent.Boogaart.PCLMock.CodeGeneration", "Kent.Boogaart.PCLMock.CodeGeneration\Kent.Boogaart.PCLMock.CodeGeneration.csproj", "{6E077796-0241-4191-A866-0EA52B9BD946}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kent.Boogaart.PCLMock.CodeGeneration.T4", "Kent.Boogaart.PCLMock.CodeGeneration.T4\Kent.Boogaart.PCLMock.CodeGeneration.T4.csproj", "{F482A52C-3D60-429D-9152-3FFB5D35CBFF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kent.Boogaart.PCLMock.CodeGeneration.Console", "Kent.Boogaart.PCLMock.CodeGeneration.Console\Kent.Boogaart.PCLMock.CodeGeneration.Console.csproj", "{B56824C1-B58E-42FB-A528-518638A7DA15}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,6 +38,18 @@ Global
 		{05115055-0BBC-49D5-8966-2B90325F2F08}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{05115055-0BBC-49D5-8966-2B90325F2F08}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{05115055-0BBC-49D5-8966-2B90325F2F08}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6E077796-0241-4191-A866-0EA52B9BD946}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E077796-0241-4191-A866-0EA52B9BD946}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E077796-0241-4191-A866-0EA52B9BD946}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E077796-0241-4191-A866-0EA52B9BD946}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F482A52C-3D60-429D-9152-3FFB5D35CBFF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F482A52C-3D60-429D-9152-3FFB5D35CBFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F482A52C-3D60-429D-9152-3FFB5D35CBFF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F482A52C-3D60-429D-9152-3FFB5D35CBFF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B56824C1-B58E-42FB-A528-518638A7DA15}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B56824C1-B58E-42FB-A528-518638A7DA15}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B56824C1-B58E-42FB-A528-518638A7DA15}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B56824C1-B58E-42FB-A528-518638A7DA15}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

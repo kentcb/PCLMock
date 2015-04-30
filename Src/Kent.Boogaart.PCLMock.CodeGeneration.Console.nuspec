@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Kent.Boogaart.PCLMock.CodeGeneration.Console</id>
+    <version>@build.number@</version>
+    <authors>Kent Boogaart</authors>
+    <owners>Kent Boogaart</owners>
+    <licenseUrl>https://github.com/kentcb/PCLMock/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/kentcb/PCLMock</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/kentcb/PCLMock/master/Art/Logo150x150.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>
+        A console-based code generation tool for PCLMock. This is a solution-level package.
+    </description>
+    <tags>.NET mocking codegen console</tags>
+    @dependencies@
+    @references@
+  </metadata>
+</package>

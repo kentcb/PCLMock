@@ -2,7 +2,9 @@
 
 ## Overview
 
-To define a mock, you need an interface to be mocked. You can also mock `virtual` members in classes that are not `sealed`, but this is not a recommended approach (more on this below). For the purposes of the ensuing discussion, we will assume the existance of the following interface:
+Typically you would use [code generation](generating-mocks.md) to create the bulk of your mock code. However, you can also define mocks manually yourself if desired. Since the code generator only supports generating mocks from interfaces, manually defining mocks can get you out of a pinch if you need to mock a class.
+
+To define a mock manually, you first need an interface to be mocked. You can also mock `virtual` members in classes that are not `sealed`, but this is not a recommended approach (more on this below). For the purposes of the ensuing discussion, we will assume the existence of the following interface:
 
 ```C#
 public interface IAuthenticationService

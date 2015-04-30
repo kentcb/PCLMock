@@ -110,7 +110,7 @@
             if (@this is Enum)
             {
                 var @enum = (Enum)@this;
-                var isFlags = @this.GetType().GetTypeInfo().GetCustomAttribute(typeof(FlagsAttribute), false) != null;
+                var isFlags = @this.GetType().GetCustomAttributes(typeof(FlagsAttribute), false).Length > 0;
                 var result = new StringBuilder();
 
                 if (isFlags)
