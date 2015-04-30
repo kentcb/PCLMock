@@ -9,7 +9,6 @@
 
     public sealed class GeneratorFixture
     {
-        [Theory(Skip = "Waiting for Roslyn RC2")]
         [InlineData(nameof(ISimpleInterface), Language.CSharp, ExpectedCSharpISimpleInterface)]
         [InlineData(nameof(IInterfaceWithGenericMethods), Language.CSharp, ExpectedCSharpIInterfaceWithGenericMethods)]
         [InlineData("IGenericInterface", Language.CSharp, ExpectedCSharpIGenericInterface)]

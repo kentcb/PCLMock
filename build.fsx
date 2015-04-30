@@ -1,4 +1,4 @@
-﻿#I "Src/packages/FAKE.3.13.4/tools"
+﻿#I "Src/packages/FAKE.3.30.1/tools"
 #r "FakeLib.dll"
 
 open Fake
@@ -6,7 +6,7 @@ open Fake.AssemblyInfoFile
 open Fake.EnvironmentHelper
 open Fake.MSBuildHelper
 open Fake.NuGetHelper
-open Fake.XUnitHelper
+open Fake.XUnit2Helper
 
 // properties
 let semanticVersion = "2.0.0"
@@ -63,7 +63,7 @@ Target "Build" (fun _ ->
 )
 
 Target "ExecuteUnitTests" (fun _ ->
-    xUnit (fun p ->
+    xUnit2 (fun p ->
         { p with
             ShadowCopy = false;
             HtmlOutput = true;
