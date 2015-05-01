@@ -29,7 +29,7 @@ There are also packages specific to [code generation](Doc/generating-mocks.md).
 
 ## How?
 
-Mocks can be created manually or by [code generation](Doc/generating-mocks.md). Generally speaking, you will want to use one of the code generation packages to generate the bulk of your mock implementation. If, instead, you want to define mocks manually, read the documentation on [defining mocks](Doc/defining-mocks.md).
+Mocks can be created automatically via [code generation](Doc/generating-mocks.md) or manually. Generally speaking, you will want to use one of the code generation packages to generate the bulk of your mock implementation. If, instead, you want to define mocks manually, read the documentation on [defining mocks](Doc/defining-mocks.md).
 
 Test code can utilize the mocks in various ways. Here is a typical example:
 

@@ -57,7 +57,7 @@ public class AuthenticationServiceMock : MockBase<IAuthenticationService>, IAuth
     
     public bool Authenticate(string user, string password, TimeSpan? timeout = default(TimeSpan?))
     {
-        return this.Apply(x => x.Authenticate(user, password, timeout), user, password, timeout);
+        return this.Apply(x => x.Authenticate(user, password, timeout));
     }
 }
 ```
@@ -169,7 +169,7 @@ public class AuthenticationServiceMock : MockBase<AuthenticationService>
         
         public override bool Authenticate(string user, string password, TimeSpan? timeout = default(TimeSpan))
         {
-            return this.owner.Apply(x => x.Authenticate(user, password, timeout), user, password, timeout);
+            return this.owner.Apply(x => x.Authenticate(user, password, timeout));
         }
     }
 }
