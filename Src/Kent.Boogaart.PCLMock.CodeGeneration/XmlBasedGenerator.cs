@@ -18,24 +18,24 @@
             string language)
         {
             var castLanguage = (Language)Enum.Parse(typeof(Language), language);
-            return GenerateMocks(solutionPath, xmlPath, castLanguage);
+            return GenerateMocks(castLanguage, solutionPath, xmlPath);
         }
 
         public static string GenerateMocks(
+            Language language,
             string solutionPath,
-            string xmlPath,
-            Language language)
+            string xmlPath)
         {
-            return GenerateMocksAsync(solutionPath, xmlPath, language)
+            return GenerateMocksAsync(language, solutionPath, xmlPath)
                 .Result
                 .Select(x => x.ToFullString())
                 .Aggregate(new StringBuilder(), (current, next) => current.AppendLine(next), x => x.ToString());
         }
 
         public async static Task<IImmutableList<SyntaxNode>> GenerateMocksAsync(
+            Language language,
             string solutionPath,
-            string xmlPath,
-            Language language)
+            string xmlPath)
         {
             if (!File.Exists(xmlPath))
             {
@@ -46,11 +46,11 @@
             var configuration = Configuration.FromXDocument(document);
 
             return await Generator.GenerateMocksAsync(
+                language,
                 solutionPath,
                 configuration.GetInterfacePredicate(),
                 configuration.GetNamespaceSelector(),
-                configuration.GetNameSelector(),
-                language);
+                configuration.GetNameSelector());
         }
     }
 }

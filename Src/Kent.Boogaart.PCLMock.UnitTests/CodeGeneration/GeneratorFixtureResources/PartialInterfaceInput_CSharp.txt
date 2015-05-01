@@ -1,0 +1,15 @@
+﻿public partial interface IPartialInterface
+{
+    int Property1
+    {
+        get;
+    }
+}
+
+public partial interface IPartialInterface
+{
+    int Property2
+    {
+        get;
+    }
+}
