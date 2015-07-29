@@ -240,3 +240,21 @@ mock.When(x => x[1, 13]).Return(190);
 Assert.Equal(190, mock[1, 13]);
 Assert.Equal(48, mock[2, 3]);
 ```
+
+## Limitations
+
+There are some things that cannot currently be mocked, or can only be mocked in a limited fashion. They are documented below.
+
+### Set-only properties
+
+Properties with only a `set` accessor cannot be mocked. This is due to expression tree limitations. Only properties with a `get` accessor can appear inside an expression tree, so there is no way to call `Apply` with an expression tree that resolves to the property.
+
+The code generator ignores `set`-only properties, so you can always supplement the generated code with a `set`-only property with an implementation of your choosing.
+
+### Events
+
+Again, limitations in expression trees prevent a viable means of resolving events. This means that there is also no way to call `Apply` and pass in an expression that resolves to the event in question.
+
+The code generator ignores events, so you can supplement the generated code with event implementations of your own.
+
+It is conceivable that *some* event mocking support will be added in the future. For example, `RaiseEvent` methods might be generated on the mock. This would allow you to simulate scenarios in which the system under test should react to an event, but it won't allow you to dictate what happens when an event handler is added or removed. In addition, verification scenarios wouldn't be supported (such as verifying that an event handler is detached when a component is disposed).
