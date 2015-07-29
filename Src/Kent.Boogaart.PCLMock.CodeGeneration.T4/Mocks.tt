@@ -16,7 +16,7 @@ var solutionPath = this.DTE.Solution.FileName;
 var xmlPath = this.Host.ResolvePath("Mocks.xml");
 var xmlBasedGenerator = Type.GetType("Kent.Boogaart.PCLMock.CodeGeneration.XmlBasedGenerator, Kent.Boogaart.PCLMock.CodeGeneration");
 var generateMethod = xmlBasedGenerator.GetMethod("GenerateMocks", new[] { typeof(string), typeof(string), typeof(string) });
-var result = (string)generateMethod.Invoke(null, new[] { language, solutionPath, xmlPath });
+var result = (string)generateMethod.Invoke(null, new[] { solutionPath, xmlPath, language });
 
 this.WriteLine(result);
 #>

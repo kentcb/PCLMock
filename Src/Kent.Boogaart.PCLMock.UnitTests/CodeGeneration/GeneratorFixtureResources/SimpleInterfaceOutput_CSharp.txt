@@ -12,27 +12,12 @@
             }
         }
 
-        partial void ConfigureLooseBehavior()
-        {
-        }
-
+        partial void ConfigureLooseBehavior();
         public System.Int32 GetProperty
         {
             get
             {
                 return this.Apply(x => x.GetProperty);
-            }
-        }
-
-        public System.Int32 SetProperty
-        {
-            get
-            {
-            }
-
-            set
-            {
-                this.ApplyPropertySet(x => x.SetProperty, value);
             }
         }
 

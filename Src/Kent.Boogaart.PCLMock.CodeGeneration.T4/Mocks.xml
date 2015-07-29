@@ -32,6 +32,13 @@ All patterns specified in this file are .NET regular expressions.
             <Replacement>${name}</Replacement>
         </Transformation>
         <!--
+        if the name includes generic arguments, strip them out
+        -->
+        <Transformation>
+            <Pattern><![CDATA[(?<name>[A-Z].*)\<.*\>]]></Pattern>
+            <Replacement>${name}</Replacement>
+        </Transformation>
+        <!--
         append "Mock" onto the name
         -->
         <Transformation>

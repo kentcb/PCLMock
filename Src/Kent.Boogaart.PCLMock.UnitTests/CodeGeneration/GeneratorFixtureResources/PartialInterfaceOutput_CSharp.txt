@@ -12,10 +12,7 @@
             }
         }
 
-        partial void ConfigureLooseBehavior()
-        {
-        }
-
+        partial void ConfigureLooseBehavior();
         public System.Int32 Property1
         {
             get

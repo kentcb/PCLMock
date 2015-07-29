@@ -57,7 +57,7 @@
                         {
                             var compilation = await x.GetCompilationAsync();
                             // make sure the compilation has a reference to PCLMock
-                            return compilation.AddReferences(MetadataReference.CreateFromAssembly(typeof(MockBase<>).Assembly));
+                            return compilation.AddReferences(MetadataReference.CreateFromFile(typeof(MockBase<>).Assembly.Location));
                         }));
 
             return compilations
@@ -322,11 +322,13 @@
             var setAccessorStatements = GetPropertySetAccessorsSyntax(syntaxGenerator, semanticModel, propertySymbol).ToList();
             var declarationModifiers = DeclarationModifiers.None;
 
-            // TODO: requires Roslyn RC2
-            //if (getAccessorStatements.Count == 0)
-            //{
-            //    declarationModifiers = declarationModifiers.WithIsWriteOnly(true);
-            //}
+            if (getAccessorStatements.Count == 0)
+            {
+                declarationModifiers = declarationModifiers.WithIsWriteOnly(true);
+
+                // set-only properties are not currently supported
+                return null;
+            }
 
             if (setAccessorStatements.Count == 0)
             {

@@ -1,6 +1,6 @@
 ﻿namespace The.Namespace
 {
-    [System.CodeDom.Compiler.GeneratedCode("PCLMock", "3.0.0.0")]
+    [System.CodeDom.Compiler.GeneratedCode("PCLMock", "$VERSION$")]
     [System.Runtime.CompilerServices.CompilerGenerated]
     public partial class Mock<TFirst, TSecond> : global::Kent.Boogaart.PCLMock.MockBase<global::IGenericInterface<TFirst, TSecond>>, global::IGenericInterface<TFirst, TSecond> where TFirst : global::System.IComparable<TSecond>, new ()where TSecond : struct
     {
@@ -12,10 +12,7 @@
             }
         }
 
-        partial void ConfigureLooseBehavior()
-        {
-        }
-
+        partial void ConfigureLooseBehavior();
         public TFirst SomeProperty
         {
             get

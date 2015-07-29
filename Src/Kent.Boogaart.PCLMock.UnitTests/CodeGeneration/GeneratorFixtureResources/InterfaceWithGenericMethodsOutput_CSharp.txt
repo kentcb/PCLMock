@@ -12,10 +12,7 @@
             }
         }
 
-        partial void ConfigureLooseBehavior()
-        {
-        }
-
+        partial void ConfigureLooseBehavior();
         public void VoidMethodWithGenericParameter<T>()
         {
             this.Apply(x => x.VoidMethodWithGenericParameter<T>());

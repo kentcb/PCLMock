@@ -18,6 +18,13 @@
         [InlineData("InterfaceWithNonMockableMembers", Language.CSharp)]
         [InlineData("PartialInterface", Language.CSharp)]
         [InlineData("InheritingInterface", Language.CSharp)]
+        // TODO: VB is totally borked - calls to syntaxGenerator.WithStatements don't seem to add the statements! Will need to look into this at a later date
+        //[InlineData("SimpleInterface", Language.VisualBasic)]
+        //[InlineData("InterfaceWithGenericMethods", Language.VisualBasic)]
+        //[InlineData("GenericInterface", Language.VisualBasic)]
+        //[InlineData("InterfaceWithNonMockableMembers", Language.VisualBasic)]
+        //[InlineData("PartialInterface", Language.VisualBasic)]
+        //[InlineData("InheritingInterface", Language.VisualBasic)]
         public async Task can_generate_simple_mock(string resourceBaseName, Language language)
         {
             var inputResourceName = "Kent.Boogaart.PCLMock.UnitTests.CodeGeneration.GeneratorFixtureResources." + resourceBaseName + "Input_" + language.ToString() + ".txt";
@@ -38,9 +45,9 @@
                     language.ToSyntaxGeneratorLanguageName(),
                     metadataReferences: new[]
                     {
-                        MetadataReference.CreateFromAssembly(typeof(object).Assembly),
-                        MetadataReference.CreateFromAssembly(typeof(Uri).Assembly),
-                        MetadataReference.CreateFromAssembly(typeof(MockBase<>).Assembly)
+                        MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
+                        MetadataReference.CreateFromFile(typeof(Uri).Assembly.Location),
+                        MetadataReference.CreateFromFile(typeof(MockBase<>).Assembly.Location)
                     });
                 var project = workspace.AddProject(projectInfo);
                 workspace.AddDocument(projectId, "Source.cs", SourceText.From(inputStream));
