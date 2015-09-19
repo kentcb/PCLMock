@@ -1169,60 +1169,37 @@ Full mocked object type name: Kent.Boogaart.PCLMock.UnitTests.MockBaseFixture+Un
                 set { this.ApplyPropertySet(x => x[first, second], value); }
             }
 
-            public ITestSubTarget SomeComplexProperty
-            {
-                get { return this.Apply(x => x.SomeComplexProperty); }
-            }
+            public ITestSubTarget SomeComplexProperty => this.Apply(x => x.SomeComplexProperty);
 
-            public void SomeMethod()
-            {
+            public void SomeMethod() =>
                 this.Apply(x => x.SomeMethod());
-            }
 
-            public ITestSubTarget SomeComplexMethod()
-            {
-                return this.Apply(x => x.SomeComplexMethod());
-            }
+            public ITestSubTarget SomeComplexMethod() =>
+                this.Apply(x => x.SomeComplexMethod());
 
-            public void SomeMethod(int i, float f)
-            {
+            public void SomeMethod(int i, float f) =>
                 this.Apply(x => x.SomeMethod(i, f));
-            }
 
-            public int SomeMethodWithReturnValue()
-            {
-                return this.Apply(x => x.SomeMethodWithReturnValue());
-            }
+            public int SomeMethodWithReturnValue() =>
+                this.Apply(x => x.SomeMethodWithReturnValue());
 
-            public int SomeMethodWithReturnValue(int i, float f)
-            {
-                return this.Apply(x => x.SomeMethodWithReturnValue(i, f));
-            }
-
-            public void SomeMethodTakingComplexType(ITestSubTarget a)
-            {
+            public int SomeMethodWithReturnValue(int i, float f) =>
+                this.Apply(x => x.SomeMethodWithReturnValue(i, f));
+            
+            public void SomeMethodTakingComplexType(ITestSubTarget a) =>
                 this.Apply(x => x.SomeMethodTakingComplexType(a));
-            }
 
-            public void SomeMethodTakingString(string s)
-            {
+            public void SomeMethodTakingString(string s) =>
                 this.Apply(x => x.SomeMethodTakingString(s));
-            }
 
-            public int SomeMethodTakingStringWithReturnValue(string s)
-            {
-                return this.Apply(x => x.SomeMethodTakingStringWithReturnValue(s));
-            }
+            public int SomeMethodTakingStringWithReturnValue(string s) =>
+                this.Apply(x => x.SomeMethodTakingStringWithReturnValue(s));
 
-            public void SomeMethodTakingObject(object o)
-            {
+            public void SomeMethodTakingObject(object o) =>
                 this.Apply(x => x.SomeMethodTakingObject(o));
-            }
 
-            public int SomeMethodTakingObjectWithReturnValue(object o)
-            {
-                return this.Apply(x => x.SomeMethodTakingObjectWithReturnValue(o));
-            }
+            public int SomeMethodTakingObjectWithReturnValue(object o) =>
+                this.Apply(x => x.SomeMethodTakingObjectWithReturnValue(o));
 
             public void SomeMethodWithOutParameter(out string s)
             {
@@ -1268,10 +1245,8 @@ Full mocked object type name: Kent.Boogaart.PCLMock.UnitTests.MockBaseFixture+Un
 
         private class UnsealedClass
         {
-            public virtual bool DoSomething()
-            {
-                return false;
-            }
+            public virtual bool DoSomething() =>
+                false;
         }
 
         private class UnsealedClassMock : MockBase<UnsealedClass>
@@ -1284,10 +1259,7 @@ Full mocked object type name: Kent.Boogaart.PCLMock.UnitTests.MockBaseFixture+Un
                 this.mockedObject = new UnsealedClassSubclass(this);
             }
 
-            public override UnsealedClass MockedObject
-            {
-                get { return this.mockedObject; }
-            }
+            public override UnsealedClass MockedObject => this.mockedObject;
 
             private sealed class UnsealedClassSubclass : UnsealedClass
             {
