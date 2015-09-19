@@ -1,16 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.22823.1
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kent.Boogaart.PCLMock", "Kent.Boogaart.PCLMock\Kent.Boogaart.PCLMock.csproj", "{A02C0394-4DAD-4422-97BB-4A90D89CEE66}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kent.Boogaart.PCLMock.UnitTests", "Kent.Boogaart.PCLMock.UnitTests\Kent.Boogaart.PCLMock.UnitTests.csproj", "{05115055-0BBC-49D5-8966-2B90325F2F08}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{4E283FC5-6620-4BD0-B9FF-352CA735B070}"
-	ProjectSection(SolutionItems) = preProject
-		.nuget\packages.config = .nuget\packages.config
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".build", ".build", "{A1B3C179-EFB2-437F-A9FF-16BD29DE2292}"
 	ProjectSection(SolutionItems) = preProject
