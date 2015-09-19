@@ -171,10 +171,10 @@
     <EmbeddedResource Include="CodeGeneration\GeneratorFixtureResources\GenericInterfaceOutput_CSharp.txt" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="CodeGeneration\GeneratorFixtureResources\InterfaceWithNonMockableMembersOutput_CSharp.txt" />
+    <EmbeddedResource Include="CodeGeneration\GeneratorFixtureResources\NonMockableMembersOutput_CSharp.txt" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="CodeGeneration\GeneratorFixtureResources\InterfaceWithNonMockableMembersInput_CSharp.txt" />
+    <EmbeddedResource Include="CodeGeneration\GeneratorFixtureResources\NonMockableMembersInput_CSharp.txt" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="CodeGeneration\GeneratorFixtureResources\PartialInterfaceOutput_CSharp.txt" />
@@ -197,6 +197,24 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="CodeGeneration\GeneratorFixtureResources\SimpleInterfaceOutput_VisualBasic.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="CodeGeneration\GeneratorFixtureResources\NameClashInput_CSharp.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="CodeGeneration\GeneratorFixtureResources\NameClashOutput_CSharp.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="CodeGeneration\GeneratorFixtureResources\IndexersInput_CSharp.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="CodeGeneration\GeneratorFixtureResources\IndexersOutput_CSharp.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="CodeGeneration\GeneratorFixtureResources\OutAndRefInput_CSharp.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="CodeGeneration\GeneratorFixtureResources\OutAndRefOutput_CSharp.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

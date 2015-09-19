@@ -358,6 +358,7 @@
                         parameters,
                         syntaxGenerator.TypeExpression(propertySymbol.Type),
                         accessibility: Accessibility.Public,
+                        modifiers: declarationModifiers,
                         getAccessorStatements: getAccessorStatements,
                         setAccessorStatements: setAccessorStatements);
             }
@@ -373,6 +374,8 @@
                 yield break;
             }
 
+            var lambdaParameterName = GetUniqueName(propertySymbol);
+
             if (!propertySymbol.IsIndexer)
             {
                 // GENERATED CODE:
@@ -385,9 +388,9 @@
                                 syntaxGenerator.ThisExpression(),
                                 "Apply"),
                             syntaxGenerator.ValueReturningLambdaExpression(
-                                "x",
+                                lambdaParameterName,
                                 syntaxGenerator.MemberAccessExpression(
-                                    syntaxGenerator.IdentifierName("x"),
+                                    syntaxGenerator.IdentifierName(lambdaParameterName),
                                     syntaxGenerator.IdentifierName(propertySymbol.Name)))));
             }
             else
@@ -407,9 +410,9 @@
                                 syntaxGenerator.ThisExpression(),
                                 "Apply"),
                             syntaxGenerator.ValueReturningLambdaExpression(
-                                "x",
+                                lambdaParameterName,
                                 syntaxGenerator.ElementAccessExpression(
-                                    syntaxGenerator.IdentifierName("x"),
+                                    syntaxGenerator.IdentifierName(lambdaParameterName),
                                     arguments))));
             }
         }
@@ -424,6 +427,8 @@
                 yield break;
             }
 
+            var lambdaParameterName = GetUniqueName(propertySymbol);
+
             if (!propertySymbol.IsIndexer)
             {
                 // GENERATED CODE:
@@ -435,9 +440,9 @@
                             syntaxGenerator.ThisExpression(),
                             "ApplyPropertySet"),
                         syntaxGenerator.ValueReturningLambdaExpression(
-                            "x",
+                            lambdaParameterName,
                             syntaxGenerator.MemberAccessExpression(
-                                syntaxGenerator.IdentifierName("x"),
+                                syntaxGenerator.IdentifierName(lambdaParameterName),
                                 syntaxGenerator.IdentifierName(propertySymbol.Name))),
                         syntaxGenerator.IdentifierName("value"));
             }
@@ -457,9 +462,9 @@
                             syntaxGenerator.ThisExpression(),
                             "ApplyPropertySet"),
                         syntaxGenerator.ValueReturningLambdaExpression(
-                            "x",
+                            lambdaParameterName,
                             syntaxGenerator.ElementAccessExpression(
-                                syntaxGenerator.IdentifierName("x"),
+                                syntaxGenerator.IdentifierName(lambdaParameterName),
                                 arguments)),
                         syntaxGenerator.IdentifierName("value"));
             }
@@ -517,13 +522,13 @@
                     yield return syntaxGenerator
                         .LocalDeclarationStatement(
                             syntaxGenerator.TypeExpression(parameter.Type),
-                            GetNameForParameter(parameter));
+                            GetNameForParameter(methodSymbol, parameter));
                 }
                 else if (parameter.RefKind == RefKind.Ref)
                 {
                     yield return syntaxGenerator
                         .LocalDeclarationStatement(
-                            GetNameForParameter(parameter),
+                            GetNameForParameter(methodSymbol, parameter),
                             initializer: syntaxGenerator.DefaultExpression(syntaxGenerator.TypeExpression(parameter.Type)));
                 }
             }
@@ -534,7 +539,7 @@
                     syntaxGenerator
                         .Argument(
                             x.RefKind,
-                            syntaxGenerator.IdentifierName(GetNameForParameter(x))))
+                            syntaxGenerator.IdentifierName(GetNameForParameter(methodSymbol, x))))
                 .ToList();
 
             var typeArguments = methodSymbol
@@ -542,9 +547,11 @@
                 .Select(x => syntaxGenerator.TypeExpression(x))
                 .ToList();
 
+            var lambdaParameterName = GetUniqueName(methodSymbol);
+
             var lambdaInvocation = syntaxGenerator
                 .MemberAccessExpression(
-                    syntaxGenerator.IdentifierName("x"),
+                    syntaxGenerator.IdentifierName(lambdaParameterName),
                     methodSymbol.Name);
 
             if (typeArguments.Count > 0)
@@ -580,7 +587,7 @@
                                         arguments: new[]
                                         {
                                             syntaxGenerator.ValueReturningLambdaExpression(
-                                                "x",
+                                                lambdaParameterName,
                                                 syntaxGenerator.InvocationExpression(
                                                     lambdaInvocation,
                                                     arguments: arguments)),
@@ -598,7 +605,7 @@
                         syntaxGenerator.ThisExpression(),
                         "Apply"),
                     syntaxGenerator.ValueReturningLambdaExpression(
-                        "x",
+                        lambdaParameterName,
                         syntaxGenerator.InvocationExpression(
                             lambdaInvocation,
                             arguments: arguments)));
@@ -607,20 +614,40 @@
             {
                 applyInvocation = syntaxGenerator.ReturnStatement(applyInvocation);
             }
-
+            
             yield return applyInvocation;
         }
 
-        private static string GetNameForParameter(IParameterSymbol parameterSymbol)
+        private static string GetUniqueName(IPropertySymbol within, string proposed = "x")
+        {
+            while (within.Parameters.Any(x => x.Name == proposed))
+            {
+                proposed = "_" + proposed;
+            }
+
+            return proposed;
+        }
+
+        private static string GetUniqueName(IMethodSymbol within, string proposed = "x")
+        {
+            while (within.Parameters.Any(x => x.Name == proposed))
+            {
+                proposed = "_" + proposed;
+            }
+
+            return proposed;
+        }
+
+        private static string GetNameForParameter(IMethodSymbol within, IParameterSymbol parameterSymbol)
         {
             switch (parameterSymbol.RefKind)
             {
                 case RefKind.None:
                     return parameterSymbol.Name;
                 case RefKind.Ref:
-                    return "_" + parameterSymbol.Name + "Ref";
+                    return GetUniqueName(within, parameterSymbol.Name);
                 case RefKind.Out:
-                    return "_" + parameterSymbol.Name + "Out";
+                    return GetUniqueName(within, parameterSymbol.Name);
                 default:
                     throw new NotSupportedException("Unknown parameter ref kind: " + parameterSymbol.RefKind);
             }

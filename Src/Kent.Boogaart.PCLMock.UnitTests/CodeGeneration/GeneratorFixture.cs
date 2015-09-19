@@ -15,9 +15,12 @@
         [InlineData("SimpleInterface", Language.CSharp)]
         [InlineData("InterfaceWithGenericMethods", Language.CSharp)]
         [InlineData("GenericInterface", Language.CSharp)]
-        [InlineData("InterfaceWithNonMockableMembers", Language.CSharp)]
+        [InlineData("NonMockableMembers", Language.CSharp)]
         [InlineData("PartialInterface", Language.CSharp)]
         [InlineData("InheritingInterface", Language.CSharp)]
+        [InlineData("NameClash", Language.CSharp)]
+        [InlineData("Indexers", Language.CSharp)]
+        [InlineData("OutAndRef", Language.CSharp)]
         // TODO: VB is totally borked - calls to syntaxGenerator.WithStatements don't seem to add the statements! Will need to look into this at a later date
         //[InlineData("SimpleInterface", Language.VisualBasic)]
         //[InlineData("InterfaceWithGenericMethods", Language.VisualBasic)]
