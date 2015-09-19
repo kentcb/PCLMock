@@ -128,6 +128,7 @@
     <Compile Include="ArgumentFilters\LogicalNotArgumentFilterFixture.cs" />
     <Compile Include="ArgumentFilters\MatchesArgumentFilterFixture.cs" />
     <Compile Include="CodeGeneration\GeneratorFixture.cs" />
+    <Compile Include="CodeGeneration\Models\ConfigurationFixture.cs" />
     <Compile Include="MockBaseFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utility\ObjectExtensionsFixture.cs" />
@@ -215,6 +216,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="CodeGeneration\GeneratorFixtureResources\OutAndRefOutput_CSharp.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="CodeGeneration\Models\ConfigurationFixtureResources\Input.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

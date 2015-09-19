@@ -47,7 +47,7 @@
                 .XPathSelectElements("./Interfaces")
                 .Single()
                 .Nodes()
-                .Cast<XElement>()
+                .OfType<XElement>()
                 .Select(x => new Filter(ParseFilterType(x.Name.LocalName), x.Element("Pattern").Value));
             return new Configuration(namespaceTransformations, nameTransformations, interfaceFilters);
         }
