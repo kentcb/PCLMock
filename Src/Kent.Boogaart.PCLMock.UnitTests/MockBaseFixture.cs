@@ -1040,6 +1040,18 @@ Full mocked object type name: Kent.Boogaart.PCLMock.UnitTests.MockBaseFixture+Un
             mock.Verify(x => x.SomeMethodTakingString(It.IsAny<string>())).WasCalledExactly(times: 3);
         }
 
+        [Fact]
+        public void issue13_repro()
+        {
+            var mock = new TestTargetMock(MockBehavior.Loose);
+            var subMock = new TestSubTargetMock(MockBehavior.Loose);
+            subMock.When(x => x.Height).Return(3);
+
+            mock.SomeMethodTakingComplexType(subMock);
+
+            mock.Verify(x => x.SomeMethodTakingComplexType(It.Matches<ITestSubTarget>(y => y.Height.HasValue))).WasCalledExactlyOnce();
+        }
+
         #region Supporting Members
 
         private interface ITestSubTarget
@@ -1048,6 +1060,11 @@ Full mocked object type name: Kent.Boogaart.PCLMock.UnitTests.MockBaseFixture+Un
             {
                 get;
                 set;
+            }
+
+            int? Height
+            {
+                get;
             }
 
             int GetAge();
@@ -1088,6 +1105,8 @@ Full mocked object type name: Kent.Boogaart.PCLMock.UnitTests.MockBaseFixture+Un
 
             int SomeMethodWithReturnValue(int i, float f);
 
+            void SomeMethodTakingComplexType(ITestSubTarget a);
+
             void SomeMethodTakingString(string s);
 
             int SomeMethodTakingStringWithReturnValue(string s);
@@ -1105,6 +1124,24 @@ Full mocked object type name: Kent.Boogaart.PCLMock.UnitTests.MockBaseFixture+Un
             void SomeMethodWithRefValueParameter(ref int i);
 
             bool SomeMethodWithAMixtureOfParameterTypes(int i, string s, out int i2, out string s2, ref int i3, ref string s3);
+        }
+
+        private sealed class TestSubTargetMock : MockBase<ITestSubTarget>, ITestSubTarget
+        {
+            public TestSubTargetMock(MockBehavior behavior)
+                : base(behavior)
+            {
+            }
+
+            public int? Height => this.Apply(x => x.Height);
+
+            public string Name
+            {
+                get { return this.Apply(x => x.Name); }
+                set { this.ApplyPropertySet(x => x.Name, value); }
+            }
+
+            public int GetAge() => this.Apply(x => x.GetAge());
         }
 
         private sealed class TestTargetMock : MockBase<ITestTarget>, ITestTarget
@@ -1160,6 +1197,11 @@ Full mocked object type name: Kent.Boogaart.PCLMock.UnitTests.MockBaseFixture+Un
             public int SomeMethodWithReturnValue(int i, float f)
             {
                 return this.Apply(x => x.SomeMethodWithReturnValue(i, f));
+            }
+
+            public void SomeMethodTakingComplexType(ITestSubTarget a)
+            {
+                this.Apply(x => x.SomeMethodTakingComplexType(a));
             }
 
             public void SomeMethodTakingString(string s)
