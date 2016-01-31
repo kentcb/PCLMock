@@ -39,15 +39,9 @@ public class AuthenticationServiceMock : MockBase<IAuthenticationService>, IAuth
     {
     }
 
-    public bool IsAuthenticated
-    {
-        get { return this.Apply(x => x.IsAuthenticated); }
-    }
+    public bool IsAuthenticated => this.Apply(x => x.IsAuthenticated);
     
-    public string UserName
-    {
-        get { return this.Apply(x => x.UserName); }
-    }
+    public string UserName => this.Apply(x => x.UserName);
     
     public ILogger Logger
     {
@@ -55,10 +49,8 @@ public class AuthenticationServiceMock : MockBase<IAuthenticationService>, IAuth
         set { this.ApplyPropertySet(x => x.Logger, value); }
     }
     
-    public bool Authenticate(string user, string password, TimeSpan? timeout = default(TimeSpan?))
-    {
-        return this.Apply(x => x.Authenticate(user, password, timeout));
-    }
+    public bool Authenticate(string user, string password, TimeSpan? timeout = default(TimeSpan?)) =>
+        this.Apply(x => x.Authenticate(user, password, timeout));
 }
 ```
 
@@ -70,7 +62,7 @@ The `MockBehavior` passed into the base constructor is used to determine whether
 
 ### Mock Behavior
 
-The `MockBase<T>` constructor takes a `MockBehavior` that dictates what it does if an invocation is made against a member for which no specifications have been configured. Using `MockBehavior.Strict` will *require* that specifications be configured, otherwise an exception will be thrown when accessing any member for which a specification has not been configured. Using `MockBehavior.Loose` won't require any specifications be provided. If an invocation is made against a loose mock for which no return value has been specified, a default value is instead returned. That is, if the member returns type `T`, the invocation will return `default(T)`.
+The `MockBase<T>` constructor takes a `MockBehavior` that dictates what will happen if an invocation is made against a member for which no specifications have been configured. Using `MockBehavior.Strict` will *require* that specifications be configured, otherwise an exception will be thrown when accessing any member for which a specification has not been configured. Using `MockBehavior.Loose` won't require any specifications be provided. If an invocation is made against a loose mock for which no return value has been specified, a default value is instead returned. That is, if the member returns type `T`, the invocation will return `default(T)`.
 
 Often it is desirable for one's loose mocks to take on some default behavior that reduces the need for configuring rote specifications within your test suite. This can be achieved using this pattern:
 
@@ -82,12 +74,17 @@ public class SomeMock : MockBase<ISomeInterface>, ISomeInterface
     {
         if (behavior == MockBehavior.Loose)
         {
-            // configure some default specifications here
-            this.When(x => x.Foo)
-                .Return("bar");
+			this.ConfigureLooseBehavior();
         }
     }
     
+	private void ConfigureLooseBehavior()
+	{
+        // configure some default specifications here
+        this.When(x => x.Foo)
+            .Return("bar");
+	}
+
     // other code here
 }
 ```
@@ -105,15 +102,9 @@ public class AuthenticationService
     private string userName;
     private ILogger logger;
     
-    public virtual bool IsAuthenticated
-    {
-        get { return this.isAuthenticated; }
-    }
+    public virtual bool IsAuthenticated => this.isAuthenticated;
     
-    public virtual string UserName
-    {
-        get { return this.userName; }
-    }
+    public virtual string UserName => this.userName;
     
     // non-virtual, so can't be mocked
     public ILogger Logger
@@ -143,10 +134,7 @@ public class AuthenticationServiceMock : MockBase<AuthenticationService>
         this.mockedObject = new AuthenticationServiceSubclass(this);
     }
     
-    public override AuthenticationService MockedObject
-    {
-        get { return this.mockedObject; }
-    }
+    public override AuthenticationService MockedObject => this.mockedObject;
     
     private class AuthenticationServiceSubclass : AuthenticationService
     {
@@ -157,20 +145,12 @@ public class AuthenticationServiceMock : MockBase<AuthenticationService>
             this.owner = owner;
         }
         
-        public override bool IsAuthenticated
-        {
-            get { return this.owner.Apply(x => x.IsAuthenticated); }
-        }
+        public override bool IsAuthenticated => this.owner.Apply(x => x.IsAuthenticated);
         
-        public override string UserName
-        {
-            get { return this.owner.Apply(x => x.UserName); }
-        }
+        public override string UserName => this.owner.Apply(x => x.UserName);
         
-        public override bool Authenticate(string user, string password, TimeSpan? timeout = default(TimeSpan))
-        {
-            return this.owner.Apply(x => x.Authenticate(user, password, timeout));
-        }
+        public override bool Authenticate(string user, string password, TimeSpan? timeout = default(TimeSpan)) =>
+            this.owner.Apply(x => x.Authenticate(user, password, timeout));
     }
 }
 ```

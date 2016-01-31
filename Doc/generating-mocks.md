@@ -2,16 +2,16 @@
 
 ## Overview
 
-PCLMock includes support for generating mock implementations from interfaces in your code base. Generated code can be either C# or Visual Basic. You have two code generation options:
+**PCLMock** includes support for generating mock implementations from interfaces in your code base. Generated code can be either C# or Visual Basic. You have two code generation options:
 
-1. A T4-based approach, available via the `Kent.Boogaart.PCLMock.CodeGeneration.T4` package.
-2. A console-based approach, available via the `Kent.Boogaart.PCLMock.CodeGeneration.Console` package.
+1. A T4-based approach, available via the `PCLMock.CodeGeneration.T4` package.
+2. A console-based approach, available via the `PCLMock.CodeGeneration.Console` package.
 
 The T4-based approach integrates into Visual Studio (Xamarin Studio is not currently supported) whereas the console-based approach is a solution-level tool that you can execute how you see fit. In both cases, these tools are driven by an XML configuration file.
 
 ## Configuration File
 
-In order to know which interfaces should have mocks generated, and how those mocks should be named, the PCLMock code generators rely on an XML configuration file. When you install the T4-based code generator, you get a default configuration file called *Mocks.xml*.
+In order to know which interfaces should have mocks generated, and how those mocks should be named, the **PCLMock** code generators rely on an XML configuration file. When you install the T4-based code generator, you get a default configuration file called *Mocks.xml*.
 
 ### Specifying Namespace Names
 
@@ -97,7 +97,7 @@ In this example, all interfaces in two different assemblies will have mocks gene
 
 ## T4-based Generation
 
-If you're using the T4-based generation approach, you will want to add the `Kent.Boogaart.PCLMock.CodeGeneration.T4` package to the project in which your mocks should reside. This is probably your unit test project.
+If you're using the T4-based generation approach, you will want to add the `PCLMock.CodeGeneration.T4` package to the project in which your mocks should reside. This is probably your unit test project.
 
 Once added, you will see two new files in the root of your project:
 
@@ -110,9 +110,9 @@ To change the language of the generated code, open *Mocks.tt* and modify the `la
 
 ## Console-based Generation
 
-The `Kent.Boogaart.PCLMock.CodeGeneration.Console` package can be added to any project because it is actually a solution-level package. This means no particular project will "own" this package but, rather, the solution will.
+The `PCLMock.CodeGeneration.Console` package can be added to any project because it is actually a solution-level package. This means no particular project will "own" this package but, rather, the solution will.
 
-Once added, you'll find an executable called *PCLMockCodeGen.exe* within your solution's *packages\Kent.Boogaart.PCLMock.CodeGeneration.Console.$version$\tools* directory. Execution of this tool requires these parameters:
+Once added, you'll find an executable called *PCLMockCodeGen.exe* within your solution's *packages\PCLMock.CodeGeneration.Console.$version$\tools* directory. Execution of this tool requires these parameters:
 
 * The path of the solution for which mocks are being generated
 * The path of the XML configuration file
@@ -149,7 +149,7 @@ namespace Foo.Bar.Mocks
 
 ## Supported Members
 
-The code generator supports everything that PCLMock itself supports:
+The code generator supports everything that **PCLMock** itself supports:
 
 * `get`-only properties
 * `set`-only properties
@@ -162,4 +162,4 @@ The code generator supports everything that PCLMock itself supports:
 * generic interfaces (including type constraints)
 * generic methods (including type constraints)
 
-If the code generator comes across something the PCLMock doesn't inherently support (such as an event), it will just ignore it. You can then supplement the generated partial class so that the mock successfully builds.
+If the code generator comes across something the **PCLMock** doesn't inherently support (such as an event), it will just ignore it. You can then supplement the generated partial class so that the mock successfully builds.
