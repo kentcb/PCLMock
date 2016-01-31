@@ -1,0 +1,55 @@
+﻿namespace The.Namespace
+{
+    [System.CodeDom.Compiler.GeneratedCode("PCLMock", "$VERSION$")]
+    [System.Runtime.CompilerServices.CompilerGenerated]
+    public partial class Mock : global::PCLMock.MockBase<global::ISomeInterface>, global::ISomeInterface
+    {
+        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base (behavior)
+        {
+            if ((behavior) == (global::PCLMock.MockBehavior.Loose))
+            {
+                ConfigureLooseBehavior();
+            }
+        }
+
+        partial void ConfigureLooseBehavior();
+        public void SomeMethod(out System.Int32 i)
+        {
+            System.Int32 _i;
+            i = (this.GetOutParameterValue<System.Int32>(x => x.SomeMethod(out _i), 0));
+            this.Apply(x => x.SomeMethod(out _i));
+        }
+
+        public void SomeMethod(out System.Double d, System.Int32 i)
+        {
+            System.Double _d;
+            d = (this.GetOutParameterValue<System.Double>(x => x.SomeMethod(out _d, i), 0));
+            this.Apply(x => x.SomeMethod(out _d, i));
+        }
+
+        public void SomeMethod(System.Int32 i, out System.Double d)
+        {
+            System.Double _d;
+            d = (this.GetOutParameterValue<System.Double>(x => x.SomeMethod(i, out _d), 1));
+            this.Apply(x => x.SomeMethod(i, out _d));
+        }
+
+        public void SomeMethod(ref System.Int32 i, out System.String s)
+        {
+            var _i = default (System.Int32);
+            System.String _s;
+            i = (this.GetRefParameterValue<System.Int32>(x => x.SomeMethod(ref _i, out _s), 0));
+            s = (this.GetOutParameterValue<System.String>(x => x.SomeMethod(ref _i, out _s), 1));
+            this.Apply(x => x.SomeMethod(ref _i, out _s));
+        }
+
+        public void SomeMethod(ref System.Int32 i, out System.String s, System.Double d)
+        {
+            var _i = default (System.Int32);
+            System.String _s;
+            i = (this.GetRefParameterValue<System.Int32>(x => x.SomeMethod(ref _i, out _s, d), 0));
+            s = (this.GetOutParameterValue<System.String>(x => x.SomeMethod(ref _i, out _s, d), 1));
+            this.Apply(x => x.SomeMethod(ref _i, out _s, d));
+        }
+    }
+}

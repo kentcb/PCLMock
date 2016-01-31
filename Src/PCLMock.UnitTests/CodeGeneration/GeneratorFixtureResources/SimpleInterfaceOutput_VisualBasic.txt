@@ -1,0 +1,56 @@
+﻿Namespace The.[Namespace]
+
+    <System.CodeDom.Compiler.GeneratedCode("PCLMock", "$VERSION$")>
+    <System.Runtime.CompilerServices.CompilerGenerated>
+    Public Partial Class Mock
+        Inherits Global.PCLMock.MockBase(Of Global.ISimpleInterface)
+        Implements Global.ISimpleInterface
+
+        Public Sub New(Optional behavior As Global.PCLMock.MockBehavior = Global.PCLMock.MockBehavior.Strict)
+            MyBase.New(behavior)
+            If(behavior) = (Global.PCLMock.MockBehavior.Loose) Then
+                ConfigureLooseBehavior()
+            End If
+        End Sub
+
+        Private Partial Sub ConfigureLooseBehavior()
+        End Sub
+
+        Public ReadOnly Property GetProperty As Int32 Implements Global.ISimpleInterface.GetProperty
+            Get
+                Return Me.Apply(Function(x) x.GetProperty)
+            End Get
+        End Property
+
+        Public Property SetProperty As Int32 Implements Global.ISimpleInterface.SetProperty
+            Get
+            End Get
+
+            Set(value As Int32)
+                Me.ApplyPropertySet(Function(x) x.SetProperty, value)
+            End Set
+        End Property
+
+        Public Property GetSetProperty As System.Object Implements Global.ISimpleInterface.GetSetProperty
+            Get
+                Return Me.Apply(Function(x) x.GetSetProperty)
+            End Get
+
+            Set(value As System.Object)
+                Me.ApplyPropertySet(Function(x) x.GetSetProperty, value)
+            End Set
+        End Property
+
+        Public Sub VoidMethod() Implements Global.ISimpleInterface.VoidMethod
+        End Sub
+
+        Public Sub VoidMethodWithArguments(i As Int32, s As System.String) Implements Global.ISimpleInterface.VoidMethodWithArguments
+        End Sub
+
+        Public Function NonVoidMethod() As System.String Implements Global.ISimpleInterface.NonVoidMethod
+        End Function
+
+        Public Function NonVoidMethodWithArguments(i As Int32, s As System.String) As System.String Implements Global.ISimpleInterface.NonVoidMethodWithArguments
+        End Function
+    End Class
+End Namespace
