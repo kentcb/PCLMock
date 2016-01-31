@@ -7,10 +7,9 @@
     <owners>Kent Boogaart</owners>
     <licenseUrl>https://github.com/kentcb/PCLMock/blob/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/kentcb/PCLMock</projectUrl>
-    <iconUrl>https://raw.githubusercontent.com/kentcb/PCLMock/master/Art/Logo150x150.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>
-        PCLMock is mocking framework in a PCL, making it usable on platforms such as iOS and Android.
+        DEPRECATED! Please install package PCLMock instead.
     </description>
     <tags>.NET mono portable pcl mocking ios android xamarin</tags>
     @dependencies@

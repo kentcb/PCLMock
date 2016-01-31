@@ -9,7 +9,7 @@ open Fake.NuGetHelper
 open Fake.Testing
 
 // properties
-let semanticVersion = "3.1.2"
+let semanticVersion = "3.1.3"
 let version = (>=>) @"(?<major>\d*)\.(?<minor>\d*)\.(?<build>\d*).*?" "${major}.${minor}.${build}.0" semanticVersion
 let configuration = getBuildParamOrDefault "configuration" "Release"
 // can be set by passing: -ev deployToNuGet true
@@ -120,23 +120,15 @@ Target "CreateNuGetPackages" (fun _ ->
         -- ("**/*.xml")
         |> CopyFiles (nugetDir @@ "Kent.Boogaart.PCLMock.CodeGeneration.Console/tools")
 
-    // copy source
-    let sourceFiles =
-        [!! (srcDir @@ "**/*.*")
-            -- ".git/**"
-            -- (srcDir @@ "**/.vs/**")
-            -- (srcDir @@ "packages/**/*")
-            -- (srcDir @@ "**/*.suo")
-            -- (srcDir @@ "**/*.csproj.user")
-            -- (srcDir @@ "**/*.gpState")
-            -- (srcDir @@ "**/bin/**")
-            -- (srcDir @@ "**/obj/**")
-            -- (srcDir @@ "Kent.Boogaart.PCLMock.CodeGeneration.*/**")
-            -- (srcDir @@ "Kent.Boogaart.PCLMock.UnitTests/**")]
-    sourceFiles
-        |> CopyWithSubfoldersTo (nugetDir @@ "Kent.Boogaart.PCLMock")
-    sourceFiles
-        |> CopyWithSubfoldersTo (nugetDir @@ "Kent.Boogaart.PCLMock.CodeGeneration")
+    // copy readme
+    CreateDir "./Gen/NuGet/Kent.Boogaart.PCLMock/"
+    CopyFile "./Gen/NuGet/Kent.Boogaart.PCLMock/readme.txt" "./Src/readme.txt"
+
+    CreateDir "./Gen/NuGet/Kent.Boogaart.PCLMock.CodeGeneration.Console/"
+    CopyFile "./Gen/NuGet/Kent.Boogaart.PCLMock.CodeGeneration.Console/readme.txt" "./Src/readme.txt"
+
+    CreateDir "./Gen/NuGet/Kent.Boogaart.PCLMock.CodeGeneration.T4/"
+    CopyFile "./Gen/NuGet/Kent.Boogaart.PCLMock.CodeGeneration.T4/readme.txt" "./Src/readme.txt"
 
     // create the NuGets
     NuGet (fun p ->
@@ -177,12 +169,8 @@ Target "CreateNuGetPackages" (fun _ ->
         (srcDir @@ "Kent.Boogaart.PCLMock.CodeGeneration.Console.nuspec")
 )
 
-// build order
 "Clean"
-    ==> "RestorePackages"
     ==> "Build"
-    ==> "ExecuteUnitTests"
-    ==> "CreateArchives"
     ==> "CreateNuGetPackages"
 
 RunTargetOrDefault "CreateNuGetPackages"
