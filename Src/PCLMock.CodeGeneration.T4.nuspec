@@ -7,7 +7,7 @@
     <owners>Kent Boogaart</owners>
     <licenseUrl>https://github.com/kentcb/PCLMock/blob/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/kentcb/PCLMock</projectUrl>
-    <iconUrl>https://raw.githubusercontent.com/kentcb/PCLMock/master/Art/Logo150x150.png</iconUrl>
+    <iconUrl>https://raw.githubusercontent.com/kentcb/PCLMock/master/Art/Logo64x64.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>
         Provides T4 code generation support for PCLMock.
