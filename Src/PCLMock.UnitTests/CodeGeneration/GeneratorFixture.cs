@@ -13,6 +13,7 @@
     {
         [Theory]
         [InlineData("SimpleInterface", Language.CSharp)]
+        [InlineData("InternalInterface", Language.CSharp)]
         [InlineData("InterfaceWithGenericMethods", Language.CSharp)]
         [InlineData("GenericInterface", Language.CSharp)]
         [InlineData("NonMockableMembers", Language.CSharp)]
