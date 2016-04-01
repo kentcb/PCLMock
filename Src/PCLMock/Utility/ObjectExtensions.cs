@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Reflection;
     using System.Text;
 
@@ -94,17 +95,17 @@
 
             if (@this is float)
             {
-                return @this.ToString() + "F";
+                return ((float)@this).ToString(CultureInfo.InvariantCulture) + "F";
             }
 
             if (@this is double)
             {
-                return @this.ToString() + "D";
+                return ((double)@this).ToString(CultureInfo.InvariantCulture) + "D";
             }
 
             if (@this is decimal)
             {
-                return @this.ToString() + "M";
+                return ((decimal)@this).ToString(CultureInfo.InvariantCulture) + "M";
             }
 
             if (@this is Enum)
