@@ -144,9 +144,13 @@
                 mockBaseType
                     .Construct(interfaceSymbol));
 
+            var accessibility = interfaceSymbol.DeclaredAccessibility == Accessibility.NotApplicable
+                ? Accessibility.Public
+                : interfaceSymbol.DeclaredAccessibility;
+
             var classDeclaration = syntaxGenerator.ClassDeclaration(
                 name,
-                accessibility: Accessibility.Public,
+                accessibility: accessibility,
                 modifiers: DeclarationModifiers.Partial,
                 typeParameters: interfaceSymbol.TypeParameters.Select(x => x.Name),
                 baseType: baseType,
