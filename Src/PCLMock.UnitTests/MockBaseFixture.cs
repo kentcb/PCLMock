@@ -27,7 +27,7 @@
             Assert.Equal(3, mock[1, 3]);
             Assert.Equal(5, mock[3, 1]);
         }
-        
+
         [Fact]
         public void apply_throws_if_method_without_specifications_is_invoked_on_a_strict_mock()
         {
@@ -77,6 +77,14 @@ Full mocked object type name: PCLMock.UnitTests.MockBaseFixture+UnsealedClass";
             var mock = new TestTargetMock();
             var ex = Assert.Throws<InvalidOperationException>(() => mock.When(x => x.SomeComplexMethod().GetAge()).Return(35));
             Assert.Equal("Specifications against methods cannot be chained: x.SomeComplexMethod().GetAge()", ex.Message);
+        }
+
+        [Fact]
+        public void when_throws_if_method_is_an_extension_method()
+        {
+            var mock = new TestTargetMock();
+            var ex = Assert.Throws<InvalidOperationException>(() => mock.When(x => x.SomeExtensionMethod()).Return(35));
+            Assert.Equal("Specifications against extension methods cannot be provided: x.SomeExtensionMethod()", ex.Message);
         }
 
         [Fact]
@@ -739,6 +747,30 @@ Full mocked object type name: PCLMock.UnitTests.MockBaseFixture+UnsealedClass";
         }
 
         [Fact]
+        public void verify_throws_if_property_access_is_chained()
+        {
+            var mock = new TestTargetMock();
+            var ex = Assert.Throws<InvalidOperationException>(() => mock.Verify(x => x.SomeComplexProperty.Name).WasCalledExactlyOnce());
+            Assert.Equal("Specifications against properties cannot be chained: x.SomeComplexProperty.Name", ex.Message);
+        }
+
+        [Fact]
+        public void verify_throws_if_method_access_is_chained()
+        {
+            var mock = new TestTargetMock();
+            var ex = Assert.Throws<InvalidOperationException>(() => mock.Verify(x => x.SomeComplexMethod().GetAge()).WasCalledExactlyOnce());
+            Assert.Equal("Specifications against methods cannot be chained: x.SomeComplexMethod().GetAge()", ex.Message);
+        }
+
+        [Fact]
+        public void verify_throws_if_method_is_an_extension_method()
+        {
+            var mock = new TestTargetMock();
+            var ex = Assert.Throws<InvalidOperationException>(() => mock.Verify(x => x.SomeExtensionMethod()).WasCalledExactlyOnce());
+            Assert.Equal("Specifications against extension methods cannot be provided: x.SomeExtensionMethod()", ex.Message);
+        }
+
+        [Fact]
         public void verify_was_not_called_does_not_throw_if_the_member_was_not_invoked()
         {
             var mock = new TestTargetMock();
@@ -1150,7 +1182,7 @@ Full mocked object type name: PCLMock.UnitTests.MockBaseFixture+UnsealedClass";
                 : base(behavior)
             {
             }
-                
+
             public int SomeProperty
             {
                 get { return this.Apply(x => x.SomeProperty); }
@@ -1185,7 +1217,7 @@ Full mocked object type name: PCLMock.UnitTests.MockBaseFixture+UnsealedClass";
 
             public int SomeMethodWithReturnValue(int i, float f) =>
                 this.Apply(x => x.SomeMethodWithReturnValue(i, f));
-            
+
             public void SomeMethodTakingComplexType(ITestSubTarget a) =>
                 this.Apply(x => x.SomeMethodTakingComplexType(a));
 
@@ -1286,5 +1318,11 @@ Full mocked object type name: PCLMock.UnitTests.MockBaseFixture+UnsealedClass";
         }
 
         #endregion
+    }
+
+    public static class Extensions
+    {
+        public static int SomeExtensionMethod(this object @this) =>
+            0;
     }
 }

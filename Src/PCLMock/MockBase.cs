@@ -366,6 +366,11 @@ Full mocked object type name: {3}";
 
             if (methodCallExpression != null)
             {
+                if (methodCallExpression.Object == null)
+                {
+                    throw new InvalidOperationException("Specifications against extension methods cannot be provided: " + methodCallExpression);
+                }
+
                 if (methodCallExpression.Object.NodeType != ExpressionType.Parameter)
                 {
                     throw new InvalidOperationException("Specifications against methods cannot be chained: " + methodCallExpression);
@@ -373,7 +378,7 @@ Full mocked object type name: {3}";
 
                 return new ContinuationKey(methodCallExpression.Method);
             }
-            
+
             var memberExpression = selector.Body as MemberExpression;
 
             if (memberExpression != null)
@@ -382,7 +387,7 @@ Full mocked object type name: {3}";
                 {
                     throw new InvalidOperationException("Specifications against properties cannot be chained: " + memberExpression);
                 }
-                
+
                 return new ContinuationKey(memberExpression.Member);
             }
 
