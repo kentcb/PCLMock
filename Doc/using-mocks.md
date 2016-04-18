@@ -181,6 +181,24 @@ mock.When(x => x.SomeMethod(It.IsAny<string>()))
 Assert.Equals(1, mock.SomeMethod("foo"));
 ```
 
+### `ref` and `out` Parameters
+
+If a mocked method takes a `ref` or `out` parameter, you can provide a value via the `AssignOutOrRefParameter` method. Consider the following example:
+
+```C#
+var mock = ...;
+string s;
+mock.When(x => x.Method(out s))
+    .AssignOutOrRefParameter(0, "out value")
+    .Return("something");
+```
+
+Here, `Method` takes a single parameter which is marked as `out`. As such, in order to call `Method` we need a `string` variable. We declare this string as `s` and use it in our `When` specification. We could have called it anything, of course.
+
+The `AssignOutOrRefParameter` is the important part. It allows us to dictate what the consumer of the mock will receive for the `out` parameter. In this case, we're saying that the parameter at index zero (i.e. the first parameter) will be assigned the value `"out value"`. This would work equally well if the parameter was marked as `ref` rather than `out`.
+
+The need for a parameter index is unfortunate, but cannot be avoided.
+
 ## Verification
 
 Calls against mocks can be verified via the `Verify` and `VerifyPropertySet` methods:

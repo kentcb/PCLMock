@@ -162,7 +162,7 @@ The code generator supports everything that **PCLMock** itself supports:
 * generic interfaces (including type constraints)
 * generic methods (including type constraints)
 
-If the code generator comes across something the **PCLMock** doesn't inherently support (such as an event), it will just ignore it. You can then supplement the generated partial class so that the mock successfully builds.
+If the code generator comes across something the **PCLMock** [doesn't inherently support](defining-mocks.md#limitations), it will just ignore it. You can then supplement the generated partial class so that the mock successfully builds.
 
 A caveat to this is that duplicate members will be ignored, even if each is supported individually. For example:
 
