@@ -229,6 +229,12 @@
   <ItemGroup>
     <EmbeddedResource Include="CodeGeneration\GeneratorFixtureResources\InternalInterfaceInput_CSharp.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="CodeGeneration\GeneratorFixtureResources\DuplicateMemberInput_CSharp.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="CodeGeneration\GeneratorFixtureResources\DuplicateMemberOutput_CSharp.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

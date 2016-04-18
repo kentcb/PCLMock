@@ -163,3 +163,23 @@ The code generator supports everything that **PCLMock** itself supports:
 * generic methods (including type constraints)
 
 If the code generator comes across something the **PCLMock** doesn't inherently support (such as an event), it will just ignore it. You can then supplement the generated partial class so that the mock successfully builds.
+
+A caveat to this is that duplicate members will be ignored, even if each is supported individually. For example:
+
+```C#
+public interface IFirst
+{
+    void SomeMethod();
+}
+
+public interface ISecond
+{
+    void SomeMethod();
+}
+
+public interface IThird : IFirst, ISecond
+{
+}
+```
+
+Here, the generated mock for `IThird` will _not_ include a `SomeMethod` implementation. This is because doing so would require either a single implementation, or multiple with one or more implemented explicitly. Either of these two options might result in a mock that is less useful to you than you would like, so the member is simply ignored. This forces you to provide the implementation yourself via a partial class, but affords you the flexibility to choose what that implementation looks like.

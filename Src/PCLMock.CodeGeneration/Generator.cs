@@ -102,7 +102,7 @@
         {
             var namespaceSyntax = GetNamespaceDeclarationSyntax(syntaxGenerator, semanticModel, mockNamespace, language);
             var classSyntax = GetClassDeclarationSyntax(syntaxGenerator, semanticModel, mockName, interfaceSymbol);
-            
+
             classSyntax = syntaxGenerator
                 .AddAttributes(classSyntax, GetClassAttributesSyntax(syntaxGenerator, semanticModel));
             classSyntax = syntaxGenerator
@@ -275,6 +275,9 @@
                     GetMembersRecursive(interfaceSymbol)
                         .Select(x => GetMemberDeclarationSyntax(syntaxGenerator, semanticModel, x))
                         .Where(x => x != null)
+                        .GroupBy(x => x, SyntaxNodeEqualityComparer.Instance)
+                        .Where(group => group.Count() == 1)
+                        .SelectMany(group => group)
                         .Select(x => syntaxGenerator.AsPublicInterfaceImplementation(x, syntaxGenerator.TypeExpression(interfaceSymbol))));
         }
 
@@ -618,7 +621,7 @@
             {
                 applyInvocation = syntaxGenerator.ReturnStatement(applyInvocation);
             }
-            
+
             yield return applyInvocation;
         }
 
@@ -655,6 +658,26 @@
                 default:
                     throw new NotSupportedException("Unknown parameter ref kind: " + parameterSymbol.RefKind);
             }
+        }
+
+        private sealed class SyntaxNodeEqualityComparer : IEqualityComparer<SyntaxNode>
+        {
+            public static readonly SyntaxNodeEqualityComparer Instance = new SyntaxNodeEqualityComparer();
+
+            private SyntaxNodeEqualityComparer()
+            {
+            }
+
+            public bool Equals(SyntaxNode x, SyntaxNode y) =>
+                x.IsEquivalentTo(y, topLevel: true);
+
+            // We have to ensure like syntax nodes have the same hash code in order for Equals to even be called
+            // Unfortunately, Roslyn does not implement GetHashCode, so we can't use that. We also don't want to
+            // use ToString because then we may as well have just grouped by it and because it includes the
+            // implementation, not just the declaration. To do this "properly", we'd have to write a recursive
+            // hash code calculator, using similar logic to what IsEquivalentTo gives us.
+            public int GetHashCode(SyntaxNode obj) =>
+                0;
         }
     }
 }

@@ -19,6 +19,7 @@
         [InlineData("NonMockableMembers", Language.CSharp)]
         [InlineData("PartialInterface", Language.CSharp)]
         [InlineData("InheritingInterface", Language.CSharp)]
+        [InlineData("DuplicateMember", Language.CSharp)]
         [InlineData("NameClash", Language.CSharp)]
         [InlineData("Indexers", Language.CSharp)]
         [InlineData("OutAndRef", Language.CSharp)]
@@ -65,7 +66,7 @@
                         x => "The.Namespace",
                         x => "Mock"));
                 var result = results
-                    .Single()
+                    .Last()
                     .ToString();
 
                 var expectedCode = outputStreamReader.ReadToEnd();
