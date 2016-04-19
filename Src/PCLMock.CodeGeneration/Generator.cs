@@ -57,37 +57,37 @@
             var compilations = await Task.WhenAll(
                 solution
                     .Projects
-                    .Select(async x =>
+                    .Select(async project =>
                         {
-                            var compilation = await x.GetCompilationAsync();
+                            var compilation = await project.GetCompilationAsync();
                             // make sure the compilation has a reference to PCLMock
                             return compilation.AddReferences(MetadataReference.CreateFromFile(typeof(MockBase<>).Assembly.Location));
                         }));
 
             return compilations
-                .SelectMany(x =>
-                    x
+                .SelectMany(compilation =>
+                    compilation
                         .SyntaxTrees
                         .Select(y =>
                             new
                             {
-                                Compilation = x,
+                                Compilation = compilation,
                                 SyntaxTree = y,
-                                SemanticModel = x.GetSemanticModel(y)
+                                SemanticModel = compilation.GetSemanticModel(y)
                             }))
                 .SelectMany(
                     x => x
                         .SyntaxTree
                         .GetRoot()
                         .DescendantNodes()
-                        .Where(y => y is InterfaceDeclarationSyntax || y is VB.InterfaceBlockSyntax)
-                        .Select(y =>
+                        .Where(syntaxNode => syntaxNode is InterfaceDeclarationSyntax || syntaxNode is VB.InterfaceBlockSyntax)
+                        .Select(syntaxNode =>
                             new
                             {
                                 Compilation = x.Compilation,
                                 SyntaxTree = x.SyntaxTree,
                                 SemanticModel = x.SemanticModel,
-                                InterfaceSymbol = (INamedTypeSymbol)x.SemanticModel.GetDeclaredSymbol(y)
+                                InterfaceSymbol = (INamedTypeSymbol)x.SemanticModel.GetDeclaredSymbol(syntaxNode)
                             }))
                 .Where(x => interfacePredicate == null || interfacePredicate(x.InterfaceSymbol))
                 .Distinct()
@@ -108,7 +108,7 @@
 
                         return GenerateMock(language, syntaxGenerator, x.SemanticModel, x.InterfaceSymbol, @namespace, name);
                     })
-                .Select((x, i) => i == 0 ? syntaxGenerator.WithLeadingComments(x, headerComment, language) : x)
+                .Select((syntaxNode, i) => i == 0 ? syntaxGenerator.WithLeadingComments(syntaxNode, headerComment, language) : syntaxNode)
                 .ToImmutableList();
         }
 
