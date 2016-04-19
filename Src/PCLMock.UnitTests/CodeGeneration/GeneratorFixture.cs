@@ -4,9 +4,10 @@
     using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
-    using PCLMock.CodeGeneration;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.Text;
+    using PCLMock.CodeGeneration;
+    using PCLMock.CodeGeneration.Logging;
     using Xunit;
 
     public sealed class GeneratorFixture
@@ -60,6 +61,7 @@
 
                 var results =
                     (await Generator.GenerateMocksAsync(
+                        NullLogSink.Instance,
                         language,
                         solution,
                         x => true,

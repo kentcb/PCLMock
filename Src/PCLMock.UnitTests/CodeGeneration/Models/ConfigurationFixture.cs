@@ -1,6 +1,7 @@
 ﻿namespace PCLMock.UnitTests.CodeGeneration.Models
 {
     using System.Xml.Linq;
+    using PCLMock.CodeGeneration.Logging;
     using PCLMock.CodeGeneration.Models;
     using Xunit;
 
@@ -14,7 +15,7 @@
             using (var inputStream = this.GetType().Assembly.GetManifestResourceStream(inputResourceName))
             {
                 var document = XDocument.Load(inputStream);
-                var configuration = Configuration.FromXDocument(document);
+                var configuration = Configuration.FromXDocument(NullLogSink.Instance, document);
 
                 Assert.Equal(2, configuration.NamespaceTransformations.Count);
                 Assert.Equal("(?<name>.+)", configuration.NamespaceTransformations[0].Pattern);

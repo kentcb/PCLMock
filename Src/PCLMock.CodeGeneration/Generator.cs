@@ -5,6 +5,7 @@
     using System.Collections.Immutable;
     using System.Linq;
     using System.Threading.Tasks;
+    using Logging;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -25,6 +26,7 @@
 ------------------------------------------------------------------------";
 
         public async static Task<IImmutableList<SyntaxNode>> GenerateMocksAsync(
+            ILogSink logSink,
             Language language,
             string solutionPath,
             Func<INamedTypeSymbol, bool> interfacePredicate,
@@ -35,6 +37,7 @@
             var solution = await workspace.OpenSolutionAsync(solutionPath);
 
             return await GenerateMocksAsync(
+                logSink,
                 language,
                 solution,
                 interfacePredicate,
@@ -43,6 +46,7 @@
         }
 
         public async static Task<IImmutableList<SyntaxNode>> GenerateMocksAsync(
+            ILogSink logSink,
             Language language,
             Solution solution,
             Func<INamedTypeSymbol, bool> interfacePredicate,
@@ -87,7 +91,23 @@
                             }))
                 .Where(x => interfacePredicate == null || interfacePredicate(x.InterfaceSymbol))
                 .Distinct()
-                .Select(x => GenerateMock(language, syntaxGenerator, x.SemanticModel, x.InterfaceSymbol, mockNamespaceSelector(x.InterfaceSymbol), mockNameSelector(x.InterfaceSymbol)))
+                .Select(
+                    x =>
+                    {
+                        var @namespace = mockNamespaceSelector(x.InterfaceSymbol);
+                        var name = mockNameSelector(x.InterfaceSymbol);
+
+                        if (logSink.IsEnabled)
+                        {
+                            logSink.Positive(
+                                "Generating mock for interface '{0}' with namespace '{1}', name '{2}'.",
+                                x.InterfaceSymbol,
+                                @namespace,
+                                name);
+                        }
+
+                        return GenerateMock(language, syntaxGenerator, x.SemanticModel, x.InterfaceSymbol, @namespace, name);
+                    })
                 .Select((x, i) => i == 0 ? syntaxGenerator.WithLeadingComments(x, headerComment, language) : x)
                 .ToImmutableList();
         }

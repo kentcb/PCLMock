@@ -13,6 +13,7 @@
                 var arguments = Args.Parse<Arguments>(args);
                 var language = arguments.Language.GetValueOrDefault(DetermineLanguageByOutputFileName(arguments.OutputFile));
                 var result = XmlBasedGenerator.GenerateMocks(
+                    ConsoleLogSink.Instance,
                     language,
                     arguments.SolutionFile,
                     arguments.ConfigurationFile);

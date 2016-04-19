@@ -1,6 +1,5 @@
 ﻿namespace PCLMock.CodeGeneration.Console
 {
-    using System.Collections.Generic;
     using PowerArgs;
 
     public sealed class Arguments
@@ -36,6 +35,13 @@
 
         [ArgDescription("Optionally force the language in which to generate mocks.")]
         public Language? Language
+        {
+            get;
+            set;
+        }
+
+        [ArgDescription("Turn on verbose output.")]
+        public bool Verbose
         {
             get;
             set;

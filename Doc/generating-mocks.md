@@ -123,7 +123,7 @@ You can also optionally force the language of the generated code, although it is
 An example of executing this tool is:
 
 ```
-.\PCLMockCodeGen.exe "Path\To\MySolution.sln" "Path\To\Mocks.xml" "output.cs"
+.\PCLMockCodeGen.exe "Path\To\MySolution.sln" "Path\To\Mocks.xml" "output.cs" -Verbose
 ```
 
 ## Supplementing Generated Code
