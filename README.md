@@ -2,6 +2,8 @@
 
 # PCLMock
 
+[![Build status](https://ci.appveyor.com/api/projects/status/wj9tyg3m99jogmqw?svg=true)](https://ci.appveyor.com/project/kentcb/pclmock)
+
 ## What?
  
 **PCLMock** is a simple mocking framework in a Portable Class Library. The PCL targets a wide range of platforms including:
