@@ -149,6 +149,7 @@
     <Compile Include="CodeGeneration\GeneratorFixture.cs" />
     <Compile Include="CodeGeneration\Models\ConfigurationFixture.cs" />
     <Compile Include="CodeGeneration\Plugins\ObservableBasedAsynchronyFixture.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="MockBaseFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utility\ObjectExtensionsFixture.cs" />
