@@ -71,12 +71,15 @@
                         ImmutableList<IPlugin>.Empty));
                 var result = results
                     .Last()
-                    .ToString();
+                    .ToString()
+                    .NormalizeLineEndings();
 
                 var expectedCode = outputStreamReader.ReadToEnd();
 
                 // make sure version changes don't break the tests
-                expectedCode = expectedCode.Replace("$VERSION$", typeof(MockBase<>).Assembly.GetName().Version.ToString());
+                expectedCode = expectedCode
+                    .Replace("$VERSION$", typeof(MockBase<>).Assembly.GetName().Version.ToString())
+                    .NormalizeLineEndings();
 
                 // useful when converting generated code to something that can be pasted into an expectation file
                 var sanitisedResult = result.Replace(typeof(MockBase<>).Assembly.GetName().Version.ToString(), "$VERSION$");

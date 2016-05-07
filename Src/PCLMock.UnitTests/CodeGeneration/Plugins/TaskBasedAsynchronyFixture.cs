@@ -77,9 +77,12 @@ namespace PCLMock.UnitTests.CodeGeneration.Plugins
 
                             return acc;
                         },
-                        x => x.ToString());
+                        x => x.ToString())
+                    .NormalizeLineEndings();
 
-                var expectedCode = outputStreamReader.ReadToEnd();
+                var expectedCode = outputStreamReader
+                    .ReadToEnd()
+                    .NormalizeLineEndings();
 
                 Assert.Equal(expectedCode, result);
             }

@@ -1320,7 +1320,7 @@ Full mocked object type name: PCLMock.UnitTests.MockBaseFixture+UnsealedClass";
         #endregion
     }
 
-    public static class Extensions
+    public static class TestExtensions
     {
         public static int SomeExtensionMethod(this object @this) =>
             0;
