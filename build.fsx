@@ -1,4 +1,4 @@
-﻿#I "Src/packages/FAKE.3.30.1/tools"
+﻿#I "Src/packages/FAKE/tools"
 #r "FakeLib.dll"
 
 open Fake
@@ -6,7 +6,7 @@ open Fake.AssemblyInfoFile
 open Fake.EnvironmentHelper
 open Fake.MSBuildHelper
 open Fake.NuGetHelper
-open Fake.XUnit2Helper
+open Fake.Testing.XUnit2
 
 // properties
 let semanticVersion = "4.0.0"
