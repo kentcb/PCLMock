@@ -1,0 +1,2 @@
+this.When(x=>x.SomeProperty).Return(global::System.Reactive.Linq.Observable.Empty<T>());
+this.When(x=>x.SomeMethod()).Return(global::System.Reactive.Linq.Observable.Return<T>(default(T)));

@@ -66,7 +66,7 @@ All patterns specified in this file are .NET regular expressions.
         </Transformation>
         -->
     </NameTransformations>
-    
+
     <!--
     To determine whether a mock should be generated for a given interface, its assembly-qualified name (e.g. "Name.Space.TypeName, AssemblyName") is matched
     against the filters specified below. Filters either Include or Exclude interfaces that match their pattern. Filters are executed in the order
@@ -88,4 +88,9 @@ All patterns specified in this file are .NET regular expressions.
         </Include>
         -->
     </Interfaces>
+
+    <Plugins>
+        <Plugin>Foo.Bar.Something, PCLMock.CodeGeneration</Plugin>
+        <Plugin>Foo.Bar.Baz, SomeAssembly</Plugin>
+    </Plugins>
 </Mocks>

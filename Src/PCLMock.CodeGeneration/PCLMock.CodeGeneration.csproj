@@ -99,6 +99,10 @@
     <Compile Include="..\AssemblyInfoCommon.cs">
       <Link>Properties\AssemblyInfoCommon.cs</Link>
     </Compile>
+    <Compile Include="Plugins\ObservableBasedAsynchrony.cs" />
+    <Compile Include="Plugins\TaskBasedAsynchrony.cs" />
+    <Compile Include="Extensions.cs" />
+    <Compile Include="IPlugin.cs" />
     <Compile Include="Language.cs" />
     <Compile Include="LanguageExtensions.cs" />
     <Compile Include="Logging\ILogSink.cs" />
@@ -106,6 +110,7 @@
     <Compile Include="Logging\LogSinkExtensions.cs" />
     <Compile Include="Logging\NullLogSink.cs" />
     <Compile Include="Logging\StringLogSink.cs" />
+    <Compile Include="Models\Plugin.cs" />
     <Compile Include="Models\Configuration.cs" />
     <Compile Include="Models\Filter.cs" />
     <Compile Include="Models\FilterType.cs" />

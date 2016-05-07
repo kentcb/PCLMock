@@ -1,5 +1,7 @@
 namespace PCLMock.CodeGeneration.Logging
 {
+    using System;
+
     public interface ILogSink
     {
         bool IsEnabled
@@ -7,6 +9,6 @@ namespace PCLMock.CodeGeneration.Logging
             get;
         }
 
-        void Log(LogLevel level, string message);
+        void Log(Type source, LogLevel level, string message);
     }
 }

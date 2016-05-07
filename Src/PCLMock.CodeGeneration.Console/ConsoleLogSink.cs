@@ -13,7 +13,7 @@ namespace PCLMock.CodeGeneration.Console
 
         public bool IsEnabled => true;
 
-        public void Log(LogLevel level, string message)
+        public void Log(Type source, LogLevel level, string message)
         {
             var currentColor = Console.ForegroundColor;
             ConsoleColor color;
@@ -25,6 +25,9 @@ namespace PCLMock.CodeGeneration.Console
                     break;
                 case LogLevel.Info:
                     color = ConsoleColor.White;
+                    break;
+                case LogLevel.Warn:
+                    color = ConsoleColor.DarkYellow;
                     break;
                 case LogLevel.Negative:
                     color = ConsoleColor.Yellow;
@@ -40,6 +43,9 @@ namespace PCLMock.CodeGeneration.Console
             }
 
             Console.ForegroundColor = color;
+            Console.Write("[");
+            Console.Write(source.FullName);
+            Console.Write("] ");
             Console.WriteLine(message);
             Console.ForegroundColor = currentColor;
         }

@@ -89,6 +89,22 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Core" />
+    <Reference Include="System.Reactive.Core, Version=2.2.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Rx-Core.2.2.5\lib\net45\System.Reactive.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Reactive.Interfaces, Version=2.2.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Rx-Interfaces.2.2.5\lib\net45\System.Reactive.Interfaces.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Reactive.Linq, Version=2.2.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Rx-Linq.2.2.5\lib\net45\System.Reactive.Linq.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Reactive.PlatformServices, Version=2.2.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Rx-PlatformServices.2.2.5\lib\net45\System.Reactive.PlatformServices.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Reflection.Metadata, Version=1.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Reflection.Metadata.1.1.0\lib\dotnet5.2\System.Reflection.Metadata.dll</HintPath>
       <Private>True</Private>
@@ -132,6 +148,7 @@
     <Compile Include="ArgumentFilters\MatchesArgumentFilterFixture.cs" />
     <Compile Include="CodeGeneration\GeneratorFixture.cs" />
     <Compile Include="CodeGeneration\Models\ConfigurationFixture.cs" />
+    <Compile Include="CodeGeneration\Plugins\ObservableBasedAsynchronyFixture.cs" />
     <Compile Include="MockBaseFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utility\ObjectExtensionsFixture.cs" />
@@ -160,6 +177,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <Compile Include="CodeGeneration\Plugins\TaskBasedAsynchronyFixture.cs" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -234,6 +252,48 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="CodeGeneration\GeneratorFixtureResources\DuplicateMemberOutput_CSharp.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="CodeGeneration\Plugins\TaskBasedAsynchronyFixtureResources\NonTaskBasedInput_CSharp.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="CodeGeneration\Plugins\TaskBasedAsynchronyFixtureResources\NonTaskBasedOutput_CSharp.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="CodeGeneration\Plugins\TaskBasedAsynchronyFixtureResources\NonGenericTaskInput_CSharp.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="CodeGeneration\Plugins\TaskBasedAsynchronyFixtureResources\NonGenericTaskOutput_CSharp.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="CodeGeneration\Plugins\TaskBasedAsynchronyFixtureResources\GenericTaskInput_CSharp.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="CodeGeneration\Plugins\TaskBasedAsynchronyFixtureResources\GenericTaskOutput_CSharp.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="CodeGeneration\Plugins\TaskBasedAsynchronyFixtureResources\GenericInterfaceInput_CSharp.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="CodeGeneration\Plugins\TaskBasedAsynchronyFixtureResources\GenericInterfaceOutput_CSharp.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="CodeGeneration\Plugins\ObservableBasedAsynchronyFixtureResources\GenericInterfaceInput_CSharp.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="CodeGeneration\Plugins\ObservableBasedAsynchronyFixtureResources\GenericInterfaceOutput_CSharp.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="CodeGeneration\Plugins\ObservableBasedAsynchronyFixtureResources\ObservableBasedInput_CSharp.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="CodeGeneration\Plugins\ObservableBasedAsynchronyFixtureResources\ObservableBasedOutput_CSharp.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="CodeGeneration\Plugins\ObservableBasedAsynchronyFixtureResources\NonObservableBasedInput_CSharp.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="CodeGeneration\Plugins\ObservableBasedAsynchronyFixtureResources\NonObservableBasedOutput_CSharp.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

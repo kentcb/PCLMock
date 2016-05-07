@@ -1,0 +1,5 @@
+this.When(x=>x.SomeProperty).Return(global::System.Threading.Tasks.Task.FromResult<System.Int32>(0));
+this.When(x=>x.SomeOtherProperty).Return(global::System.Threading.Tasks.Task.FromResult<System.String>(null));
+this.When(x=>x[global::PCLMock.It.IsAny<System.Int32>(),global::PCLMock.It.IsAny<System.Single>()]).Return(global::System.Threading.Tasks.Task.FromResult<System.Int32>(0));
+this.When(x=>x.SomeMethod()).Return(global::System.Threading.Tasks.Task.FromResult<System.Int32>(0));
+this.When(x=>x.SomeMethod(global::PCLMock.It.IsAny<System.String>(),global::PCLMock.It.IsAny<System.Int32>())).Return(global::System.Threading.Tasks.Task.FromResult<System.String>(null));

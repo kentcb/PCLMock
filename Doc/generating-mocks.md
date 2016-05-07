@@ -95,6 +95,18 @@ A more complicated filter arrangement might look like this:
 
 In this example, all interfaces in two different assemblies will have mocks generated for them unless the word "Ignore" appears anywhere within their assembly-qualified name.
 
+### Specifying Plugins
+
+You can read all about plugins [here](plugins.md). To configure plugins, you specify their fully-qualified names in the `Plugins` element of the configuration file:
+
+```XML
+<Plugins>
+    <Plugin>Your.Plugin.Class.Name, Your.Plugin.Assembly</Plugin>
+</Plugins>
+```
+
+You can include any number of plugins and they will be executed in the order you specify. This is important if more than one plugin might produce specifications for the same member. You should identify which plugin's specifications should take precedence and list it after the other plugins.
+
 ## T4-based Generation
 
 If you're using the T4-based generation approach, you will want to add the `PCLMock.CodeGeneration.T4` package to the project in which your mocks should reside. This is probably your unit test project.
@@ -118,7 +130,7 @@ Once added, you'll find an executable called *PCLMockCodeGen.exe* within your so
 * The path of the XML configuration file
 * The path of the output file which will contain the generated code
 
-You can also optionally force the language of the generated code, although it is inferred from the output file's extension.
+You can also optionally force the language of the generated code, although it is inferred from the output file's extension. In addition, to can execute with a `-Verbose` flag gain insight into the decisions PCLMock is making during code generation.
 
 An example of executing this tool is:
 
@@ -130,18 +142,27 @@ An example of executing this tool is:
 
 Regardless of how you generate mock implementations, what you end up with are `partial` classes that extend `MockBase<T>`. Each takes a `MockBehavior` in its constructor and defaults it to `MockBehavior.Strict`.
 
-If you want to configure expectations for loose mocks, you can supplement the generated `partial` class with your own logic. Specifically, there is a `partial` method called `ConfigureLooseBehavior` that the mock will invoke during construction if it is passed `MockBehavior.Loose`. Therefore, you can configure your expectations as follows:
+You can configure expectations that apply to all mocks (regardless of behavior) by supplementing the generated `partial` class with a `partial` method called `ConfigureBehavior`. If you want to configure expectations that only apply to loose mocks, there is a corresponding `partial` method called `ConfigureLooseBehavior`. Therefore, you can configure your expectations as follows:
 
 ```C#
 namespace Foo.Bar.Mocks
 {
     public partial class SomeServiceMock
     {
-        partial void ConfigureLooseBehavior()
+        partial void ConfigureBehavior()
         {
+            // these specifications apply to all instances of the mock, regardless of behavior
             this
                 .When(x => x.Name)
                 .Return("Kent");
+        }
+
+        partial void ConfigureLooseBehavior()
+        {
+            // these specifications apply only to loose instances of the mock
+            this
+                .When(x => x.Age)
+                .Return(36);
         }
     }
 }

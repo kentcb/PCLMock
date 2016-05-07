@@ -4,6 +4,7 @@ namespace PCLMock.CodeGeneration.Logging
     {
         Debug,
         Info,
+        Warn,
         Positive,
         Negative,
         Error

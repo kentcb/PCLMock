@@ -1,6 +1,7 @@
 ﻿namespace PCLMock.UnitTests.CodeGeneration
 {
     using System;
+    using System.Collections.Immutable;
     using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
@@ -31,7 +32,7 @@
         //[InlineData("InterfaceWithNonMockableMembers", Language.VisualBasic)]
         //[InlineData("PartialInterface", Language.VisualBasic)]
         //[InlineData("InheritingInterface", Language.VisualBasic)]
-        public async Task can_generate_simple_mock(string resourceBaseName, Language language)
+        public async Task can_generate_mocks(string resourceBaseName, Language language)
         {
             var inputResourceName = "PCLMock.UnitTests.CodeGeneration.GeneratorFixtureResources." + resourceBaseName + "Input_" + language.ToString() + ".txt";
             var outputResourceName = "PCLMock.UnitTests.CodeGeneration.GeneratorFixtureResources." + resourceBaseName + "Output_" + language.ToString() + ".txt";
@@ -66,7 +67,8 @@
                         solution,
                         x => true,
                         x => "The.Namespace",
-                        x => "Mock"));
+                        x => "Mock",
+                        ImmutableList<IPlugin>.Empty));
                 var result = results
                     .Last()
                     .ToString();

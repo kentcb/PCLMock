@@ -36,6 +36,10 @@
                 Assert.Equal(".*", configuration.InterfaceFilters[0].Pattern);
                 Assert.Equal(FilterType.Exclude, configuration.InterfaceFilters[1].Type);
                 Assert.Equal("FooBar", configuration.InterfaceFilters[1].Pattern);
+
+                Assert.Equal(2, configuration.Plugins.Count);
+                Assert.Equal("Foo.Bar.Something, PCLMock.CodeGeneration", configuration.Plugins[0].AssemblyQualifiedName);
+                Assert.Equal("Foo.Bar.Baz, SomeAssembly", configuration.Plugins[1].AssemblyQualifiedName);
             }
         }
     }

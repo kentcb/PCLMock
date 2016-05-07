@@ -6,12 +6,24 @@
     {
         public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base (behavior)
         {
+            ConfigureBehaviorGenerated();
+            ConfigureBehavior();
             if ((behavior) == (global::PCLMock.MockBehavior.Loose))
             {
+                ConfigureLooseBehaviorGenerated();
                 ConfigureLooseBehavior();
             }
         }
 
+        private void ConfigureBehaviorGenerated()
+        {
+        }
+
+        private void ConfigureLooseBehaviorGenerated()
+        {
+        }
+
+        partial void ConfigureBehavior();
         partial void ConfigureLooseBehavior();
         public System.Int32 this[System.Int32 i]
         {

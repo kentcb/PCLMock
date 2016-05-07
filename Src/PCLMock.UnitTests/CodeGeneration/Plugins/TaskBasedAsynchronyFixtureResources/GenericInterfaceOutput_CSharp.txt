@@ -1,0 +1,2 @@
+this.When(x=>x.SomeProperty).Return(global::System.Threading.Tasks.Task.FromResult<T>(default(T)));
+this.When(x=>x.SomeMethod()).Return(global::System.Threading.Tasks.Task.FromResult<T>(default(T)));

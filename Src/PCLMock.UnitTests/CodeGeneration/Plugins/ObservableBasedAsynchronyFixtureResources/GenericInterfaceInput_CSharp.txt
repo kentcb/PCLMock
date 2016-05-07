@@ -1,0 +1,11 @@
+using System;
+
+interface ISomeInterface<T>
+{
+	IObservable<T> SomeProperty
+	{
+		get;
+	}
+
+	IObservable<T> SomeMethod();
+}

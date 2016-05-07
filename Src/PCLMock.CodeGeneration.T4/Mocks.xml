@@ -46,7 +46,7 @@ All patterns specified in this file are .NET regular expressions.
             <Replacement>${name}Mock</Replacement>
         </Transformation>
     </NameTransformations>
-    
+
     <!--
     To determine whether a mock should be generated for a given interface, its assembly-qualified name (e.g. "Name.Space.TypeName, AssemblyName") is matched
     against the filters specified below. Filters either Include or Exclude interfaces that match their pattern. Filters are executed in the order
@@ -57,4 +57,12 @@ All patterns specified in this file are .NET regular expressions.
             <Pattern>.*</Pattern>
         </Include>
     </Interfaces>
+
+    <!--
+    List any plugins you want to execute during mock generation. See the documentation for more information.
+    -->
+    <Plugins>
+        <Plugin>PCLMock.CodeGeneration.Plugins.TaskBasedAsynchrony, PCLMock.CodeGeneration</Plugin>
+        <Plugin>PCLMock.CodeGeneration.Plugins.ObservableBasedAsynchrony, PCLMock.CodeGeneration</Plugin>
+    </Plugins>
 </Mocks>

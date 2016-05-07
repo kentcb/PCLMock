@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>PCLMock.CodeGeneration</id>
+    <version>@build.number@</version>
+    <authors>Kent Boogaart</authors>
+    <owners>Kent Boogaart</owners>
+    <licenseUrl>https://github.com/kentcb/PCLMock/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/kentcb/PCLMock</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/kentcb/PCLMock/master/Art/Logo64x64.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>
+        Contains the code generation engine and SDK for PCLMock.
+    </description>
+    <tags>.NET mono portable pcl mocking ios android xamarin</tags>
+    @dependencies@
+    @references@
+  </metadata>
+</package>

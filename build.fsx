@@ -6,7 +6,7 @@ open Fake.AssemblyInfoFile
 open Fake.EnvironmentHelper
 open Fake.MSBuildHelper
 open Fake.NuGetHelper
-open Fake.Testing
+open Fake.XUnit2Helper
 
 // properties
 let semanticVersion = "4.0.0"
@@ -17,6 +17,7 @@ let deployToNuGet = getBuildParamOrDefault "deployToNuGet" "false"
 let genDir = "Gen/"
 let docDir = "Doc/"
 let srcDir = "Src/"
+let packagesDir = "Src/packages/"
 let testDir = genDir @@ "Test"
 let nugetDir = genDir @@ "NuGet"
 
@@ -33,7 +34,7 @@ Target "Clean" (fun _ ->
 )
 
 // would prefer to use the built-in RestorePackages function, but it restores packages in the root dir (not in Src), which causes build problems
-Target "RestorePackages" (fun _ -> 
+Target "RestorePackages" (fun _ ->
     !! "./**/packages.config"
     |> Seq.iter (
         RestorePackage (fun p ->
@@ -109,7 +110,10 @@ Target "CreateNuGetPackages" (fun _ ->
     // copy files required in the various NuGets
     !! (srcDir @@ "PCLMock/bin" @@ configuration @@ "PCLMock.*")
         |> CopyFiles (nugetDir @@ "PCLMock/lib/portable-win+net40+sl50+WindowsPhoneApp81+wp80+MonoAndroid+Xamarin.iOS10+MonoTouch")
-        
+
+    !! (srcDir @@ "PCLMock.CodeGeneration/bin" @@ configuration @@ "PCLMock.CodeGeneration.*")
+        |> CopyFiles (nugetDir @@ "PCLMock.CodeGeneration/lib/net45")
+
     !! (srcDir @@ "PCLMock.CodeGeneration.T4/bin" @@ configuration @@ "Mocks.*")
         |> CopyFiles (nugetDir @@ "PCLMock.CodeGeneration.T4/content")
     !! (srcDir @@ "PCLMock.CodeGeneration.T4/bin" @@ configuration @@ "*.*")
@@ -149,6 +153,47 @@ Target "CreateNuGetPackages" (fun _ ->
             Publish = System.Convert.ToBoolean(deployToNuGet)
         })
         (srcDir @@ "PCLMock.nuspec")
+
+    NuGet (fun p ->
+        {p with
+            Project = "PCLMock.CodeGeneration"
+            Version = semanticVersion
+            OutputPath = nugetDir
+            WorkingDir = nugetDir @@ "PCLMock.CodeGeneration"
+            SymbolPackage = NugetSymbolPackage.Nuspec
+            Dependencies =
+                [
+                    "Microsoft.CodeAnalysis", GetPackageVersion packagesDir "Microsoft.CodeAnalysis"
+                    "Microsoft.CodeAnalysis.Analyzers", GetPackageVersion packagesDir "Microsoft.CodeAnalysis.Analyzers"
+                    "Microsoft.CodeAnalysis.Common", GetPackageVersion packagesDir "Microsoft.CodeAnalysis.Common"
+                    "Microsoft.CodeAnalysis.CSharp", GetPackageVersion packagesDir "Microsoft.CodeAnalysis.CSharp"
+                    "Microsoft.CodeAnalysis.CSharp.Workspaces", GetPackageVersion packagesDir "Microsoft.CodeAnalysis.CSharp.Workspaces"
+                    "Microsoft.CodeAnalysis.VisualBasic", GetPackageVersion packagesDir "Microsoft.CodeAnalysis.VisualBasic"
+                    "Microsoft.CodeAnalysis.VisualBasic.Workspaces", GetPackageVersion packagesDir "Microsoft.CodeAnalysis.VisualBasic.Workspaces"
+                    "Microsoft.CodeAnalysis.Workspaces.Common", GetPackageVersion packagesDir "Microsoft.CodeAnalysis.Workspaces.Common"
+                    "Microsoft.Composition", GetPackageVersion packagesDir "Microsoft.Composition"
+                    "System.Collections", GetPackageVersion packagesDir "System.Collections"
+                    "System.Collections.Immutable", GetPackageVersion packagesDir "System.Collections.Immutable"
+                    "System.Diagnostics.Debug", GetPackageVersion packagesDir "System.Diagnostics.Debug"
+                    "System.Globalization", GetPackageVersion packagesDir "System.Globalization"
+                    "System.IO", GetPackageVersion packagesDir "System.IO"
+                    "System.Linq", GetPackageVersion packagesDir "System.Linq"
+                    "System.Reflection", GetPackageVersion packagesDir "System.Reflection"
+                    "System.Reflection.Extensions", GetPackageVersion packagesDir "System.Reflection.Extensions"
+                    "System.Reflection.Metadata", GetPackageVersion packagesDir "System.Reflection.Metadata"
+                    "System.Reflection.Primitives", GetPackageVersion packagesDir "System.Reflection.Primitives"
+                    "System.Resources.ResourceManager", GetPackageVersion packagesDir "System.Resources.ResourceManager"
+                    "System.Runtime", GetPackageVersion packagesDir "System.Runtime"
+                    "System.Runtime.Extensions", GetPackageVersion packagesDir "System.Runtime.Extensions"
+                    "System.Runtime.InteropServices", GetPackageVersion packagesDir "System.Runtime.InteropServices"
+                    "System.Text.Encoding", GetPackageVersion packagesDir "System.Text.Encoding"
+                    "System.Text.Encoding.Extensions", GetPackageVersion packagesDir "System.Text.Encoding.Extensions"
+                    "System.Threading", GetPackageVersion packagesDir "System.Threading"
+                    "PCLMock", semanticVersion
+                ]
+            Publish = System.Convert.ToBoolean(deployToNuGet)
+        })
+        (srcDir @@ "PCLMock.CodeGeneration.nuspec")
 
     NuGet (fun p ->
         {p with

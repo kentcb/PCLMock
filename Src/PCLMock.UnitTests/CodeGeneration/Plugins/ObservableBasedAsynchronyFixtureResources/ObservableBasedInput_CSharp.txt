@@ -1,0 +1,40 @@
+using System;
+
+interface ICustomObservable<T> : IObservable<T>
+{
+}
+
+interface ISomeInterface
+{
+	IObservable<int> SomeProperty
+	{
+		get;
+	}
+
+	IObservable<string> SomeOtherProperty
+	{
+		get;
+	}
+
+	// expecting this to be ignored because it's set-only
+	IObservable<int> SomeSetOnlyProperty
+	{
+		set;
+	}
+
+	IObservable<int> this[int i, float f]
+	{
+		get;
+	}
+
+    IObservable<int> SomeMethod();
+	IObservable<string> SomeMethod(string s, int i);
+
+	// expecting these to be ignored because of the type parameters
+	IObservable<int> SomeMethod<T>();
+	IObservable<int> SomeMethod<T1, T2>();
+
+	// expecting these two to be ignored because of it being a custom observable (which we have no way of providing a default value for)
+    ICustomObservable<int> SomeMethod();
+	ICustomObservable<string> SomeMethod(string s, int i);
+}

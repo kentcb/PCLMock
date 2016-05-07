@@ -2,6 +2,7 @@
 {
     using System;
     using System.IO;
+    using Logging;
     using PowerArgs;
 
     class Program
@@ -12,8 +13,9 @@
             {
                 var arguments = Args.Parse<Arguments>(args);
                 var language = arguments.Language.GetValueOrDefault(DetermineLanguageByOutputFileName(arguments.OutputFile));
+                var logSink = arguments.Verbose ? (ILogSink)ConsoleLogSink.Instance : NullLogSink.Instance;
                 var result = XmlBasedGenerator.GenerateMocks(
-                    ConsoleLogSink.Instance,
+                    logSink,
                     language,
                     arguments.SolutionFile,
                     arguments.ConfigurationFile);

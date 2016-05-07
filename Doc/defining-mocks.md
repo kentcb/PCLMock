@@ -64,7 +64,7 @@ The `MockBehavior` passed into the base constructor is used to determine whether
 
 The `MockBase<T>` constructor takes a `MockBehavior` that dictates what will happen if an invocation is made against a member for which no specifications have been configured. Using `MockBehavior.Strict` will *require* that specifications be configured, otherwise an exception will be thrown when accessing any member for which a specification has not been configured. Using `MockBehavior.Loose` won't require any specifications be provided. If an invocation is made against a loose mock for which no return value has been specified, a default value is instead returned. That is, if the member returns type `T`, the invocation will return `default(T)`.
 
-Often it is desirable for one's loose mocks to take on some default behavior that reduces the need for configuring rote specifications within your test suite. This can be achieved using this pattern:
+Often it is desirable for mocks to take on some default behavior that reduces the need for configuring rote specifications within your test suite. This can be achieved using this pattern:
 
 ```C#
 public class SomeMock : MockBase<ISomeInterface>, ISomeInterface
@@ -72,17 +72,28 @@ public class SomeMock : MockBase<ISomeInterface>, ISomeInterface
     public SomeMock(MockBehavior behavior = MockBehavior.Strict)
         : base(behavior)
     {
+        this.ConfigureBehavior();
+
         if (behavior == MockBehavior.Loose)
         {
 			this.ConfigureLooseBehavior();
         }
     }
     
+	private void ConfigureBehavior()
+	{
+        // these specifications apply to all instances of the mock, regardless of behavior
+        this
+            .When(x => x.Foo)
+            .Return("bar");
+	}
+    
 	private void ConfigureLooseBehavior()
 	{
-        // configure some default specifications here
-        this.When(x => x.Foo)
-            .Return("bar");
+        // these specifications apply only to loose instances of the mock
+        this
+            .When(x => x.Bar)
+            .Return("foo");
 	}
 
     // other code here

@@ -13,6 +13,8 @@
 
     public static class XmlBasedGenerator
     {
+        private static readonly Type logSource = typeof(XmlBasedGenerator);
+
         public static string GenerateMocks(
             ILogSink logSink,
             string solutionPath,
@@ -44,11 +46,11 @@
             if (!File.Exists(xmlPath))
             {
                 var message = $"XML input file '{xmlPath}' no found.";
-                logSink.Error(message);
+                logSink.Error(logSource, message);
                 throw new IOException(message);
             }
 
-            logSink.Info("Loading XML input file '{0}'.", xmlPath);
+            logSink.Info(logSource, "Loading XML input file '{0}'.", xmlPath);
 
             var document = XDocument.Load(xmlPath);
             var configuration = Configuration.FromXDocument(logSink, document);
@@ -59,7 +61,8 @@
                 solutionPath,
                 configuration.GetInterfacePredicate(),
                 configuration.GetNamespaceSelector(),
-                configuration.GetNameSelector());
+                configuration.GetNameSelector(),
+                configuration.GetPlugins());
         }
     }
 }
