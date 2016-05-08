@@ -25,7 +25,7 @@ this.WriteLine(result);
 if (language == "CSharp")
 {
 	this.WriteLine("/*");
-	this.WriteLine(logSinkInstance);
+	this.WriteLine(logSinkInstance.ToString());
 	this.WriteLine("*/");
 }
 #>
