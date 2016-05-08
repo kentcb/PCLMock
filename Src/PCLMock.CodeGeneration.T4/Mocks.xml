@@ -62,6 +62,7 @@ All patterns specified in this file are .NET regular expressions.
     List any plugins you want to execute during mock generation. See the documentation for more information.
     -->
     <Plugins>
+        <Plugin>PCLMock.CodeGeneration.Plugins.Collections, PCLMock.CodeGeneration</Plugin>
         <Plugin>PCLMock.CodeGeneration.Plugins.TaskBasedAsynchrony, PCLMock.CodeGeneration</Plugin>
         <Plugin>PCLMock.CodeGeneration.Plugins.ObservableBasedAsynchrony, PCLMock.CodeGeneration</Plugin>
     </Plugins>

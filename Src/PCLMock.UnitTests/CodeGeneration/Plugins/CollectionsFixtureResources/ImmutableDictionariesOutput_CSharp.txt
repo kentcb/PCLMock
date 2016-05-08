@@ -1,0 +1,6 @@
+this.When(x=>x.SomeProperty).Return(global::System.Collections.Immutable.ImmutableDictionary.Create<System.Int32,System.String>());
+this.When(x=>x.SomeMethod()).Return(global::System.Collections.Immutable.ImmutableDictionary.Create<System.Int32,System.String>());
+this.When(x=>x.SomeMethod(global::PCLMock.It.IsAny<System.Int32>(),global::PCLMock.It.IsAny<System.Single>())).Return(global::System.Collections.Immutable.ImmutableDictionary.Create<System.Int32,System.String>());
+this.When(x=>x.SomeProperty).Return(global::System.Collections.Immutable.ImmutableDictionary.Create<TKey,TValue>());
+this.When(x=>x.SomeMethod()).Return(global::System.Collections.Immutable.ImmutableDictionary.Create<TKey,TValue>());
+this.When(x=>x.SomeMethod(global::PCLMock.It.IsAny<System.Int32>(),global::PCLMock.It.IsAny<System.Single>())).Return(global::System.Collections.Immutable.ImmutableDictionary.Create<TKey,TValue>());

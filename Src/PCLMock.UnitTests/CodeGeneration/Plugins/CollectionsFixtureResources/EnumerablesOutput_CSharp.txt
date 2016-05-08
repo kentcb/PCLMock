@@ -1,0 +1,6 @@
+this.When(x=>x.SomeProperty).Return(global::System.Linq.Enumerable.Empty<System.Int32>());
+this.When(x=>x.SomeMethod()).Return(global::System.Linq.Enumerable.Empty<System.String>());
+this.When(x=>x.SomeMethod(global::PCLMock.It.IsAny<System.Int32>(),global::PCLMock.It.IsAny<System.Single>())).Return(global::System.Linq.Enumerable.Empty<System.String>());
+this.When(x=>x.SomeProperty).Return(global::System.Linq.Enumerable.Empty<T>());
+this.When(x=>x.SomeMethod()).Return(global::System.Linq.Enumerable.Empty<T>());
+this.When(x=>x.SomeMethod(global::PCLMock.It.IsAny<System.Int32>(),global::PCLMock.It.IsAny<System.Single>())).Return(global::System.Linq.Enumerable.Empty<T>());

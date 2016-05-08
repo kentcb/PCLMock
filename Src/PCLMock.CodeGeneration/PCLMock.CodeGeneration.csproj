@@ -99,6 +99,7 @@
     <Compile Include="..\AssemblyInfoCommon.cs">
       <Link>Properties\AssemblyInfoCommon.cs</Link>
     </Compile>
+    <Compile Include="Plugins\Collections.cs" />
     <Compile Include="Plugins\ObservableBasedAsynchrony.cs" />
     <Compile Include="Plugins\TaskBasedAsynchrony.cs" />
     <Compile Include="Extensions.cs" />

@@ -1,0 +1,47 @@
+using System;
+using System.Collections.Generic;
+
+interface ICustomSet<T> : ISet<T>
+{
+}
+
+interface ISomeInterface
+{
+	ISet<int> SomeProperty
+	{
+		get;
+	}
+
+	// expecting this to be ignored because it's set-only
+	ISet<string> SomeSetOnlyProperty
+	{
+		set;
+	}
+
+	ISet<string> SomeMethod();
+	ISet<string> SomeMethod(int i, float f);
+
+	// should all be ignored because they're generic
+	ISet<int> SomeGenericMethod<T>();
+	ISet<T> SomeOtherGenericMethod<T>();
+
+	// should be ignored because they're a custom enumerable type
+	ICustomSet<int> SomeCustomProperty
+	{
+		get;
+	}
+
+	ICustomSet<string> SomeMethod();
+	ICustomSet<string> SomeMethod(int i, float f);
+}
+
+interface ISomeGenericInterface<T>
+{
+	ISet<T> SomeProperty
+	{
+		get;
+	}
+
+	ISet<T> SomeMethod();
+	ISet<T> SomeMethod(int i, float f);
+}

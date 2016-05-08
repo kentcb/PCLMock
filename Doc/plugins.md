@@ -4,7 +4,7 @@
 
 PCLMock's code generator includes support for plugins. These are implementations of `PCLMock.CodeGeneration.IPlugin`. Plugins are able to participate in the code generation process, generating specifications for the target mock.
 
-PCLMock itself comes with a couple of plugins, discussed below. They are enabled by default, but you can always disable them or replace them with your own.
+PCLMock itself comes with several plugins, discussed below. They are enabled by default, but you can always disable them or replace them with your own.
 
 ## The `IPlugin` Interface
 
@@ -15,6 +15,46 @@ The `IPlugin` interface defines members that allow you to generate code that app
 ## Built-in Plugins
 
 PCLMock itself comes with a couple of plugins. These are enabled by default and are both intended to avoid common traps with respect to asynchronous code and mocks.
+
+### The `Collections` Plugin
+
+This plugin can be configured thusly:
+
+```XML
+<Plugins>
+    <Plugin>PCLMock.CodeGeneration.Plugins.Collections, PCLMock.CodeGeneration</Plugin>
+</Plugins>
+```
+
+Its purpose is to ensure that any method or property returning a standard collection type will return a default, empty instance of an appropriate collection rather than `null`. The supported collection types are:
+
+* `System.Collections.Generic.IEnumerable<T>`
+* `System.Collections.Generic.ICollection<T>`
+* `System.Collections.Generic.IReadOnlyCollection<T>`
+* `System.Collections.Generic.IList<T>`
+* `System.Collections.Generic.IReadOnlyList<T>`
+* `System.Collections.Generic.IDictionary<TKey, TValue>`
+* `System.Collections.Generic.IReadOnlyDictionary<TKey, TValue>`
+* `System.Collections.Generic.ISet<T>`
+* `System.Collections.Generic.IImmutableList<T>`
+* `System.Collections.Generic.IImmutableDictionary<TKey, TValue>`
+* `System.Collections.Generic.IImmutableQueue<T>`
+* `System.Collections.Generic.IImmutableSet<T>`
+* `System.Collections.Generic.IImmutableStack<T>`
+
+Consider the following interface:
+
+```C#
+public interface ICustomerService
+{
+    IReadOnlyList<Customer> Customers
+    {
+        get;
+    }
+}
+```
+
+Without this plugin, the generated mock will return `null` when you dereference the `Customers` property. This is likely at odds with what you would expect, since framework guidelines stipulate that members returning collections should not return `null`. Thus, any consuming code that assumes it won't receive `null` will throw an exception.
 
 ### The `TaskBasedAsynchrony` Plugin
 

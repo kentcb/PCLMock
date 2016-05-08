@@ -1,0 +1,52 @@
+using System;
+using System.Collections.Generic;
+
+interface ICustomDictionary<TKey, TValue> : IDictionary<TKey, TValue>
+{
+}
+
+interface ISomeInterface
+{
+	IDictionary<int, string> SomeProperty
+	{
+		get;
+	}
+
+	// expecting this to be ignored because it's set-only
+	IDictionary<int, string> SomeSetOnlyProperty
+	{
+		set;
+	}
+
+	IReadOnlyDictionary<int, string> SomeReadOnlyProperty
+	{
+		get;
+	}
+
+	IDictionary<int, string> SomeMethod();
+	IDictionary<int, string> SomeMethod(int i, float f);
+
+	// should all be ignored because they're generic
+	IDictionary<int, string> SomeGenericMethod<T>();
+	IDictionary<int, T> SomeOtherGenericMethod<T>();
+
+	// should be ignored because they're a custom enumerable type
+	ICustomDictionary<int, string> SomeCustomProperty
+	{
+		get;
+	}
+
+	ICustomDictionary<int, string> SomeMethod();
+	ICustomDictionary<int, string> SomeMethod(int i, float f);
+}
+
+interface ISomeGenericInterface<TKey, TValue>
+{
+	IDictionary<TKey, TValue> SomeProperty
+	{
+		get;
+	}
+
+	IDictionary<TKey, TValue> SomeMethod();
+	IDictionary<TKey, TValue> SomeMethod(int i, float f);
+}

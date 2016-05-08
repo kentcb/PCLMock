@@ -1,0 +1,7 @@
+this.When(x=>x.SomeProperty).Return(new global::System.Collections.Generic.List<System.Int32>());
+this.When(x=>x.SomeReadOnlyProperty).Return(new global::System.Collections.Generic.List<System.Int32>());
+this.When(x=>x.SomeMethod()).Return(new global::System.Collections.Generic.List<System.String>());
+this.When(x=>x.SomeMethod(global::PCLMock.It.IsAny<System.Int32>(),global::PCLMock.It.IsAny<System.Single>())).Return(new global::System.Collections.Generic.List<System.String>());
+this.When(x=>x.SomeProperty).Return(new global::System.Collections.Generic.List<T>());
+this.When(x=>x.SomeMethod()).Return(new global::System.Collections.Generic.List<T>());
+this.When(x=>x.SomeMethod(global::PCLMock.It.IsAny<System.Int32>(),global::PCLMock.It.IsAny<System.Single>())).Return(new global::System.Collections.Generic.List<T>());
