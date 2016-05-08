@@ -11,7 +11,6 @@
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Editing;
     using Microsoft.CodeAnalysis.MSBuild;
-    using VB = Microsoft.CodeAnalysis.VisualBasic.Syntax;
 
     public static class Generator
     {
@@ -70,32 +69,17 @@
                         }));
 
             return compilations
-                .SelectMany(compilation =>
-                    compilation
-                        .SyntaxTrees
-                        .Select(y =>
-                            new
-                            {
-                                Compilation = compilation,
-                                SyntaxTree = y,
-                                SemanticModel = compilation.GetSemanticModel(y)
-                            }))
                 .SelectMany(
-                    x => x
-                        .SyntaxTree
-                        .GetRoot()
-                        .DescendantNodes()
-                        .Where(syntaxNode => syntaxNode is InterfaceDeclarationSyntax || syntaxNode is VB.InterfaceBlockSyntax)
-                        .Select(syntaxNode =>
-                            new
+                    compilation =>
+                        GetSymbolsRecursive(compilation.SourceModule.GlobalNamespace)
+                            .OfType<INamedTypeSymbol>()
+                            .Where(typeSymbol => typeSymbol.TypeKind == TypeKind.Interface && !typeSymbol.IsImplicitlyDeclared)
+                            .Where(typeSymbol => interfacePredicate == null || interfacePredicate(typeSymbol))
+                            .Select(interfaceSymbol => new
                             {
-                                Compilation = x.Compilation,
-                                SyntaxTree = x.SyntaxTree,
-                                SemanticModel = x.SemanticModel,
-                                InterfaceSymbol = (INamedTypeSymbol)x.SemanticModel.GetDeclaredSymbol(syntaxNode)
+                                InterfaceSymbol = interfaceSymbol,
+                                Compilation = compilation
                             }))
-                .Where(x => interfacePredicate == null || interfacePredicate(x.InterfaceSymbol))
-                .Distinct()
                 .Select(
                     x =>
                     {
@@ -112,7 +96,9 @@
                                 name);
                         }
 
-                        return GenerateMock(logSink, language, syntaxGenerator, x.SemanticModel, x.InterfaceSymbol, @namespace, name, codeGenerators);
+                        var semanticModel = x.Compilation.GetSemanticModel(x.InterfaceSymbol.DeclaringSyntaxReferences.First().SyntaxTree);
+
+                        return GenerateMock(logSink, language, syntaxGenerator, semanticModel, x.InterfaceSymbol, @namespace, name, codeGenerators);
                     })
                 .Select((syntaxNode, i) => i == 0 ? syntaxGenerator.WithLeadingComments(syntaxNode, headerComment, language) : syntaxNode)
                 .ToImmutableList();
@@ -727,6 +713,34 @@
             }
 
             yield return applyInvocation;
+        }
+
+        private static IEnumerable<ISymbol> GetSymbolsRecursive(INamespaceSymbol namespaceSymbol)
+        {
+            // using a heap-based stack here instead of recursive call just to be sure we don't overflow the stack
+            var stack = new Stack<INamespaceSymbol>();
+            stack.Push(namespaceSymbol);
+
+            while (stack.Count > 0)
+            {
+                var namespaceSymbolToProcess = stack.Pop();
+
+                yield return namespaceSymbolToProcess;
+
+                foreach (var namespaceMember in namespaceSymbolToProcess.GetMembers())
+                {
+                    var namespaceMemberAsNamespace = namespaceMember as INamespaceSymbol;
+
+                    if (namespaceMemberAsNamespace != null)
+                    {
+                        stack.Push(namespaceMemberAsNamespace);
+                    }
+                    else
+                    {
+                        yield return namespaceMember;
+                    }
+                }
+            }
         }
 
         private sealed class SyntaxNodeEqualityComparer : IEqualityComparer<SyntaxNode>
