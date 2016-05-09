@@ -315,11 +315,7 @@ namespace PCLMock.CodeGeneration.Plugins
             }
 
             returnValueSyntax = syntaxGenerator.ObjectCreationExpression(
-                    listType.Construct(returnType.TypeArguments[0])).WithAdditionalAnnotations(Formatter.Annotation);
-
-            // TODO: I can't believe this is necessary (along with the WithAdditionalAnnotations call above) just to
-            // get a space between 'new' and the type name, but see https://github.com/dotnet/roslyn/issues/3960
-            returnValueSyntax = Formatter.Format(returnValueSyntax, Formatter.Annotation, new AdhocWorkspace());
+                    listType.Construct(returnType.TypeArguments[0])).NormalizeWhitespace();
             return true;
         }
 
@@ -357,11 +353,7 @@ namespace PCLMock.CodeGeneration.Plugins
             }
 
             returnValueSyntax = syntaxGenerator.ObjectCreationExpression(
-                    dictionaryType.Construct(returnType.TypeArguments[0], returnType.TypeArguments[1])).WithAdditionalAnnotations(Formatter.Annotation);
-
-            // TODO: I can't believe this is necessary (along with the WithAdditionalAnnotations call above) just to
-            // get a space between 'new' and the type name, but see https://github.com/dotnet/roslyn/issues/3960
-            returnValueSyntax = Formatter.Format(returnValueSyntax, Formatter.Annotation, new AdhocWorkspace());
+                    dictionaryType.Construct(returnType.TypeArguments[0], returnType.TypeArguments[1])).NormalizeWhitespace();
             return true;
         }
 
@@ -394,11 +386,7 @@ namespace PCLMock.CodeGeneration.Plugins
             }
 
             returnValueSyntax = syntaxGenerator.ObjectCreationExpression(
-                    dictionaryType.Construct(returnType.TypeArguments[0])).WithAdditionalAnnotations(Formatter.Annotation);
-
-            // TODO: I can't believe this is necessary (along with the WithAdditionalAnnotations call above) just to
-            // get a space between 'new' and the type name, but see https://github.com/dotnet/roslyn/issues/3960
-            returnValueSyntax = Formatter.Format(returnValueSyntax, Formatter.Annotation, new AdhocWorkspace());
+                    dictionaryType.Construct(returnType.TypeArguments[0])).NormalizeWhitespace();
             return true;
         }
 
