@@ -207,6 +207,7 @@ Target "CreateNuGetPackages" (fun _ ->
                     "PCLMock", semanticVersion
                 ]
             Publish = System.Convert.ToBoolean(deployToNuGet)
+            TimeOut = System.TimeSpan.FromMinutes(15.0)
         })
         (srcDir @@ "PCLMock.CodeGeneration.T4.nuspec")
 
@@ -218,6 +219,7 @@ Target "CreateNuGetPackages" (fun _ ->
             WorkingDir = nugetDir @@ "PCLMock.CodeGeneration.Console"
             SymbolPackage = NugetSymbolPackage.None
             Publish = System.Convert.ToBoolean(deployToNuGet)
+            TimeOut = System.TimeSpan.FromMinutes(15.0)
         })
         (srcDir @@ "PCLMock.CodeGeneration.Console.nuspec")
 )
