@@ -149,6 +149,7 @@
     <Compile Include="CodeGeneration\GeneratorFixture.cs" />
     <Compile Include="CodeGeneration\Models\ConfigurationFixture.cs" />
     <Compile Include="CodeGeneration\Plugins\CollectionsFixture.cs" />
+    <Compile Include="CodeGeneration\Plugins\DisposablesFixture.cs" />
     <Compile Include="CodeGeneration\Plugins\ObservableBasedAsynchronyFixture.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="MockBaseFixture.cs" />
@@ -356,6 +357,12 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="CodeGeneration\Plugins\CollectionsFixtureResources\ImmutableStacksOutput_CSharp.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="CodeGeneration\Plugins\DisposablesFixtureResources\DisposablesInput_CSharp.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="CodeGeneration\Plugins\DisposablesFixtureResources\DisposablesOutput_CSharp.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

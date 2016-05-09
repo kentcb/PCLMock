@@ -5,39 +5,29 @@ namespace PCLMock.CodeGeneration.Plugins
     using Logging;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.Editing;
+    using Microsoft.CodeAnalysis.Formatting;
 
     /// <summary>
-    /// A plugin that generates appropriate default return values for any member that uses observable-based
-    /// asynchrony.
+    /// A plugin that generates appropriate default return values for any member that returns <see cref="IDisposable"/>.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// This plugin generates default return specifications for properties and methods that use observable-based asynchrony.
-    /// That is, they return an object of type <see cref="IObservable{T}"/>. For such members, a specification is generated
-    /// such that an actual observable will be returned rather than returning <see langword="null"/>.
+    /// This plugin generates return specifications for any member returning <see cref="IDisposable"/>. The returned
+    /// value is an instance of <c>System.Reactive.Disposables.Disposable.Empty</c>. Since the <c>Disposable</c> type
+    /// is defined by Reactive Extensions, the target code must have a reference in order for the specification to be
+    /// generated.
     /// </para>
     /// <para>
-    /// The observable returned depends on the member type. For properties, an empty observable is returned (i.e.
-    /// <c>Observable.Empty&lt;T&gt;</c>. For methods, an observable with a single default item is returned (i.e.
-    /// <c>Observable.Return&lt;T&gt;(default(T))</c>.
-    /// </para>
-    /// <para>
-    /// The idea of these defaults is to best-guess the semantics of the observable. Typically, observables returned from
-    /// methods represent asynchronous operations, so the returned value represents the result of that operation. Observables
-    /// returned by properties, on the other hand, will typically have collection semantics. That is, they represent zero or
-    /// more asynchronously-received items.
-    /// </para>
-    /// <para>
-    /// Members for which specifications cannot be generated are ignored. This of course includes members that do not use
-    /// observable-based asynchrony, but also set-only properties, generic methods, and any members that return custom
-    /// <see cref="IObservable{T}"/> subtypes.
+    /// Members for which specifications cannot be generated are ignored. This of course includes members that do not
+    /// return <see cref="IDisposable"/>, but also set-only properties, generic methods, and any members that return
+    /// custom disposable subtypes.
     /// </para>
     /// </remarks>
-    public sealed class ObservableBasedAsynchrony : IPlugin
+    public sealed class Disposables : IPlugin
     {
-        private static readonly Type logSource = typeof(ObservableBasedAsynchrony);
+        private static readonly Type logSource = typeof(Disposables);
 
-        public string Name => "Observable-based Asynchrony";
+        public string Name => "Disposables";
 
         /// <inheritdoc />
         public SyntaxNode GenerateConfigureBehavior(
@@ -87,21 +77,33 @@ namespace PCLMock.CodeGeneration.Plugins
 
             if (returnType == null)
             {
-                logSink.Warn(logSource, "Ignoring symbol '{0}' because its return type could not be determined (it's probably a sgeneric).", symbol);
+                logSink.Warn(logSource, "Ignoring symbol '{0}' because its return type could not be determined (it's probably a generic).", symbol);
                 return null;
             }
 
-            var observableInterfaceType = semanticModel
+            var disposableInterfaceType = semanticModel
                 .Compilation
-                .GetTypeByMetadataName("System.IObservable`1");
+                .GetTypeByMetadataName("System.IDisposable");
 
-            var observableType = semanticModel
-                .Compilation
-                .GetTypeByMetadataName("System.Reactive.Linq.Observable");
-
-            if (observableInterfaceType == null || observableType == null)
+            if (disposableInterfaceType == null)
             {
-                logSink.Warn(logSource, "Failed to resolve IObservable<T> interface or Observable class.");
+                logSink.Warn(logSource, "Failed to resolve IDisposable type.");
+                return null;
+            }
+
+            if (returnType != disposableInterfaceType)
+            {
+                logSink.Debug(logSource, "Ignoring symbol '{0}' because its return type is not IDisposable.");
+                return null;
+            }
+
+            var disposableType = semanticModel
+                .Compilation
+                .GetTypeByMetadataName("System.Reactive.Disposables.Disposable");
+
+            if (disposableType == null)
+            {
+                logSink.Debug(logSource, "Ignoring symbol '{0}' because Disposable type could not be resolved (probably a missing reference to System.Reactive.Core).");
                 return null;
             }
 
@@ -125,15 +127,6 @@ namespace PCLMock.CodeGeneration.Plugins
                 return null;
             }
 
-            var isObservable = returnType.IsGenericType && returnType.ConstructedFrom == observableInterfaceType;
-
-            if (!isObservable)
-            {
-                logSink.Debug(logSource, "Ignoring symbol '{0}' because it does not return IObservable<T>.", symbol);
-                return null;
-            }
-
-            var observableInnerType = returnType.TypeArguments[0];
             var lambdaParameterName = symbol.GetUniqueName();
 
             SyntaxNode lambdaExpression;
@@ -146,7 +139,7 @@ namespace PCLMock.CodeGeneration.Plugins
                     //
                     //     this
                     //         .When(x => x.SymbolName)
-                    //         .Return(Observable.Empty<T>());
+                    //         .Return(Disposable.Empty);
                     lambdaExpression = syntaxGenerator.MemberAccessExpression(
                         syntaxGenerator.IdentifierName(lambdaParameterName),
                         propertySymbol.Name);
@@ -157,7 +150,7 @@ namespace PCLMock.CodeGeneration.Plugins
                     //
                     //     this
                     //         .When(x => x[It.IsAny<P1>(), It.IsAny<P2>() ...)
-                    //         .Return(Observable.Empty<T>());
+                    //         .Return(Disposable.Empty);
                     var whenArguments = propertySymbol
                         .Parameters
                         .Select(
@@ -183,7 +176,7 @@ namespace PCLMock.CodeGeneration.Plugins
                 //
                 //     this
                 //         .When(x => x.SymbolName(It.IsAny<P1>(), It.IsAny<P2>() ...)
-                //         .Return(Observable.Return<T>(default(T)));
+                //         .Return(Disposable.Empty);
                 var whenArguments = methodSymbol
                     .Parameters
                     .Select(
@@ -215,33 +208,6 @@ namespace PCLMock.CodeGeneration.Plugins
                     syntaxGenerator.IdentifierName("When")),
                 whenLambdaArgument);
 
-            SyntaxNode observableInvocation;
-
-            if (propertySymbol != null)
-            {
-                // properties are given collection semantics by returning Observable.Empty<T>()
-                observableInvocation = syntaxGenerator.InvocationExpression(
-                    syntaxGenerator.WithTypeArguments(
-                        syntaxGenerator.MemberAccessExpression(
-                            syntaxGenerator.TypeExpression(observableType),
-                            "Empty"),
-                        syntaxGenerator.TypeExpression(observableInnerType)));
-            }
-            else
-            {
-                // methods are given async operation semantics by returning Observable.Return(default(T))
-                observableInvocation = syntaxGenerator.InvocationExpression(
-                    syntaxGenerator.WithTypeArguments(
-                        syntaxGenerator.MemberAccessExpression(
-                            syntaxGenerator.TypeExpression(observableType),
-                            "Return"),
-                        syntaxGenerator.TypeExpression(observableInnerType)),
-                    arguments: new[]
-                    {
-                        syntaxGenerator.DefaultExpression(observableInnerType)
-                    });
-            }
-
             var result = syntaxGenerator.ExpressionStatement(
                 syntaxGenerator.InvocationExpression(
                     syntaxGenerator.MemberAccessExpression(
@@ -249,7 +215,9 @@ namespace PCLMock.CodeGeneration.Plugins
                         syntaxGenerator.IdentifierName("Return")),
                     arguments: new[]
                     {
-                        observableInvocation
+                        syntaxGenerator.MemberAccessExpression(
+                            syntaxGenerator.TypeExpression(disposableType),
+                            syntaxGenerator.IdentifierName("Empty"))
                     }));
 
             return result;

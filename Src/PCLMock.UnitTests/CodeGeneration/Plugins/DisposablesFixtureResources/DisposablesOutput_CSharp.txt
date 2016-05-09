@@ -1,0 +1,3 @@
+this.When(x=>x.SomeProperty).Return(global::System.Reactive.Disposables.Disposable.Empty);
+this.When(x=>x.SomeMethod()).Return(global::System.Reactive.Disposables.Disposable.Empty);
+this.When(x=>x.SomeMethod(global::PCLMock.It.IsAny<System.Int32>(),global::PCLMock.It.IsAny<System.Single>())).Return(global::System.Reactive.Disposables.Disposable.Empty);

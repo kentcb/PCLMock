@@ -84,7 +84,7 @@ namespace PCLMock.CodeGeneration.Plugins
 
             if (returnType == null)
             {
-                logSink.Warn(logSource, "Ignoring symbol '{0}' because its return type could not be determined (it's probably generic).", symbol);
+                logSink.Warn(logSource, "Ignoring symbol '{0}' because its return type could not be determined (it's probably a generic).", symbol);
                 return null;
             }
 

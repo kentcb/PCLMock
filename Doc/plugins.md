@@ -127,3 +127,17 @@ The `ObservableBasedAsyncrony` plugin saves you needing to do this manually. It 
 Notice how the two members have different observables returned. The `ObservableBasedAsynchrony` plugin makes inferences about the semantics of the observable from the member type. Observables returned from properties typically have collection semantics, so an empty observable is returned. Observables returned from methods typically have asychronous operation semantics, so the observable returned here contains a single, default item.
 
 This plugin will not generate any specifications for set-only properties or members that use custom `IObservable<T>` subtypes.
+
+### The `Disposables` Plugin
+
+This plugin can be configured thusly:
+
+```XML
+<Plugins>
+    <Plugin>PCLMock.CodeGeneration.Plugins.Disposables, PCLMock.CodeGeneration</Plugin>
+</Plugins>
+```
+
+Its purpose is to ensure that any method or property returning `IDisposable` will return `System.Reactive.Disposables.Disposable.Empty` by default. This ensures that consuming code can dispose of the returned value without triggering a `NullReferenceException`.
+
+Naturally, if the target code does not include a reference to _System.Reactive.Core.dll_ then no specification will be generated. 
