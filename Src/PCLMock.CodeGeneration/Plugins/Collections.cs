@@ -430,12 +430,11 @@ namespace PCLMock.CodeGeneration.Plugins
                 return false;
             }
 
-            returnValueSyntax = syntaxGenerator.InvocationExpression(
+            returnValueSyntax = syntaxGenerator.MemberAccessExpression(
                 syntaxGenerator.WithTypeArguments(
-                    syntaxGenerator.MemberAccessExpression(
-                        syntaxGenerator.TypeExpression(immutableListType),
-                        "Empty"),
-                    syntaxGenerator.TypeExpression(returnType.TypeArguments[0])));
+                    syntaxGenerator.TypeExpression(immutableListType),
+                    syntaxGenerator.TypeExpression(returnType.TypeArguments[0])),
+                "Empty");
             return true;
         }
 
@@ -467,13 +466,12 @@ namespace PCLMock.CodeGeneration.Plugins
                 return false;
             }
 
-            returnValueSyntax = syntaxGenerator.InvocationExpression(
+            returnValueSyntax = syntaxGenerator.MemberAccessExpression(
                 syntaxGenerator.WithTypeArguments(
-                    syntaxGenerator.MemberAccessExpression(
-                        syntaxGenerator.TypeExpression(immutableDictionaryType),
-                        "Create"),
+                    syntaxGenerator.TypeExpression(immutableDictionaryType),
                     syntaxGenerator.TypeExpression(returnType.TypeArguments[0]),
-                    syntaxGenerator.TypeExpression(returnType.TypeArguments[1])));
+                    syntaxGenerator.TypeExpression(returnType.TypeArguments[1])),
+                "Empty");
             return true;
         }
 
@@ -505,12 +503,11 @@ namespace PCLMock.CodeGeneration.Plugins
                 return false;
             }
 
-            returnValueSyntax = syntaxGenerator.InvocationExpression(
+            returnValueSyntax = syntaxGenerator.MemberAccessExpression(
                 syntaxGenerator.WithTypeArguments(
-                    syntaxGenerator.MemberAccessExpression(
-                        syntaxGenerator.TypeExpression(immutableQueueType),
-                        "Empty"),
-                    syntaxGenerator.TypeExpression(returnType.TypeArguments[0])));
+                    syntaxGenerator.TypeExpression(immutableQueueType),
+                    syntaxGenerator.TypeExpression(returnType.TypeArguments[0])),
+                "Empty");
             return true;
         }
 
@@ -542,12 +539,11 @@ namespace PCLMock.CodeGeneration.Plugins
                 return false;
             }
 
-            returnValueSyntax = syntaxGenerator.InvocationExpression(
+            returnValueSyntax = syntaxGenerator.MemberAccessExpression(
                 syntaxGenerator.WithTypeArguments(
-                    syntaxGenerator.MemberAccessExpression(
-                        syntaxGenerator.TypeExpression(immutableSetType),
-                        "Empty"),
-                    syntaxGenerator.TypeExpression(returnType.TypeArguments[0])));
+                    syntaxGenerator.TypeExpression(immutableSetType),
+                    syntaxGenerator.TypeExpression(returnType.TypeArguments[0])),
+                "Empty");
             return true;
         }
 
@@ -579,12 +575,11 @@ namespace PCLMock.CodeGeneration.Plugins
                 return false;
             }
 
-            returnValueSyntax = syntaxGenerator.InvocationExpression(
+            returnValueSyntax = syntaxGenerator.MemberAccessExpression(
                 syntaxGenerator.WithTypeArguments(
-                    syntaxGenerator.MemberAccessExpression(
-                        syntaxGenerator.TypeExpression(immutableStackType),
-                        "Empty"),
-                    syntaxGenerator.TypeExpression(returnType.TypeArguments[0])));
+                    syntaxGenerator.TypeExpression(immutableStackType),
+                    syntaxGenerator.TypeExpression(returnType.TypeArguments[0])),
+                "Empty");
             return true;
         }
     }

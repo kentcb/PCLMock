@@ -10,19 +10,28 @@
 // set this to either "CSharp" or "VisualBasic"
 var language = "CSharp";
 
+// set this to true to include verbose logging output (you can find it following the generated code)
+var verbose = true;
+
 this.SetFileExtensionForLanguage(language);
 this.HookAssemblyResolution();
 var solutionPath = this.DTE.Solution.FileName;
 var xmlPath = this.Host.ResolvePath("Mocks.xml");
 var xmlBasedGenerator = Type.GetType("PCLMock.CodeGeneration.XmlBasedGenerator, PCLMock.CodeGeneration");
-var logSink = Type.GetType("PCLMock.CodeGeneration.Logging.ILogSink, PCLMock.CodeGeneration");
-var logSinkInstance = Activator.CreateInstance(Type.GetType("PCLMock.CodeGeneration.Logging.StringLogSink, PCLMock.CodeGeneration"));
-var generateMethod = xmlBasedGenerator.GetMethod("GenerateMocks", new[] { logSink, typeof(string), typeof(string), typeof(string) });
+var logSinkType = Type.GetType("PCLMock.CodeGeneration.Logging.ILogSink, PCLMock.CodeGeneration");
+var logSinkInstance = Type.GetType("PCLMock.CodeGeneration.Logging.NullLogSink, PCLMock.CodeGeneration").GetField("Instance").GetValue(null);
+
+if (verbose)
+{
+	logSinkInstance = Activator.CreateInstance(Type.GetType("PCLMock.CodeGeneration.Logging.StringLogSink, PCLMock.CodeGeneration"));
+}
+
+var generateMethod = xmlBasedGenerator.GetMethod("GenerateMocks", new[] { logSinkType, typeof(string), typeof(string), typeof(string) });
 var result = (string)generateMethod.Invoke(null, new[] { logSinkInstance, solutionPath, xmlPath, language });
 
 this.WriteLine(result);
 
-if (language == "CSharp")
+if (verbose && language == "CSharp")
 {
 	this.WriteLine("/*");
 	this.WriteLine(logSinkInstance.ToString());
