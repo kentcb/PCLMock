@@ -99,9 +99,15 @@ namespace PCLMock.CodeGeneration.Plugins
                 .Compilation
                 .GetTypeByMetadataName("System.Reactive.Linq.Observable");
 
-            if (observableInterfaceType == null || observableType == null)
+            if (observableInterfaceType == null)
             {
-                logSink.Warn(logSource, "Failed to resolve IObservable<T> interface or Observable class.");
+                logSink.Warn(logSource, "Failed to resolve System.IObservable<T>.");
+                return null;
+            }
+
+            if (observableType == null)
+            {
+                logSink.Warn(logSource, "Failed to resolve System.Reactive.Linq.Observable.");
                 return null;
             }
 

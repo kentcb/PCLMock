@@ -56,7 +56,7 @@
                     .plugins
                     .Aggregate(
                         new StringBuilder(),
-                        (sb, next) => sb.Append(" - Plugin with assembly-qualified name '").Append(next.AssemblyQualifiedName).Append("' will be applied."));
+                        (sb, next) => sb.Append(" - Plugin with assembly-qualified name '").Append(next.AssemblyQualifiedName).AppendLine("' will be applied."));
                 logSink.Debug(logSource, $"Created configuration with the following rules:{Environment.NewLine}{namespaceTransformationsLog}{nameTransformationsLog}{interfaceFiltersLog}{pluginsLog}");
             }
         }

@@ -65,7 +65,19 @@
                         {
                             var compilation = await project.GetCompilationAsync();
                             // make sure the compilation has a reference to PCLMock
-                            return compilation.AddReferences(MetadataReference.CreateFromFile(typeof(MockBase<>).Assembly.Location));
+                            compilation = compilation.AddReferences(MetadataReference.CreateFromFile(typeof(MockBase<>).Assembly.Location));
+
+                            if (logSink.IsEnabled)
+                            {
+                                logSink.Debug(logSource, "Compilationg generated for project '{0}' with references:", project.Name);
+
+                                foreach (var reference in compilation.References)
+                                {
+                                    logSink.Debug(logSource, "- {0}", reference.Display);
+                                }
+                            }
+
+                            return compilation;
                         }));
 
             return compilations
