@@ -33,7 +33,7 @@
             Func<INamedTypeSymbol, bool> interfacePredicate,
             Func<INamedTypeSymbol, string> mockNamespaceSelector,
             Func<INamedTypeSymbol, string> mockNameSelector,
-            IImmutableList<IPlugin> codeGenerators)
+            IImmutableList<IPlugin> plugins)
         {
             var workspace = MSBuildWorkspace.Create();
             var solution = await workspace.OpenSolutionAsync(solutionPath);
@@ -45,7 +45,7 @@
                 interfacePredicate,
                 mockNamespaceSelector,
                 mockNameSelector,
-                codeGenerators);
+                plugins);
         }
 
         public async static Task<IImmutableList<SyntaxNode>> GenerateMocksAsync(
@@ -55,7 +55,7 @@
             Func<INamedTypeSymbol, bool> interfacePredicate,
             Func<INamedTypeSymbol, string> mockNamespaceSelector,
             Func<INamedTypeSymbol, string> mockNameSelector,
-            IImmutableList<IPlugin> codeGenerators)
+            IImmutableList<IPlugin> plugins)
         {
             var syntaxGenerator = SyntaxGenerator.GetGenerator(solution.Workspace, language.ToSyntaxGeneratorLanguageName());
             var compilations = await Task.WhenAll(
@@ -67,9 +67,14 @@
                             // make sure the compilation has a reference to PCLMock
                             compilation = compilation.AddReferences(MetadataReference.CreateFromFile(typeof(MockBase<>).Assembly.Location));
 
+                            foreach (var plugin in plugins)
+                            {
+                                compilation = plugin.InitializeCompilation(compilation);
+                            }
+
                             if (logSink.IsEnabled)
                             {
-                                logSink.Debug(logSource, "Compilationg generated for project '{0}' with references:", project.Name);
+                                logSink.Debug(logSource, "Compilation generated for project '{0}' with references:", project.Name);
 
                                 foreach (var reference in compilation.References)
                                 {
@@ -110,7 +115,7 @@
 
                         var semanticModel = x.Compilation.GetSemanticModel(x.InterfaceSymbol.DeclaringSyntaxReferences.First().SyntaxTree);
 
-                        return GenerateMock(logSink, language, syntaxGenerator, semanticModel, x.InterfaceSymbol, @namespace, name, codeGenerators);
+                        return GenerateMock(logSink, language, syntaxGenerator, semanticModel, x.InterfaceSymbol, @namespace, name, plugins);
                     })
                 .Select((syntaxNode, i) => i == 0 ? syntaxGenerator.WithLeadingComments(syntaxNode, headerComment, language) : syntaxNode)
                 .ToImmutableList();
@@ -124,7 +129,7 @@
             INamedTypeSymbol interfaceSymbol,
             string mockNamespace,
             string mockName,
-            IImmutableList<IPlugin> codeGenerators)
+            IImmutableList<IPlugin> plugins)
         {
             var namespaceSyntax = GetNamespaceDeclarationSyntax(syntaxGenerator, semanticModel, mockNamespace, language);
             var classSyntax = GetClassDeclarationSyntax(syntaxGenerator, semanticModel, mockName, interfaceSymbol);
@@ -132,7 +137,7 @@
             classSyntax = syntaxGenerator
                 .AddAttributes(classSyntax, GetClassAttributesSyntax(syntaxGenerator, semanticModel));
             classSyntax = syntaxGenerator
-                .AddMembers(classSyntax, GetMemberDeclarations(logSink, syntaxGenerator, semanticModel, mockName, interfaceSymbol, language, codeGenerators));
+                .AddMembers(classSyntax, GetMemberDeclarations(logSink, syntaxGenerator, semanticModel, mockName, interfaceSymbol, language, plugins));
             namespaceSyntax = syntaxGenerator
                 .AddMembers(namespaceSyntax, classSyntax);
 
@@ -282,7 +287,7 @@
             SyntaxGenerator syntaxGenerator,
             SemanticModel semanticModel,
             INamedTypeSymbol interfaceSymbol,
-            IImmutableList<IPlugin> codeGenerators)
+            IImmutableList<IPlugin> plugins)
         {
             // GENERATED CODE:
             //
@@ -291,7 +296,7 @@
             //         // for each plugin, inject the code it generates
             //     }
             var statements = GetMembersRecursive(interfaceSymbol)
-                .SelectMany(symbol => codeGenerators.Select(codeGenerator => codeGenerator.GenerateConfigureBehavior(logSink, syntaxGenerator, semanticModel, symbol)))
+                .SelectMany(symbol => plugins.Select(plugin => plugin.GenerateConfigureBehavior(logSink, syntaxGenerator, semanticModel, symbol)))
                 .Where(symbol => symbol != null)
                 .ToImmutableList();
 
@@ -307,7 +312,7 @@
             SyntaxGenerator syntaxGenerator,
             SemanticModel semanticModel,
             INamedTypeSymbol interfaceSymbol,
-            IImmutableList<IPlugin> codeGenerators)
+            IImmutableList<IPlugin> plugins)
         {
             // GENERATED CODE:
             //
@@ -316,7 +321,7 @@
             //         // for each plugin, inject the code it generates
             //     }
             var statements = GetMembersRecursive(interfaceSymbol)
-                .SelectMany(symbol => codeGenerators.Select(codeGenerator => codeGenerator.GenerateConfigureLooseBehavior(logSink, syntaxGenerator, semanticModel, symbol)))
+                .SelectMany(symbol => plugins.Select(plugin => plugin.GenerateConfigureLooseBehavior(logSink, syntaxGenerator, semanticModel, symbol)))
                 .Where(symbol => symbol != null)
                 .ToImmutableList();
 
@@ -362,14 +367,14 @@
             string name,
             INamedTypeSymbol interfaceSymbol,
             Language language,
-            IImmutableList<IPlugin> codeGenerators)
+            IImmutableList<IPlugin> plugins)
         {
             return
                 new SyntaxNode[]
                 {
                     GetConstructorDeclarationSyntax(syntaxGenerator, semanticModel, name),
-                    GetConfigureBehaviorGeneratedSyntax(logSink, syntaxGenerator, semanticModel, interfaceSymbol, codeGenerators),
-                    GetConfigureLooseBehaviorGeneratedSyntax(logSink, syntaxGenerator, semanticModel, interfaceSymbol, codeGenerators),
+                    GetConfigureBehaviorGeneratedSyntax(logSink, syntaxGenerator, semanticModel, interfaceSymbol, plugins),
+                    GetConfigureLooseBehaviorGeneratedSyntax(logSink, syntaxGenerator, semanticModel, interfaceSymbol, plugins),
                     GetConfigureBehaviorMethodSyntax(language, syntaxGenerator, semanticModel),
                     GetConfigureLooseBehaviorMethodSyntax(language, syntaxGenerator, semanticModel)
                 }

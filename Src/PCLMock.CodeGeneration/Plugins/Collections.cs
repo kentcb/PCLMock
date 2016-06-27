@@ -37,6 +37,10 @@ namespace PCLMock.CodeGeneration.Plugins
         public string Name => "Collections";
 
         /// <inheritdoc />
+        public Compilation InitializeCompilation(Compilation compilation) =>
+            compilation;
+
+        /// <inheritdoc />
         public SyntaxNode GenerateConfigureBehavior(
             ILogSink logSink,
             SyntaxGenerator syntaxGenerator,

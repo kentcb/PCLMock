@@ -28,6 +28,23 @@ namespace PCLMock.CodeGeneration
         }
 
         /// <summary>
+        /// Perform any initialization against the compilation.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// This method is called once per compilation and per plugin, before any code is generated. If no initialization is required,
+        /// plugins should simply return the provided compilation.
+        /// </para>
+        /// </remarks>
+        /// <param name="compilation">
+        /// The compilation.
+        /// </param>
+        /// <returns>
+        /// The initialized compilation.
+        /// </returns>
+        Compilation InitializeCompilation(Compilation compilation);
+
+        /// <summary>
         /// Called to generate any behavior that is always applicable to an instance of the mock.
         /// </summary>
         /// <remarks>

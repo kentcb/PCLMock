@@ -2,6 +2,7 @@ namespace PCLMock.CodeGeneration.Plugins
 {
     using System;
     using System.Linq;
+    using System.Reactive.Linq;
     using Logging;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.Editing;
@@ -38,6 +39,10 @@ namespace PCLMock.CodeGeneration.Plugins
         private static readonly Type logSource = typeof(ObservableBasedAsynchrony);
 
         public string Name => "Observable-based Asynchrony";
+
+        /// <inheritdoc />
+        public Compilation InitializeCompilation(Compilation compilation) =>
+            compilation.AddReferences(MetadataReference.CreateFromFile(typeof(Observable).Assembly.Location));
 
         /// <inheritdoc />
         public SyntaxNode GenerateConfigureBehavior(

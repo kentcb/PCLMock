@@ -2,8 +2,8 @@
 using System.Reflection;
 using System.Resources;
 
-[assembly: AssemblyVersionAttribute("5.0.0.0")]
-[assembly: AssemblyFileVersionAttribute("5.0.0.0")]
+[assembly: AssemblyVersionAttribute("5.0.1.0")]
+[assembly: AssemblyFileVersionAttribute("5.0.1.0")]
 [assembly: AssemblyConfigurationAttribute("Release")]
 [assembly: AssemblyCompanyAttribute("Kent Boogaart")]
 [assembly: AssemblyProductAttribute("PCLMock")]
@@ -11,4 +11,4 @@ using System.Resources;
 [assembly: AssemblyTrademarkAttribute("")]
 [assembly: AssemblyCultureAttribute("")]
 [assembly: NeutralResourcesLanguageAttribute("en-US")]
-[assembly: AssemblyInformationalVersionAttribute("5.0.0-alpha")]
+[assembly: AssemblyInformationalVersionAttribute("5.0.1-alpha")]

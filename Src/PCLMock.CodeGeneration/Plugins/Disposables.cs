@@ -2,10 +2,10 @@ namespace PCLMock.CodeGeneration.Plugins
 {
     using System;
     using System.Linq;
+    using System.Reactive.Disposables;
     using Logging;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.Editing;
-    using Microsoft.CodeAnalysis.Formatting;
 
     /// <summary>
     /// A plugin that generates appropriate default return values for any member that returns <see cref="IDisposable"/>.
@@ -28,6 +28,10 @@ namespace PCLMock.CodeGeneration.Plugins
         private static readonly Type logSource = typeof(Disposables);
 
         public string Name => "Disposables";
+
+        /// <inheritdoc />
+        public Compilation InitializeCompilation(Compilation compilation) =>
+            compilation.AddReferences(MetadataReference.CreateFromFile(typeof(Disposable).Assembly.Location));
 
         /// <inheritdoc />
         public SyntaxNode GenerateConfigureBehavior(
