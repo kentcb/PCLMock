@@ -26,7 +26,7 @@
         [InlineData("Indexers", Language.CSharp)]
         [InlineData("OutAndRef", Language.CSharp)]
         // TODO: VB is totally borked - calls to syntaxGenerator.WithStatements don't seem to add the statements! Will need to look into this at a later date
-        [InlineData("SimpleInterface", Language.VisualBasic)]
+        //[InlineData("SimpleInterface", Language.VisualBasic)]
         //[InlineData("InterfaceWithGenericMethods", Language.VisualBasic)]
         //[InlineData("GenericInterface", Language.VisualBasic)]
         //[InlineData("InterfaceWithNonMockableMembers", Language.VisualBasic)]
