@@ -8,9 +8,21 @@
 
         Public Sub New(Optional behavior As Global.PCLMock.MockBehavior = Global.PCLMock.MockBehavior.Strict)
             MyBase.New(behavior)
+            ConfigureBehaviorGenerated()
+            ConfigureBehavior()
             If(behavior) = (Global.PCLMock.MockBehavior.Loose) Then
+                ConfigureLooseBehaviorGenerated()
                 ConfigureLooseBehavior()
             End If
+        End Sub
+
+        Private Sub ConfigureBehaviorGenerated()
+        End Sub
+
+        Private Sub ConfigureLooseBehaviorGenerated()
+        End Sub
+
+        Private Partial Sub ConfigureBehavior()
         End Sub
 
         Private Partial Sub ConfigureLooseBehavior()
@@ -20,15 +32,6 @@
             Get
                 Return Me.Apply(Function(x) x.GetProperty)
             End Get
-        End Property
-
-        Public Property SetProperty As Int32 Implements Global.ISimpleInterface.SetProperty
-            Get
-            End Get
-
-            Set(value As Int32)
-                Me.ApplyPropertySet(Function(x) x.SetProperty, value)
-            End Set
         End Property
 
         Public Property GetSetProperty As System.Object Implements Global.ISimpleInterface.GetSetProperty
@@ -42,6 +45,7 @@
         End Property
 
         Public Sub VoidMethod() Implements Global.ISimpleInterface.VoidMethod
+THERE SHOULD BE SOMETHING HERE!
         End Sub
 
         Public Sub VoidMethodWithArguments(i As Int32, s As System.String) Implements Global.ISimpleInterface.VoidMethodWithArguments
