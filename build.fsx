@@ -9,7 +9,7 @@ open Fake.NuGetHelper
 open Fake.Testing.XUnit2
 
 // properties
-let semanticVersion = "5.0.1-alpha"
+let semanticVersion = "5.0.2-alpha"
 let version = (>=>) @"(?<major>\d*)\.(?<minor>\d*)\.(?<build>\d*).*?" "${major}.${minor}.${build}.0" semanticVersion
 let configuration = getBuildParamOrDefault "configuration" "Release"
 // can be set by passing: -ev deployToNuGet true
