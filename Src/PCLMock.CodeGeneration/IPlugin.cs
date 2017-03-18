@@ -45,20 +45,23 @@ namespace PCLMock.CodeGeneration
         Compilation InitializeCompilation(Compilation compilation);
 
         /// <summary>
-        /// Called to generate any behavior that is always applicable to an instance of the mock.
+        /// Called to generate the default value for a given symbol.
         /// </summary>
         /// <remarks>
         /// <para>
-        /// The code generation engine calls this method for each discovered symbol (property/method). Any returned syntax
-        /// will be incorporated into the mock's <c>ConfigureBehaviorGenerated</c> method. This method is always executed
-        /// by the mock's constructor regardless of whether the mock is loose or strict.
+        /// The code generation engine calls this method for each discovered symbol (property/method) that returns a value.
+        /// The first plugin to return a value will have that syntax incorporated into the mock's <c>ConfigureBehaviorGenerated</c>
+        /// or <c>ConfigureLooseBehaviorGenerated</c> method, depending on the value of <param name="behavior"/>.
         /// </para>
         /// </remarks>
-        /// <param name="logSink">
-        /// A log sink.
+        /// <param name="behavior">
+        /// Indicates whether the default value is being generated for strict or loose behavioral semantics.
         /// </param>
         /// <param name="syntaxGenerator">
         /// The syntax generator.
+        /// </param>
+        /// <param name="logSink">
+        /// A log sink.
         /// </param>
         /// <param name="semanticModel">
         /// The semantic model.
@@ -66,46 +69,19 @@ namespace PCLMock.CodeGeneration
         /// <param name="symbol">
         /// The symbol.
         /// </param>
-        /// <returns>
-        /// An instance of <see cref="SyntaxNode"/> containing the desired code, or <see langword="null"/> if no code should
-        /// be generated for the symbol.
-        /// </returns>
-        SyntaxNode GenerateConfigureBehavior(
-            ILogSink logSink,
-            SyntaxGenerator syntaxGenerator,
-            SemanticModel semanticModel,
-            ISymbol symbol);
-
-        /// <summary>
-        /// Called to generate any behavior that is applicable to an instance of the mock when it is loose.
-        /// </summary>
-        /// <remarks>
-        /// <para>
-        /// The code generation engine calls this method for each discovered symbol (property/method). Any returned syntax
-        /// will be incorporated into the mock's <c>ConfigureLooseBehaviorGenerated</c> method. This method is executed
-        /// by the mock's constructor if the mock is loose.
-        /// </para>
-        /// </remarks>
-        /// <param name="logSink">
-        /// A log sink.
-        /// </param>
-        /// <param name="syntaxGenerator">
-        /// The syntax generator.
-        /// </param>
-        /// <param name="semanticModel">
-        /// The semantic model.
-        /// </param>
-        /// <param name="symbol">
-        /// The symbol.
+        /// <param name="returnType">
+        /// The symbol's return type.
         /// </param>
         /// <returns>
-        /// An instance of <see cref="SyntaxNode"/> containing the desired code, or <see langword="null"/> if no code should
-        /// be generated for the symbol.
+        /// An instance of <see cref="SyntaxNode"/> containing the default value, or <see langword="null"/> if no default value is
+        /// relevant.
         /// </returns>
-        SyntaxNode GenerateConfigureLooseBehavior(
+        SyntaxNode GetDefaultValueSyntax(
             ILogSink logSink,
+            MockBehavior behavior,
             SyntaxGenerator syntaxGenerator,
             SemanticModel semanticModel,
-            ISymbol symbol);
+            ISymbol symbol,
+            INamedTypeSymbol returnType);
     }
 }

@@ -1,2 +1,43 @@
-this.When(x=>x.SomeProperty).Return(global::System.Threading.Tasks.Task.FromResult<T>(default(T)));
-this.When(x=>x.SomeMethod()).Return(global::System.Threading.Tasks.Task.FromResult<T>(default(T)));
+namespace The.Namespace
+{
+    [System.CodeDom.Compiler.GeneratedCode("PCLMock", "$VERSION$")]
+    [System.Runtime.CompilerServices.CompilerGenerated]
+    internal partial class Mock<T> : global::PCLMock.MockBase<global::ISomeInterface<T>>, global::ISomeInterface<T>
+    {
+        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base (behavior)
+        {
+            ConfigureBehaviorGenerated();
+            ConfigureBehavior();
+            if ((behavior) == (global::PCLMock.MockBehavior.Loose))
+            {
+                ConfigureLooseBehaviorGenerated();
+                ConfigureLooseBehavior();
+            }
+        }
+
+        private void ConfigureBehaviorGenerated()
+        {
+            this.When(x => x.SomeProperty).Return(global::System.Threading.Tasks.Task.FromResult<T>(default (T)));
+            this.When(x => x.SomeMethod()).Return(global::System.Threading.Tasks.Task.FromResult<T>(default (T)));
+        }
+
+        private void ConfigureLooseBehaviorGenerated()
+        {
+        }
+
+        partial void ConfigureBehavior();
+        partial void ConfigureLooseBehavior();
+        public global::System.Threading.Tasks.Task<T> SomeProperty
+        {
+            get
+            {
+                return this.Apply(x => x.SomeProperty);
+            }
+        }
+
+        public global::System.Threading.Tasks.Task<T> SomeMethod()
+        {
+            return this.Apply(x => x.SomeMethod());
+        }
+    }
+}

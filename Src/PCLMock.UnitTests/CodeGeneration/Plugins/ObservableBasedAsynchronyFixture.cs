@@ -1,14 +1,12 @@
 namespace PCLMock.UnitTests.CodeGeneration.Plugins
 {
     using System;
+    using System.Collections.Immutable;
     using System.IO;
     using System.Linq;
     using System.Reactive.Linq;
-    using System.Text;
     using System.Threading.Tasks;
     using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CSharp.Syntax;
-    using Microsoft.CodeAnalysis.Editing;
     using Microsoft.CodeAnalysis.Text;
     using PCLMock.CodeGeneration;
     using PCLMock.CodeGeneration.Logging;
@@ -43,47 +41,38 @@ namespace PCLMock.UnitTests.CodeGeneration.Plugins
                     {
                         MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
                         MetadataReference.CreateFromFile(typeof(Uri).Assembly.Location),
-                        MetadataReference.CreateFromFile(typeof(MockBase<>).Assembly.Location),
-                        MetadataReference.CreateFromFile(typeof(Observable).Assembly.Location)
+                        MetadataReference.CreateFromFile(typeof(MockBase<>).Assembly.Location)
                     });
                 var project = workspace.AddProject(projectInfo);
                 workspace.AddDocument(projectId, "Source.cs", SourceText.From(inputStream));
-                var syntaxGenerator = SyntaxGenerator.GetGenerator(workspace, language.ToSyntaxGeneratorLanguageName());
                 var solution = workspace.CurrentSolution;
-                var compilation = await solution
-                    .Projects
-                    .Single()
-                    .GetCompilationAsync();
-                var syntaxTree = compilation
-                    .SyntaxTrees
-                    .Single();
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var sut = new ObservableBasedAsynchrony();
-                var memberSyntaxes = syntaxTree
-                    .GetRoot()
-                    .DescendantNodes()
-                    .Where(syntaxNode => syntaxNode is BaseMethodDeclarationSyntax || syntaxNode is BasePropertyDeclarationSyntax);
 
-                var result = memberSyntaxes
-                    .Select(syntax => semanticModel.GetDeclaredSymbol(syntax))
-                    .Select(symbol => sut.GenerateConfigureBehavior(NullLogSink.Instance, syntaxGenerator, semanticModel, symbol))
-                    .Aggregate(
-                        new StringBuilder(),
-                        (acc, next) =>
+                var results =
+                    (await Generator.GenerateMocksAsync(
+                        NullLogSink.Instance,
+                        language,
+                        solution,
+                        x => true,
+                        x => "The.Namespace",
+                        x => "Mock",
+                        new IPlugin[]
                         {
-                            if (next != null)
-                            {
-                                acc.AppendLine(next.ToFullString());
-                            }
-
-                            return acc;
-                        },
-                        x => x.ToString())
+                            new ObservableBasedAsynchrony()
+                        }.ToImmutableList()));
+                var result = results
+                    .Last()
+                    .ToString()
                     .NormalizeLineEndings();
 
-                var expectedCode = outputStreamReader
-                    .ReadToEnd()
+                var expectedCode = outputStreamReader.ReadToEnd();
+
+                // make sure version changes don't break the tests
+                expectedCode = expectedCode
+                    .Replace("$VERSION$", typeof(MockBase<>).Assembly.GetName().Version.ToString())
                     .NormalizeLineEndings();
+
+                // useful when converting generated code to something that can be pasted into an expectation file
+                var sanitisedResult = result.Replace(typeof(MockBase<>).Assembly.GetName().Version.ToString(), "$VERSION$");
 
                 Assert.Equal(expectedCode, result);
             }

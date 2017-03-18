@@ -287,49 +287,193 @@
             SyntaxGenerator syntaxGenerator,
             SemanticModel semanticModel,
             INamedTypeSymbol interfaceSymbol,
-            IImmutableList<IPlugin> plugins)
+            IImmutableList<IPlugin> plugins,
+            MockBehavior behavior)
         {
-            // GENERATED CODE:
-            //
-            //     private void ConfigureBehaviorGenerated()
-            //     {
-            //         // for each plugin, inject the code it generates
-            //     }
             var statements = GetMembersRecursive(interfaceSymbol)
-                .SelectMany(symbol => plugins.Select(plugin => plugin.GenerateConfigureBehavior(logSink, syntaxGenerator, semanticModel, symbol)))
-                .Where(symbol => symbol != null)
+                .Select(symbol => GetConfigureBehaviorGeneratedForSymbol(logSink, syntaxGenerator, semanticModel, interfaceSymbol, symbol, plugins, behavior))
+                .Where(syntaxNode => syntaxNode != null)
                 .ToImmutableList();
 
             return syntaxGenerator
                 .MethodDeclaration(
-                    "ConfigureBehaviorGenerated",
+                    behavior == MockBehavior.Strict ? "ConfigureBehaviorGenerated" : "ConfigureLooseBehaviorGenerated",
                     accessibility: Accessibility.Private,
                     statements: statements);
         }
 
-        private static SyntaxNode GetConfigureLooseBehaviorGeneratedSyntax(
+        private static SyntaxNode GetConfigureBehaviorGeneratedForSymbol(
             ILogSink logSink,
             SyntaxGenerator syntaxGenerator,
             SemanticModel semanticModel,
             INamedTypeSymbol interfaceSymbol,
-            IImmutableList<IPlugin> plugins)
+            ISymbol symbol,
+            IImmutableList<IPlugin> plugins,
+            MockBehavior behavior)
         {
-            // GENERATED CODE:
-            //
-            //     private void ConfigureLooseBehaviorGenerated()
-            //     {
-            //         // for each plugin, inject the code it generates
-            //     }
-            var statements = GetMembersRecursive(interfaceSymbol)
-                .SelectMany(symbol => plugins.Select(plugin => plugin.GenerateConfigureLooseBehavior(logSink, syntaxGenerator, semanticModel, symbol)))
-                .Where(symbol => symbol != null)
-                .ToImmutableList();
+            logSink.Debug(logSource, "Considering symbol '{0}'.", symbol);
 
-            return syntaxGenerator
-                .MethodDeclaration(
-                    "ConfigureLooseBehaviorGenerated",
-                    accessibility: Accessibility.Private,
-                    statements: statements);
+            var propertySymbol = symbol as IPropertySymbol;
+            var methodSymbol = symbol as IMethodSymbol;
+
+            INamedTypeSymbol returnType = null;
+
+            if (propertySymbol != null)
+            {
+                if (propertySymbol.GetMethod == null)
+                {
+                    logSink.Debug(logSource, "Ignoring symbol '{0}' because it is a write-only property.", symbol);
+                    return null;
+                }
+
+                returnType = propertySymbol.GetMethod.ReturnType as INamedTypeSymbol;
+            }
+            else if (methodSymbol != null)
+            {
+                if (methodSymbol.AssociatedSymbol != null)
+                {
+                    logSink.Debug(logSource, "Ignoring symbol '{0}' because it is a method with an associated symbol.", symbol);
+                    return null;
+                }
+
+                if (methodSymbol.IsGenericMethod)
+                {
+                    logSink.Debug(logSource, "Ignoring symbol '{0}' because it is a generic method.", symbol);
+                    return null;
+                }
+
+                returnType = methodSymbol.ReturnType as INamedTypeSymbol;
+            }
+            else
+            {
+                logSink.Debug(logSource, "Ignoring symbol '{0}' because it is neither a property nor a method.", symbol);
+                return null;
+            }
+
+            if (returnType == null)
+            {
+                logSink.Warn(logSource, "Ignoring symbol '{0}' because its return type could not be determined (it's probably a sgeneric).", symbol);
+                return null;
+            }
+
+            var defaultValueSyntax = plugins
+                .Select(plugin => plugin.GetDefaultValueSyntax(logSink, behavior, syntaxGenerator, semanticModel, symbol, returnType))
+                .Where(syntax => syntax != null)
+                .FirstOrDefault();
+
+            if (defaultValueSyntax == null)
+            {
+                return null;
+            }
+
+            var itType = semanticModel
+                .Compilation
+                .GetTypeByMetadataName("PCLMock.It");
+
+            if (itType == null)
+            {
+                logSink.Error(logSource, "Failed to resolve It class.");
+                return null;
+            }
+
+            var isAnyMethod = itType
+                .GetMembers("IsAny")
+                .Single();
+
+            if (isAnyMethod == null)
+            {
+                logSink.Error(logSource, "Failed to resolve IsAny method.");
+                return null;
+            }
+
+            var lambdaParameterName = symbol.GetUniqueName();
+            SyntaxNode lambdaExpression;
+
+            if (propertySymbol != null)
+            {
+                if (!propertySymbol.IsIndexer)
+                {
+                    // GENERATED CODE:
+                    //
+                    //     this
+                    //         .When(x => x.SymbolName)
+                    lambdaExpression = syntaxGenerator.MemberAccessExpression(
+                        syntaxGenerator.IdentifierName(lambdaParameterName),
+                        propertySymbol.Name);
+                }
+                else
+                {
+                    // GENERATED CODE:
+                    //
+                    //     this
+                    //         .When(x => x[It.IsAny<P1>(), It.IsAny<P2>() ...)
+                    var whenArguments = propertySymbol
+                        .Parameters
+                        .Select(
+                            parameter =>
+                                syntaxGenerator.InvocationExpression(
+                                    syntaxGenerator.MemberAccessExpression(
+                                        syntaxGenerator.TypeExpression(itType),
+                                        syntaxGenerator.GenericName(
+                                            "IsAny",
+                                            typeArguments: new[]
+                                            {
+                                            parameter.Type
+                                            }))));
+
+                    lambdaExpression = syntaxGenerator.ElementAccessExpression(
+                        syntaxGenerator.IdentifierName(lambdaParameterName),
+                        arguments: whenArguments);
+                }
+            }
+            else
+            {
+                // GENERATED CODE:
+                //
+                //     this
+                //         .When(x => x.SymbolName(It.IsAny<P1>(), It.IsAny<P2>() ...)
+                var whenArguments = methodSymbol
+                    .Parameters
+                    .Select(
+                        parameter =>
+                            syntaxGenerator.InvocationExpression(
+                                syntaxGenerator.MemberAccessExpression(
+                                    syntaxGenerator.TypeExpression(itType),
+                                    syntaxGenerator.GenericName(
+                                        "IsAny",
+                                        typeArguments: new[]
+                                        {
+                                        parameter.Type
+                                        }))));
+
+                lambdaExpression = syntaxGenerator.InvocationExpression(
+                    syntaxGenerator.MemberAccessExpression(
+                        syntaxGenerator.IdentifierName(lambdaParameterName),
+                        methodSymbol.Name),
+                    arguments: whenArguments);
+            }
+
+            var whenLambdaArgument = syntaxGenerator.ValueReturningLambdaExpression(
+                lambdaParameterName,
+                lambdaExpression);
+
+            var whenInvocation = syntaxGenerator.InvocationExpression(
+                syntaxGenerator.MemberAccessExpression(
+                    syntaxGenerator.ThisExpression(),
+                    syntaxGenerator.IdentifierName("When")),
+                whenLambdaArgument);
+
+            var result = syntaxGenerator.ExpressionStatement(
+                syntaxGenerator.InvocationExpression(
+                    syntaxGenerator.MemberAccessExpression(
+                        whenInvocation,
+                        syntaxGenerator.IdentifierName("Return")),
+                    arguments: new[]
+                    {
+                        defaultValueSyntax
+                    }));
+
+            return result;
         }
 
         private static SyntaxNode GetConfigureBehaviorMethodSyntax(
@@ -373,8 +517,8 @@
                 new SyntaxNode[]
                 {
                     GetConstructorDeclarationSyntax(syntaxGenerator, semanticModel, name),
-                    GetConfigureBehaviorGeneratedSyntax(logSink, syntaxGenerator, semanticModel, interfaceSymbol, plugins),
-                    GetConfigureLooseBehaviorGeneratedSyntax(logSink, syntaxGenerator, semanticModel, interfaceSymbol, plugins),
+                    GetConfigureBehaviorGeneratedSyntax(logSink, syntaxGenerator, semanticModel, interfaceSymbol, plugins, MockBehavior.Strict),
+                    GetConfigureBehaviorGeneratedSyntax(logSink, syntaxGenerator, semanticModel, interfaceSymbol, plugins, MockBehavior.Loose),
                     GetConfigureBehaviorMethodSyntax(language, syntaxGenerator, semanticModel),
                     GetConfigureLooseBehaviorMethodSyntax(language, syntaxGenerator, semanticModel)
                 }
