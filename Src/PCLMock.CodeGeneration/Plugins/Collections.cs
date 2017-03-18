@@ -3,7 +3,6 @@ namespace PCLMock.CodeGeneration.Plugins
     using System;
     using Logging;
     using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.Editing;
 
     /// <summary>
     /// A plugin that generates appropriate default return values for any member that returns a collection.
@@ -40,10 +39,8 @@ namespace PCLMock.CodeGeneration.Plugins
 
         /// <inheritdoc />
         public SyntaxNode GetDefaultValueSyntax(
-            ILogSink logSink,
+            Context context,
             MockBehavior behavior,
-            SyntaxGenerator syntaxGenerator,
-            SemanticModel semanticModel,
             ISymbol symbol,
             INamedTypeSymbol returnType)
         {
@@ -54,23 +51,27 @@ namespace PCLMock.CodeGeneration.Plugins
 
             if (!returnType.IsGenericType)
             {
-                logSink.Debug(logSource, "Ignoring symbol '{0}' because its return type is not a generic type, so it cannot be one of the supported collection types.");
+                context
+                    .LogSink
+                    .Debug(logSource, "Ignoring symbol '{0}' because its return type is not a generic type, so it cannot be one of the supported collection types.");
                 return null;
             }
 
             SyntaxNode returnValueSyntax;
 
-            if (!TryGetReturnValueSyntaxForEnumerableReturnType(logSink, syntaxGenerator, semanticModel, returnType, out returnValueSyntax) &&
-                !TryGetReturnValueSyntaxForCollectionReturnType(logSink, syntaxGenerator, semanticModel, returnType, out returnValueSyntax) &&
-                !TryGetReturnValueSyntaxForDictionaryReturnType(logSink, syntaxGenerator, semanticModel, returnType, out returnValueSyntax) &&
-                !TryGetReturnValueSyntaxForSetReturnType(logSink, syntaxGenerator, semanticModel, returnType, out returnValueSyntax) &&
-                !TryGetReturnValueSyntaxForImmutableListReturnType(logSink, syntaxGenerator, semanticModel, returnType, out returnValueSyntax) &&
-                !TryGetReturnValueSyntaxForImmutableDictionaryReturnType(logSink, syntaxGenerator, semanticModel, returnType, out returnValueSyntax) &&
-                !TryGetReturnValueSyntaxForImmutableQueueReturnType(logSink, syntaxGenerator, semanticModel, returnType, out returnValueSyntax) &&
-                !TryGetReturnValueSyntaxForImmutableSetReturnType(logSink, syntaxGenerator, semanticModel, returnType, out returnValueSyntax) &&
-                !TryGetReturnValueSyntaxForImmutableStackReturnType(logSink, syntaxGenerator, semanticModel, returnType, out returnValueSyntax))
+            if (!TryGetReturnValueSyntaxForEnumerableReturnType(context, returnType, out returnValueSyntax) &&
+                !TryGetReturnValueSyntaxForCollectionReturnType(context, returnType, out returnValueSyntax) &&
+                !TryGetReturnValueSyntaxForDictionaryReturnType(context, returnType, out returnValueSyntax) &&
+                !TryGetReturnValueSyntaxForSetReturnType(context, returnType, out returnValueSyntax) &&
+                !TryGetReturnValueSyntaxForImmutableListReturnType(context, returnType, out returnValueSyntax) &&
+                !TryGetReturnValueSyntaxForImmutableDictionaryReturnType(context, returnType, out returnValueSyntax) &&
+                !TryGetReturnValueSyntaxForImmutableQueueReturnType(context, returnType, out returnValueSyntax) &&
+                !TryGetReturnValueSyntaxForImmutableSetReturnType(context, returnType, out returnValueSyntax) &&
+                !TryGetReturnValueSyntaxForImmutableStackReturnType(context, returnType, out returnValueSyntax))
             {
-                logSink.Debug(logSource, "Ignoring symbol '{0}' because it does not return a supported collection type.", symbol);
+                context
+                    .LogSink
+                    .Debug(logSource, "Ignoring symbol '{0}' because it does not return a supported collection type.", symbol);
                 return null;
             }
 
@@ -78,15 +79,14 @@ namespace PCLMock.CodeGeneration.Plugins
         }
 
         private static bool TryGetReturnValueSyntaxForEnumerableReturnType(
-            ILogSink logSink,
-            SyntaxGenerator syntaxGenerator,
-            SemanticModel semanticModel,
+            Context context,
             INamedTypeSymbol returnType,
             out SyntaxNode returnValueSyntax)
         {
-            var enumerableInterfaceType = semanticModel
-               .Compilation
-               .GetTypeByMetadataName("System.Collections.Generic.IEnumerable`1");
+            var enumerableInterfaceType = context
+                .SemanticModel
+                .Compilation
+                .GetTypeByMetadataName("System.Collections.Generic.IEnumerable`1");
 
             if (returnType.ConstructedFrom != enumerableInterfaceType)
             {
@@ -94,46 +94,61 @@ namespace PCLMock.CodeGeneration.Plugins
                 return false;
             }
 
-            var enumerableType = semanticModel
-                    .Compilation
-                    .GetTypeByMetadataName("System.Linq.Enumerable");
+            var enumerableType = context
+                .SemanticModel
+                .Compilation
+                .GetTypeByMetadataName("System.Linq.Enumerable");
 
             if (enumerableType == null)
             {
-                logSink.Warn(logSource, "Failed to resolve Enumerable class.");
+                context
+                    .LogSink
+                    .Warn(logSource, "Failed to resolve Enumerable class.");
                 returnValueSyntax = null;
                 return false;
             }
 
-            returnValueSyntax = syntaxGenerator.InvocationExpression(
-                syntaxGenerator.WithTypeArguments(
-                    syntaxGenerator.MemberAccessExpression(
-                        syntaxGenerator.TypeExpression(enumerableType),
-                        "Empty"),
-                    syntaxGenerator.TypeExpression(returnType.TypeArguments[0])));
+            returnValueSyntax = context
+                .SyntaxGenerator
+                .InvocationExpression(
+                    context
+                        .SyntaxGenerator
+                        .WithTypeArguments(
+                            context
+                                .SyntaxGenerator
+                                .MemberAccessExpression(
+                                    context
+                                        .SyntaxGenerator
+                                        .TypeExpression(enumerableType),
+                                    "Empty"),
+                                context
+                                    .SyntaxGenerator
+                                    .TypeExpression(returnType.TypeArguments[0])));
             return true;
         }
 
         private static bool TryGetReturnValueSyntaxForCollectionReturnType(
-            ILogSink logSink,
-            SyntaxGenerator syntaxGenerator,
-            SemanticModel semanticModel,
+            Context context,
             INamedTypeSymbol returnType,
             out SyntaxNode returnValueSyntax)
         {
-            var collectionInterfaceType = semanticModel
+            var collectionInterfaceType = context
+                .SemanticModel
                 .Compilation
                 .GetTypeByMetadataName("System.Collections.Generic.ICollection`1");
 
-            var readOnlyCollectionInterfaceType = semanticModel
+            var readOnlyCollectionInterfaceType = context
+                .SemanticModel
                 .Compilation
                 .GetTypeByMetadataName("System.Collections.Generic.IReadOnlyCollection`1");
 
-            var listInterfaceType = semanticModel
+            var listInterfaceType = context
+                .SemanticModel
                 .Compilation
                 .GetTypeByMetadataName("System.Collections.Generic.IList`1");
 
-            var readOnlyListInterfaceType = semanticModel
+            var readOnlyListInterfaceType = context
+                .SemanticModel
                 .Compilation
                 .GetTypeByMetadataName("System.Collections.Generic.IReadOnlyList`1");
 
@@ -146,34 +161,39 @@ namespace PCLMock.CodeGeneration.Plugins
                 return false;
             }
 
-            var listType = semanticModel
+            var listType = context
+                .SemanticModel
                 .Compilation
                 .GetTypeByMetadataName("System.Collections.Generic.List`1");
 
             if (listType == null)
             {
-                logSink.Warn(logSource, "Failed to resolve List<T> class.");
+                context
+                    .LogSink
+                    .Warn(logSource, "Failed to resolve List<T> class.");
                 returnValueSyntax = null;
                 return false;
             }
 
-            returnValueSyntax = syntaxGenerator.ObjectCreationExpression(
-                    listType.Construct(returnType.TypeArguments[0])).NormalizeWhitespace();
+            returnValueSyntax = context
+                .SyntaxGenerator
+                    .ObjectCreationExpression(
+                        listType.Construct(returnType.TypeArguments[0])).NormalizeWhitespace();
             return true;
         }
 
         private static bool TryGetReturnValueSyntaxForDictionaryReturnType(
-            ILogSink logSink,
-            SyntaxGenerator syntaxGenerator,
-            SemanticModel semanticModel,
+            Context context,
             INamedTypeSymbol returnType,
             out SyntaxNode returnValueSyntax)
         {
-            var dictionaryInterfaceType = semanticModel
+            var dictionaryInterfaceType = context
+                .SemanticModel
                 .Compilation
                 .GetTypeByMetadataName("System.Collections.Generic.IDictionary`2");
 
-            var readOnlyDictionaryInterfaceType = semanticModel
+            var readOnlyDictionaryInterfaceType = context
+                .SemanticModel
                 .Compilation
                 .GetTypeByMetadataName("System.Collections.Generic.IReadOnlyDictionary`2");
 
@@ -184,30 +204,34 @@ namespace PCLMock.CodeGeneration.Plugins
                 return false;
             }
 
-            var dictionaryType = semanticModel
+            var dictionaryType = context
+                .SemanticModel
                 .Compilation
                 .GetTypeByMetadataName("System.Collections.Generic.Dictionary`2");
 
             if (dictionaryType == null)
             {
-                logSink.Warn(logSource, "Failed to resolve Dictionary<TKey, TValue> class.");
+                context
+                    .LogSink
+                    .Warn(logSource, "Failed to resolve Dictionary<TKey, TValue> class.");
                 returnValueSyntax = null;
                 return false;
             }
 
-            returnValueSyntax = syntaxGenerator.ObjectCreationExpression(
+            returnValueSyntax = context
+                .SyntaxGenerator
+                .ObjectCreationExpression(
                     dictionaryType.Construct(returnType.TypeArguments[0], returnType.TypeArguments[1])).NormalizeWhitespace();
             return true;
         }
 
         private static bool TryGetReturnValueSyntaxForSetReturnType(
-            ILogSink logSink,
-            SyntaxGenerator syntaxGenerator,
-            SemanticModel semanticModel,
+            Context context,
             INamedTypeSymbol returnType,
             out SyntaxNode returnValueSyntax)
         {
-            var setInterfaceType = semanticModel
+            var setInterfaceType = context
+                .SemanticModel
                 .Compilation
                 .GetTypeByMetadataName("System.Collections.Generic.ISet`1");
 
@@ -217,32 +241,36 @@ namespace PCLMock.CodeGeneration.Plugins
                 return false;
             }
 
-            var dictionaryType = semanticModel
+            var dictionaryType = context
+                .SemanticModel
                 .Compilation
                 .GetTypeByMetadataName("System.Collections.Generic.HashSet`1");
 
             if (dictionaryType == null)
             {
-                logSink.Warn(logSource, "Failed to resolve HashSet<T> class.");
+                context
+                    .LogSink
+                    .Warn(logSource, "Failed to resolve HashSet<T> class.");
                 returnValueSyntax = null;
                 return false;
             }
 
-            returnValueSyntax = syntaxGenerator.ObjectCreationExpression(
+            returnValueSyntax = context
+                .SyntaxGenerator
+                .ObjectCreationExpression(
                     dictionaryType.Construct(returnType.TypeArguments[0])).NormalizeWhitespace();
             return true;
         }
 
         private static bool TryGetReturnValueSyntaxForImmutableListReturnType(
-            ILogSink logSink,
-            SyntaxGenerator syntaxGenerator,
-            SemanticModel semanticModel,
+            Context context,
             INamedTypeSymbol returnType,
             out SyntaxNode returnValueSyntax)
         {
-            var immutableListInterfaceType = semanticModel
-               .Compilation
-               .GetTypeByMetadataName("System.Collections.Immutable.IImmutableList`1");
+            var immutableListInterfaceType = context
+                .SemanticModel
+                .Compilation
+                .GetTypeByMetadataName("System.Collections.Immutable.IImmutableList`1");
 
             if (returnType.ConstructedFrom != immutableListInterfaceType)
             {
@@ -250,35 +278,45 @@ namespace PCLMock.CodeGeneration.Plugins
                 return false;
             }
 
-            var immutableListType = semanticModel
+            var immutableListType = context
+                .SemanticModel
                 .Compilation
                 .GetTypeByMetadataName("System.Collections.Immutable.ImmutableList");
 
             if (immutableListType == null)
             {
-                logSink.Warn(logSource, "Failed to resolve ImmutableList class.");
+                context
+                    .LogSink
+                    .Warn(logSource, "Failed to resolve ImmutableList class.");
                 returnValueSyntax = null;
                 return false;
             }
 
-            returnValueSyntax = syntaxGenerator.MemberAccessExpression(
-                syntaxGenerator.WithTypeArguments(
-                    syntaxGenerator.TypeExpression(immutableListType),
-                    syntaxGenerator.TypeExpression(returnType.TypeArguments[0])),
-                "Empty");
+            returnValueSyntax = context
+                .SyntaxGenerator
+                .MemberAccessExpression(
+                    context
+                        .SyntaxGenerator
+                        .WithTypeArguments(
+                            context
+                                .SyntaxGenerator
+                                .TypeExpression(immutableListType),
+                            context
+                                .SyntaxGenerator
+                                .TypeExpression(returnType.TypeArguments[0])),
+                    "Empty");
             return true;
         }
 
         private static bool TryGetReturnValueSyntaxForImmutableDictionaryReturnType(
-            ILogSink logSink,
-            SyntaxGenerator syntaxGenerator,
-            SemanticModel semanticModel,
+            Context context,
             INamedTypeSymbol returnType,
             out SyntaxNode returnValueSyntax)
         {
-            var immutableDictionaryInterfaceType = semanticModel
-               .Compilation
-               .GetTypeByMetadataName("System.Collections.Immutable.IImmutableDictionary`2");
+            var immutableDictionaryInterfaceType = context
+                .SemanticModel
+                .Compilation
+                .GetTypeByMetadataName("System.Collections.Immutable.IImmutableDictionary`2");
 
             if (returnType.ConstructedFrom != immutableDictionaryInterfaceType)
             {
@@ -286,36 +324,48 @@ namespace PCLMock.CodeGeneration.Plugins
                 return false;
             }
 
-            var immutableDictionaryType = semanticModel
+            var immutableDictionaryType = context
+                .SemanticModel
                 .Compilation
                 .GetTypeByMetadataName("System.Collections.Immutable.ImmutableDictionary");
 
             if (immutableDictionaryType == null)
             {
-                logSink.Warn(logSource, "Failed to resolve ImmutableDictionary class.");
+                context
+                    .LogSink
+                    .Warn(logSource, "Failed to resolve ImmutableDictionary class.");
                 returnValueSyntax = null;
                 return false;
             }
 
-            returnValueSyntax = syntaxGenerator.MemberAccessExpression(
-                syntaxGenerator.WithTypeArguments(
-                    syntaxGenerator.TypeExpression(immutableDictionaryType),
-                    syntaxGenerator.TypeExpression(returnType.TypeArguments[0]),
-                    syntaxGenerator.TypeExpression(returnType.TypeArguments[1])),
-                "Empty");
+            returnValueSyntax = context
+                .SyntaxGenerator
+                .MemberAccessExpression(
+                    context
+                        .SyntaxGenerator
+                        .WithTypeArguments(
+                            context
+                                .SyntaxGenerator
+                                .TypeExpression(immutableDictionaryType),
+                            context
+                                .SyntaxGenerator
+                                .TypeExpression(returnType.TypeArguments[0]),
+                            context
+                                .SyntaxGenerator
+                                .TypeExpression(returnType.TypeArguments[1])),
+                    "Empty");
             return true;
         }
 
         private static bool TryGetReturnValueSyntaxForImmutableQueueReturnType(
-            ILogSink logSink,
-            SyntaxGenerator syntaxGenerator,
-            SemanticModel semanticModel,
+            Context context,
             INamedTypeSymbol returnType,
             out SyntaxNode returnValueSyntax)
         {
-            var immutableQueueInterfaceType = semanticModel
-               .Compilation
-               .GetTypeByMetadataName("System.Collections.Immutable.IImmutableQueue`1");
+            var immutableQueueInterfaceType = context
+                .SemanticModel
+                .Compilation
+                .GetTypeByMetadataName("System.Collections.Immutable.IImmutableQueue`1");
 
             if (returnType.ConstructedFrom != immutableQueueInterfaceType)
             {
@@ -323,35 +373,45 @@ namespace PCLMock.CodeGeneration.Plugins
                 return false;
             }
 
-            var immutableQueueType = semanticModel
+            var immutableQueueType = context
+                .SemanticModel
                 .Compilation
                 .GetTypeByMetadataName("System.Collections.Immutable.ImmutableQueue");
 
             if (immutableQueueType == null)
             {
-                logSink.Warn(logSource, "Failed to resolve ImmutableQueue class.");
+                context
+                    .LogSink
+                    .Warn(logSource, "Failed to resolve ImmutableQueue class.");
                 returnValueSyntax = null;
                 return false;
             }
 
-            returnValueSyntax = syntaxGenerator.MemberAccessExpression(
-                syntaxGenerator.WithTypeArguments(
-                    syntaxGenerator.TypeExpression(immutableQueueType),
-                    syntaxGenerator.TypeExpression(returnType.TypeArguments[0])),
-                "Empty");
+            returnValueSyntax = context
+                .SyntaxGenerator
+                .MemberAccessExpression(
+                    context
+                        .SyntaxGenerator
+                        .WithTypeArguments(
+                            context
+                                .SyntaxGenerator
+                                .TypeExpression(immutableQueueType),
+                            context
+                                .SyntaxGenerator
+                                .TypeExpression(returnType.TypeArguments[0])),
+                    "Empty");
             return true;
         }
 
         private static bool TryGetReturnValueSyntaxForImmutableSetReturnType(
-            ILogSink logSink,
-            SyntaxGenerator syntaxGenerator,
-            SemanticModel semanticModel,
+            Context context,
             INamedTypeSymbol returnType,
             out SyntaxNode returnValueSyntax)
         {
-            var immutableSetInterfaceType = semanticModel
-               .Compilation
-               .GetTypeByMetadataName("System.Collections.Immutable.IImmutableSet`1");
+            var immutableSetInterfaceType = context
+                .SemanticModel
+                .Compilation
+                .GetTypeByMetadataName("System.Collections.Immutable.IImmutableSet`1");
 
             if (returnType.ConstructedFrom != immutableSetInterfaceType)
             {
@@ -359,35 +419,45 @@ namespace PCLMock.CodeGeneration.Plugins
                 return false;
             }
 
-            var immutableSetType = semanticModel
+            var immutableSetType = context
+                .SemanticModel
                 .Compilation
                 .GetTypeByMetadataName("System.Collections.Immutable.ImmutableHashSet");
 
             if (immutableSetType == null)
             {
-                logSink.Warn(logSource, "Failed to resolve ImmutableSet class.");
+                context
+                    .LogSink
+                    .Warn(logSource, "Failed to resolve ImmutableSet class.");
                 returnValueSyntax = null;
                 return false;
             }
 
-            returnValueSyntax = syntaxGenerator.MemberAccessExpression(
-                syntaxGenerator.WithTypeArguments(
-                    syntaxGenerator.TypeExpression(immutableSetType),
-                    syntaxGenerator.TypeExpression(returnType.TypeArguments[0])),
-                "Empty");
+            returnValueSyntax = context
+                .SyntaxGenerator
+                .MemberAccessExpression(
+                    context
+                        .SyntaxGenerator
+                        .WithTypeArguments(
+                            context
+                                .SyntaxGenerator
+                                .TypeExpression(immutableSetType),
+                            context
+                                .SyntaxGenerator
+                                .TypeExpression(returnType.TypeArguments[0])),
+                    "Empty");
             return true;
         }
 
         private static bool TryGetReturnValueSyntaxForImmutableStackReturnType(
-            ILogSink logSink,
-            SyntaxGenerator syntaxGenerator,
-            SemanticModel semanticModel,
+            Context context,
             INamedTypeSymbol returnType,
             out SyntaxNode returnValueSyntax)
         {
-            var immutableStackInterfaceType = semanticModel
-               .Compilation
-               .GetTypeByMetadataName("System.Collections.Immutable.IImmutableStack`1");
+            var immutableStackInterfaceType = context
+                .SemanticModel
+                .Compilation
+                .GetTypeByMetadataName("System.Collections.Immutable.IImmutableStack`1");
 
             if (returnType.ConstructedFrom != immutableStackInterfaceType)
             {
@@ -395,22 +465,33 @@ namespace PCLMock.CodeGeneration.Plugins
                 return false;
             }
 
-            var immutableStackType = semanticModel
+            var immutableStackType = context
+                .SemanticModel
                 .Compilation
                 .GetTypeByMetadataName("System.Collections.Immutable.ImmutableStack");
 
             if (immutableStackType == null)
             {
-                logSink.Warn(logSource, "Failed to resolve ImmutableStack class.");
+                context
+                    .LogSink
+                    .Warn(logSource, "Failed to resolve ImmutableStack class.");
                 returnValueSyntax = null;
                 return false;
             }
 
-            returnValueSyntax = syntaxGenerator.MemberAccessExpression(
-                syntaxGenerator.WithTypeArguments(
-                    syntaxGenerator.TypeExpression(immutableStackType),
-                    syntaxGenerator.TypeExpression(returnType.TypeArguments[0])),
-                "Empty");
+            returnValueSyntax = context
+                .SyntaxGenerator
+                .MemberAccessExpression(
+                    context
+                        .SyntaxGenerator
+                        .WithTypeArguments(
+                            context
+                                .SyntaxGenerator
+                                .TypeExpression(immutableStackType),
+                            context
+                                .SyntaxGenerator
+                                .TypeExpression(returnType.TypeArguments[0])),
+                    "Empty");
             return true;
         }
     }

@@ -1,8 +1,6 @@
 namespace PCLMock.CodeGeneration
 {
-    using Logging;
     using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.Editing;
 
     /// <summary>
     /// Defines the interface for a plugin.
@@ -54,17 +52,11 @@ namespace PCLMock.CodeGeneration
         /// or <c>ConfigureLooseBehaviorGenerated</c> method, depending on the value of <param name="behavior"/>.
         /// </para>
         /// </remarks>
+        /// <param name="context">
+        /// A context for the operation.
+        /// </param>
         /// <param name="behavior">
         /// Indicates whether the default value is being generated for strict or loose behavioral semantics.
-        /// </param>
-        /// <param name="syntaxGenerator">
-        /// The syntax generator.
-        /// </param>
-        /// <param name="logSink">
-        /// A log sink.
-        /// </param>
-        /// <param name="semanticModel">
-        /// The semantic model.
         /// </param>
         /// <param name="symbol">
         /// The symbol.
@@ -77,10 +69,8 @@ namespace PCLMock.CodeGeneration
         /// relevant.
         /// </returns>
         SyntaxNode GetDefaultValueSyntax(
-            ILogSink logSink,
+            Context context,
             MockBehavior behavior,
-            SyntaxGenerator syntaxGenerator,
-            SemanticModel semanticModel,
             ISymbol symbol,
             INamedTypeSymbol returnType);
     }

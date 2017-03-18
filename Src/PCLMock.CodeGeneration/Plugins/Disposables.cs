@@ -4,7 +4,6 @@ namespace PCLMock.CodeGeneration.Plugins
     using System.Reactive.Disposables;
     using Logging;
     using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.Editing;
 
     /// <summary>
     /// A plugin that generates appropriate default return values for any member that returns <see cref="IDisposable"/>.
@@ -34,10 +33,8 @@ namespace PCLMock.CodeGeneration.Plugins
 
         /// <inheritdoc />
         public SyntaxNode GetDefaultValueSyntax(
-            ILogSink logSink,
+            Context context,
             MockBehavior behavior,
-            SyntaxGenerator syntaxGenerator,
-            SemanticModel semanticModel,
             ISymbol symbol,
             INamedTypeSymbol returnType)
         {
@@ -46,35 +43,49 @@ namespace PCLMock.CodeGeneration.Plugins
                 return null;
             }
 
-            var disposableInterfaceType = semanticModel
+            var disposableInterfaceType = context
+                .SemanticModel
                 .Compilation
                 .GetTypeByMetadataName("System.IDisposable");
 
             if (disposableInterfaceType == null)
             {
-                logSink.Warn(logSource, "Failed to resolve IDisposable type.");
+                context
+                    .LogSink
+                    .Warn(logSource, "Failed to resolve IDisposable type.");
                 return null;
             }
 
             if (returnType != disposableInterfaceType)
             {
-                logSink.Debug(logSource, "Ignoring symbol '{0}' because its return type is not IDisposable.");
+                context
+                    .LogSink
+                    .Debug(logSource, "Ignoring symbol '{0}' because its return type is not IDisposable.");
                 return null;
             }
 
-            var disposableType = semanticModel
+            var disposableType = context
+                .SemanticModel
                 .Compilation
                 .GetTypeByMetadataName("System.Reactive.Disposables.Disposable");
 
             if (disposableType == null)
             {
-                logSink.Debug(logSource, "Ignoring symbol '{0}' because Disposable type could not be resolved (probably a missing reference to System.Reactive.Core).");
+                context
+                    .LogSink
+                    .Debug(logSource, "Ignoring symbol '{0}' because Disposable type could not be resolved (probably a missing reference to System.Reactive.Core).");
                 return null;
             }
 
-            var result = syntaxGenerator.MemberAccessExpression(
-                syntaxGenerator.TypeExpression(disposableType),
-                syntaxGenerator.IdentifierName("Empty"));
+            var result = context
+                .SyntaxGenerator
+                .MemberAccessExpression(
+                    context
+                        .SyntaxGenerator
+                        .TypeExpression(disposableType),
+                    context
+                        .SyntaxGenerator
+                        .IdentifierName("Empty"));
 
             return result;
         }

@@ -116,6 +116,7 @@
     <Compile Include="..\AssemblyInfoCommon.cs">
       <Link>Properties\AssemblyInfoCommon.cs</Link>
     </Compile>
+    <Compile Include="Context.cs" />
     <Compile Include="Plugins\Collections.cs" />
     <Compile Include="Plugins\Disposables.cs" />
     <Compile Include="Plugins\ObservableBasedAsynchrony.cs" />

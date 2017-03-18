@@ -4,7 +4,6 @@ namespace PCLMock.CodeGeneration.Plugins
     using System.Reactive.Linq;
     using Logging;
     using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.Editing;
 
     /// <summary>
     /// A plugin that generates appropriate default return values for any member that uses observable-based
@@ -45,10 +44,8 @@ namespace PCLMock.CodeGeneration.Plugins
 
         /// <inheritdoc />
         public SyntaxNode GetDefaultValueSyntax(
-            ILogSink logSink,
+            Context context,
             MockBehavior behavior,
-            SyntaxGenerator syntaxGenerator,
-            SemanticModel semanticModel,
             ISymbol symbol,
             INamedTypeSymbol returnType)
         {
@@ -57,23 +54,29 @@ namespace PCLMock.CodeGeneration.Plugins
                 return null;
             }
 
-            var observableInterfaceType = semanticModel
+            var observableInterfaceType = context
+                .SemanticModel
                 .Compilation
                 .GetTypeByMetadataName("System.IObservable`1");
 
-            var observableType = semanticModel
+            var observableType = context
+                .SemanticModel
                 .Compilation
                 .GetTypeByMetadataName("System.Reactive.Linq.Observable");
 
             if (observableInterfaceType == null)
             {
-                logSink.Warn(logSource, "Failed to resolve System.IObservable<T>.");
+                context
+                    .LogSink
+                    .Warn(logSource, "Failed to resolve System.IObservable<T>.");
                 return null;
             }
 
             if (observableType == null)
             {
-                logSink.Warn(logSource, "Failed to resolve System.Reactive.Linq.Observable.");
+                context
+                    .LogSink
+                    .Warn(logSource, "Failed to resolve System.Reactive.Linq.Observable.");
                 return null;
             }
 
@@ -81,7 +84,9 @@ namespace PCLMock.CodeGeneration.Plugins
 
             if (!isObservable)
             {
-                logSink.Debug(logSource, "Ignoring symbol '{0}' because it does not return IObservable<T>.", symbol);
+                context
+                    .LogSink
+                    .Debug(logSource, "Ignoring symbol '{0}' because it does not return IObservable<T>.", symbol);
                 return null;
             }
 
@@ -92,26 +97,48 @@ namespace PCLMock.CodeGeneration.Plugins
             if (propertySymbol != null)
             {
                 // properties are given collection semantics by returning Observable.Empty<T>()
-                observableInvocation = syntaxGenerator.InvocationExpression(
-                    syntaxGenerator.WithTypeArguments(
-                        syntaxGenerator.MemberAccessExpression(
-                            syntaxGenerator.TypeExpression(observableType),
-                            "Empty"),
-                        syntaxGenerator.TypeExpression(observableInnerType)));
+                observableInvocation = context
+                    .SyntaxGenerator
+                    .InvocationExpression(
+                        context
+                            .SyntaxGenerator
+                            .WithTypeArguments(
+                                context
+                                    .SyntaxGenerator
+                                    .MemberAccessExpression(
+                                        context
+                                            .SyntaxGenerator
+                                            .TypeExpression(observableType),
+                                        "Empty"),
+                                context
+                                    .SyntaxGenerator
+                                    .TypeExpression(observableInnerType)));
             }
             else
             {
                 // methods are given async operation semantics by returning Observable.Return(default(T))
-                observableInvocation = syntaxGenerator.InvocationExpression(
-                    syntaxGenerator.WithTypeArguments(
-                        syntaxGenerator.MemberAccessExpression(
-                            syntaxGenerator.TypeExpression(observableType),
-                            "Return"),
-                        syntaxGenerator.TypeExpression(observableInnerType)),
-                    arguments: new[]
-                    {
-                        syntaxGenerator.DefaultExpression(observableInnerType)
-                    });
+                observableInvocation = context
+                    .SyntaxGenerator
+                    .InvocationExpression(
+                        context
+                            .SyntaxGenerator
+                            .WithTypeArguments(
+                                context
+                                    .SyntaxGenerator
+                                    .MemberAccessExpression(
+                                        context
+                                            .SyntaxGenerator
+                                            .TypeExpression(observableType),
+                                        "Return"),
+                                context
+                                    .SyntaxGenerator
+                                    .TypeExpression(observableInnerType)),
+                        arguments: new[]
+                        {
+                            context
+                                .SyntaxGenerator
+                                .DefaultExpression(observableInnerType)
+                        });
             }
 
             return observableInvocation;

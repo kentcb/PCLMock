@@ -114,55 +114,58 @@
                         }
 
                         var semanticModel = x.Compilation.GetSemanticModel(x.InterfaceSymbol.DeclaringSyntaxReferences.First().SyntaxTree);
-
-                        return GenerateMock(logSink, language, syntaxGenerator, semanticModel, x.InterfaceSymbol, @namespace, name, plugins);
+                        var context = new Context(logSink, language, plugins, syntaxGenerator, semanticModel);
+                        return GenerateMock(context, x.InterfaceSymbol, @namespace, name, plugins);
                     })
                 .Select((syntaxNode, i) => i == 0 ? syntaxGenerator.WithLeadingComments(syntaxNode, headerComment, language) : syntaxNode)
                 .ToImmutableList();
         }
 
         private static SyntaxNode GenerateMock(
-            ILogSink logSink,
-            Language language,
-            SyntaxGenerator syntaxGenerator,
-            SemanticModel semanticModel,
+            Context context,
             INamedTypeSymbol interfaceSymbol,
             string mockNamespace,
             string mockName,
             IImmutableList<IPlugin> plugins)
         {
-            var namespaceSyntax = GetNamespaceDeclarationSyntax(syntaxGenerator, semanticModel, mockNamespace, language);
-            var classSyntax = GetClassDeclarationSyntax(syntaxGenerator, semanticModel, mockName, interfaceSymbol);
+            var namespaceSyntax = GetNamespaceDeclarationSyntax(context, mockNamespace);
+            var classSyntax = GetClassDeclarationSyntax(context, mockName, interfaceSymbol);
 
-            classSyntax = syntaxGenerator
-                .AddAttributes(classSyntax, GetClassAttributesSyntax(syntaxGenerator, semanticModel));
-            classSyntax = syntaxGenerator
-                .AddMembers(classSyntax, GetMemberDeclarations(logSink, syntaxGenerator, semanticModel, mockName, interfaceSymbol, language, plugins));
-            namespaceSyntax = syntaxGenerator
+            classSyntax = context
+                .SyntaxGenerator
+                .AddAttributes(classSyntax, GetClassAttributesSyntax(context));
+            classSyntax = context
+                .SyntaxGenerator
+                .AddMembers(classSyntax, GetMemberDeclarations(context, mockName, interfaceSymbol, plugins));
+            namespaceSyntax = context
+                .SyntaxGenerator
                 .AddMembers(namespaceSyntax, classSyntax);
 
-            return syntaxGenerator
+            return context
+                .SyntaxGenerator
                 .CompilationUnit(namespaceSyntax)
                 .NormalizeWhitespace();
         }
 
         private static SyntaxNode GetNamespaceDeclarationSyntax(
-            SyntaxGenerator syntaxGenerator,
-            SemanticModel semanticModel,
-            string @namespace,
-            Language language)
+            Context context,
+            string @namespace)
         {
-            return syntaxGenerator.NamespaceDeclaration(@namespace);
+            return context
+                .SyntaxGenerator
+                .NamespaceDeclaration(@namespace);
         }
 
         private static SyntaxNode GetClassDeclarationSyntax(
-            SyntaxGenerator syntaxGenerator,
-            SemanticModel semanticModel,
+            Context context,
             string name,
             INamedTypeSymbol interfaceSymbol)
         {
-            var interfaceType = syntaxGenerator.TypeExpression(interfaceSymbol);
-            var mockBaseType = semanticModel
+            var interfaceType = context
+                .SyntaxGenerator
+                .TypeExpression(interfaceSymbol);
+            var mockBaseType = context
+                .SemanticModel
                 .Compilation
                 .GetTypeByMetadataName("PCLMock.MockBase`1");
 
@@ -171,21 +174,25 @@
                 throw new InvalidOperationException("Failed to find type in PCLMock assembly. Are you sure this project has a reference to PCLMock?");
             }
 
-            var baseType = syntaxGenerator.TypeExpression(
-                mockBaseType
-                    .Construct(interfaceSymbol));
+            var baseType = context
+                .SyntaxGenerator
+                .TypeExpression(
+                    mockBaseType
+                        .Construct(interfaceSymbol));
 
             var accessibility = interfaceSymbol.DeclaredAccessibility == Accessibility.NotApplicable
                 ? Accessibility.Public
                 : interfaceSymbol.DeclaredAccessibility;
 
-            var classDeclaration = syntaxGenerator.ClassDeclaration(
-                name,
-                accessibility: accessibility,
-                modifiers: DeclarationModifiers.Partial,
-                typeParameters: interfaceSymbol.TypeParameters.Select(x => x.Name),
-                baseType: baseType,
-                interfaceTypes: new[] { interfaceType });
+            var classDeclaration = context
+                .SyntaxGenerator
+                .ClassDeclaration(
+                    name,
+                    accessibility: accessibility,
+                    modifiers: DeclarationModifiers.Partial,
+                    typeParameters: interfaceSymbol.TypeParameters.Select(x => x.Name),
+                    baseType: baseType,
+                    interfaceTypes: new[] { interfaceType });
 
             // TODO: tidy this up once this issue is rectified: https://github.com/dotnet/roslyn/issues/1658
             foreach (var typeParameter in interfaceSymbol.TypeParameters)
@@ -199,11 +206,13 @@
                                 (typeParameter.HasReferenceTypeConstraint ? SpecialTypeConstraintKind.ReferenceType : SpecialTypeConstraintKind.None) |
                                 (typeParameter.HasValueTypeConstraint ? SpecialTypeConstraintKind.ValueType : SpecialTypeConstraintKind.None);
 
-                    classDeclaration = syntaxGenerator.WithTypeConstraint(
-                        classDeclaration,
-                        typeParameter.Name,
-                        kinds: kinds,
-                        types: typeParameter.ConstraintTypes.Select(t => syntaxGenerator.TypeExpression(t)));
+                    classDeclaration = context
+                        .SyntaxGenerator
+                        .WithTypeConstraint(
+                            classDeclaration,
+                            typeParameter.Name,
+                            kinds: kinds,
+                            types: typeParameter.ConstraintTypes.Select(t => context.SyntaxGenerator.TypeExpression(t)));
                 }
             }
 
@@ -211,26 +220,30 @@
         }
 
         private static IEnumerable<SyntaxNode> GetClassAttributesSyntax(
-            SyntaxGenerator syntaxGenerator,
-            SemanticModel semanticModel)
+            Context context)
         {
             // GENERATED CODE:
             //
             //     [System.CodeDom.Compiler.GeneratedCode("PCLMock", "[version]")]
             //     [System.Runtime.CompilerServices.CompilerGenerated)]
-            yield return syntaxGenerator
+            yield return context
+                .SyntaxGenerator
                 .Attribute(
                     "System.CodeDom.Compiler.GeneratedCode",
-                    syntaxGenerator.LiteralExpression("PCLMock"),
-                    syntaxGenerator.LiteralExpression(typeof(MockBase<>).Assembly.GetName().Version.ToString()));
-            yield return syntaxGenerator
+                    context
+                        .SyntaxGenerator
+                        .LiteralExpression("PCLMock"),
+                    context
+                        .SyntaxGenerator
+                        .LiteralExpression(typeof(MockBase<>).Assembly.GetName().Version.ToString()));
+            yield return context
+                .SyntaxGenerator
                 .Attribute(
                     "System.Runtime.CompilerServices.CompilerGenerated");
         }
 
         private static SyntaxNode GetConstructorDeclarationSyntax(
-            SyntaxGenerator syntaxGenerator,
-            SemanticModel semanticModel,
+            Context context,
             string name)
         {
             // GENERATED CODE:
@@ -247,55 +260,86 @@
             //             ConfigureLooseBehavior();
             //         }
             //     }
-            var mockBehaviorType = syntaxGenerator
+            var mockBehaviorType = context
+                .SyntaxGenerator
                 .TypeExpression(
-                    semanticModel
+                    context
+                        .SemanticModel
                         .Compilation
                         .GetTypeByMetadataName("PCLMock.MockBehavior"));
 
-            return syntaxGenerator
+            return context
+                .SyntaxGenerator
                 .ConstructorDeclaration(
                     name,
                     parameters: new[]
                     {
-                        syntaxGenerator
+                        context
+                            .SyntaxGenerator
                             .ParameterDeclaration(
                                 "behavior",
                                 mockBehaviorType,
-                                initializer: syntaxGenerator.MemberAccessExpression(mockBehaviorType, "Strict"))
+                                initializer: context.SyntaxGenerator.MemberAccessExpression(mockBehaviorType, "Strict"))
                     },
                     accessibility: Accessibility.Public,
-                    baseConstructorArguments: new[] { syntaxGenerator.IdentifierName("behavior") },
+                    baseConstructorArguments: new[] { context.SyntaxGenerator.IdentifierName("behavior") },
                     statements: new[]
                     {
-                        syntaxGenerator.InvocationExpression(syntaxGenerator.IdentifierName("ConfigureBehaviorGenerated")),
-                        syntaxGenerator.InvocationExpression(syntaxGenerator.IdentifierName("ConfigureBehavior")),
-                        syntaxGenerator.IfStatement(
-                            syntaxGenerator.ValueEqualsExpression(
-                                syntaxGenerator.IdentifierName("behavior"),
-                                syntaxGenerator.MemberAccessExpression(mockBehaviorType, "Loose")),
+                        context
+                            .SyntaxGenerator
+                            .InvocationExpression(
+                                context
+                                    .SyntaxGenerator
+                                    .IdentifierName("ConfigureBehaviorGenerated")),
+                        context
+                            .SyntaxGenerator
+                            .InvocationExpression(
+                                context
+                                    .SyntaxGenerator
+                                    .IdentifierName("ConfigureBehavior")),
+                        context
+                            .SyntaxGenerator
+                            .IfStatement(
+                                context
+                                    .SyntaxGenerator
+                                    .ValueEqualsExpression(
+                                        context
+                                            .SyntaxGenerator
+                                            .IdentifierName("behavior"),
+                                        context
+                                            .SyntaxGenerator
+                                            .MemberAccessExpression(mockBehaviorType, "Loose")),
                                 new[]
                                 {
-                                    syntaxGenerator.InvocationExpression(syntaxGenerator.IdentifierName("ConfigureLooseBehaviorGenerated")),
-                                    syntaxGenerator.InvocationExpression(syntaxGenerator.IdentifierName("ConfigureLooseBehavior"))
+                                    context
+                                        .SyntaxGenerator
+                                        .InvocationExpression(
+                                            context
+                                                .SyntaxGenerator
+                                                .IdentifierName("ConfigureLooseBehaviorGenerated")),
+                                    context
+                                        .SyntaxGenerator
+                                        .InvocationExpression(
+                                            context
+                                                .SyntaxGenerator
+                                                .IdentifierName("ConfigureLooseBehavior"))
                                 })
                     });
         }
 
         private static SyntaxNode GetConfigureBehaviorGeneratedSyntax(
-            ILogSink logSink,
-            SyntaxGenerator syntaxGenerator,
-            SemanticModel semanticModel,
+            Context context,
             INamedTypeSymbol interfaceSymbol,
             IImmutableList<IPlugin> plugins,
             MockBehavior behavior)
         {
             var statements = GetMembersRecursive(interfaceSymbol)
-                .Select(symbol => GetConfigureBehaviorGeneratedForSymbol(logSink, syntaxGenerator, semanticModel, interfaceSymbol, symbol, plugins, behavior))
+                .Select(symbol => GetConfigureBehaviorGeneratedForSymbol(context, interfaceSymbol, symbol, plugins, behavior))
                 .Where(syntaxNode => syntaxNode != null)
                 .ToImmutableList();
 
-            return syntaxGenerator
+            return context
+                .SyntaxGenerator
                 .MethodDeclaration(
                     behavior == MockBehavior.Strict ? "ConfigureBehaviorGenerated" : "ConfigureLooseBehaviorGenerated",
                     accessibility: Accessibility.Private,
@@ -303,15 +347,15 @@
         }
 
         private static SyntaxNode GetConfigureBehaviorGeneratedForSymbol(
-            ILogSink logSink,
-            SyntaxGenerator syntaxGenerator,
-            SemanticModel semanticModel,
+            Context context,
             INamedTypeSymbol interfaceSymbol,
             ISymbol symbol,
             IImmutableList<IPlugin> plugins,
             MockBehavior behavior)
         {
-            logSink.Debug(logSource, "Considering symbol '{0}'.", symbol);
+            context
+                .LogSink
+                .Debug(logSource, "Considering symbol '{0}'.", symbol);
 
             var propertySymbol = symbol as IPropertySymbol;
             var methodSymbol = symbol as IMethodSymbol;
@@ -322,7 +366,9 @@
             {
                 if (propertySymbol.GetMethod == null)
                 {
-                    logSink.Debug(logSource, "Ignoring symbol '{0}' because it is a write-only property.", symbol);
+                    context
+                        .LogSink
+                        .Debug(logSource, "Ignoring symbol '{0}' because it is a write-only property.", symbol);
                     return null;
                 }
 
@@ -332,13 +378,17 @@
             {
                 if (methodSymbol.AssociatedSymbol != null)
                 {
-                    logSink.Debug(logSource, "Ignoring symbol '{0}' because it is a method with an associated symbol.", symbol);
+                    context
+                        .LogSink
+                        .Debug(logSource, "Ignoring symbol '{0}' because it is a method with an associated symbol.", symbol);
                     return null;
                 }
 
                 if (methodSymbol.IsGenericMethod)
                 {
-                    logSink.Debug(logSource, "Ignoring symbol '{0}' because it is a generic method.", symbol);
+                    context
+                        .LogSink
+                        .Debug(logSource, "Ignoring symbol '{0}' because it is a generic method.", symbol);
                     return null;
                 }
 
@@ -346,18 +396,22 @@
             }
             else
             {
-                logSink.Debug(logSource, "Ignoring symbol '{0}' because it is neither a property nor a method.", symbol);
+                context
+                    .LogSink
+                    .Debug(logSource, "Ignoring symbol '{0}' because it is neither a property nor a method.", symbol);
                 return null;
             }
 
             if (returnType == null)
             {
-                logSink.Warn(logSource, "Ignoring symbol '{0}' because its return type could not be determined (it's probably a sgeneric).", symbol);
+                context
+                    .LogSink
+                    .Warn(logSource, "Ignoring symbol '{0}' because its return type could not be determined (it's probably a sgeneric).", symbol);
                 return null;
             }
 
             var defaultValueSyntax = plugins
-                .Select(plugin => plugin.GetDefaultValueSyntax(logSink, behavior, syntaxGenerator, semanticModel, symbol, returnType))
+                .Select(plugin => plugin.GetDefaultValueSyntax(context, behavior, symbol, returnType))
                 .Where(syntax => syntax != null)
                 .FirstOrDefault();
 
@@ -366,13 +420,16 @@
                 return null;
             }
 
-            var itType = semanticModel
+            var itType = context
+                .SemanticModel
                 .Compilation
                 .GetTypeByMetadataName("PCLMock.It");
 
             if (itType == null)
             {
-                logSink.Error(logSource, "Failed to resolve It class.");
+                context
+                    .LogSink
+                    .Error(logSource, "Failed to resolve It class.");
                 return null;
             }
 
@@ -382,7 +439,9 @@
 
             if (isAnyMethod == null)
             {
-                logSink.Error(logSource, "Failed to resolve IsAny method.");
+                context
+                    .LogSink
+                    .Error(logSource, "Failed to resolve IsAny method.");
                 return null;
             }
 
@@ -397,9 +456,13 @@
                     //
                     //     this
                     //         .When(x => x.SymbolName)
-                    lambdaExpression = syntaxGenerator.MemberAccessExpression(
-                        syntaxGenerator.IdentifierName(lambdaParameterName),
-                        propertySymbol.Name);
+                    lambdaExpression = context
+                        .SyntaxGenerator
+                        .MemberAccessExpression(
+                            context
+                                .SyntaxGenerator
+                                .IdentifierName(lambdaParameterName),
+                            propertySymbol.Name);
                 }
                 else
                 {
@@ -411,19 +474,31 @@
                         .Parameters
                         .Select(
                             parameter =>
-                                syntaxGenerator.InvocationExpression(
-                                    syntaxGenerator.MemberAccessExpression(
-                                        syntaxGenerator.TypeExpression(itType),
-                                        syntaxGenerator.GenericName(
-                                            "IsAny",
-                                            typeArguments: new[]
-                                            {
-                                            parameter.Type
-                                            }))));
+                                context
+                                    .SyntaxGenerator
+                                    .InvocationExpression(
+                                        context
+                                            .SyntaxGenerator
+                                            .MemberAccessExpression(
+                                                context
+                                                    .SyntaxGenerator
+                                                    .TypeExpression(itType),
+                                                context
+                                                    .SyntaxGenerator
+                                                    .GenericName(
+                                                        "IsAny",
+                                                        typeArguments: new[]
+                                                        {
+                                                            parameter.Type
+                                                        }))));
 
-                    lambdaExpression = syntaxGenerator.ElementAccessExpression(
-                        syntaxGenerator.IdentifierName(lambdaParameterName),
-                        arguments: whenArguments);
+                    lambdaExpression = context
+                        .SyntaxGenerator
+                        .ElementAccessExpression(
+                            context
+                                .SyntaxGenerator
+                                .IdentifierName(lambdaParameterName),
+                            arguments: whenArguments);
                 }
             }
             else
@@ -436,100 +511,129 @@
                     .Parameters
                     .Select(
                         parameter =>
-                            syntaxGenerator.InvocationExpression(
-                                syntaxGenerator.MemberAccessExpression(
-                                    syntaxGenerator.TypeExpression(itType),
-                                    syntaxGenerator.GenericName(
-                                        "IsAny",
-                                        typeArguments: new[]
-                                        {
-                                        parameter.Type
-                                        }))));
+                            context
+                                .SyntaxGenerator
+                                .InvocationExpression(
+                                    context
+                                        .SyntaxGenerator
+                                        .MemberAccessExpression(
+                                            context
+                                                .SyntaxGenerator
+                                                .TypeExpression(itType),
+                                            context
+                                                .SyntaxGenerator
+                                                .GenericName(
+                                                    "IsAny",
+                                                    typeArguments: new[]
+                                                    {
+                                                        parameter.Type
+                                                    }))));
 
-                lambdaExpression = syntaxGenerator.InvocationExpression(
-                    syntaxGenerator.MemberAccessExpression(
-                        syntaxGenerator.IdentifierName(lambdaParameterName),
-                        methodSymbol.Name),
-                    arguments: whenArguments);
+                lambdaExpression = context
+                    .SyntaxGenerator
+                    .InvocationExpression(
+                        context
+                            .SyntaxGenerator
+                            .MemberAccessExpression(
+                                context
+                                    .SyntaxGenerator
+                                    .IdentifierName(lambdaParameterName),
+                                methodSymbol.Name),
+                        arguments: whenArguments);
             }
 
-            var whenLambdaArgument = syntaxGenerator.ValueReturningLambdaExpression(
-                lambdaParameterName,
-                lambdaExpression);
+            var whenLambdaArgument = context
+                .SyntaxGenerator
+                .ValueReturningLambdaExpression(
+                    lambdaParameterName,
+                    lambdaExpression);
 
-            var whenInvocation = syntaxGenerator.InvocationExpression(
-                syntaxGenerator.MemberAccessExpression(
-                    syntaxGenerator.ThisExpression(),
-                    syntaxGenerator.IdentifierName("When")),
-                whenLambdaArgument);
+            var whenInvocation = context
+                .SyntaxGenerator
+                .InvocationExpression(
+                    context
+                        .SyntaxGenerator
+                        .MemberAccessExpression(
+                            context
+                                .SyntaxGenerator
+                                .ThisExpression(),
+                            context
+                                .SyntaxGenerator
+                                .IdentifierName("When")),
+                    whenLambdaArgument);
 
-            var result = syntaxGenerator.ExpressionStatement(
-                syntaxGenerator.InvocationExpression(
-                    syntaxGenerator.MemberAccessExpression(
-                        whenInvocation,
-                        syntaxGenerator.IdentifierName("Return")),
-                    arguments: new[]
-                    {
-                        defaultValueSyntax
-                    }));
+            var result = context
+                .SyntaxGenerator
+                .ExpressionStatement(
+                    context
+                        .SyntaxGenerator
+                        .InvocationExpression(
+                            context
+                                .SyntaxGenerator
+                                .MemberAccessExpression(
+                                    whenInvocation,
+                                    context
+                                        .SyntaxGenerator
+                                        .IdentifierName("Return")),
+                            arguments: new[]
+                            {
+                                defaultValueSyntax
+                            }));
 
             return result;
         }
 
         private static SyntaxNode GetConfigureBehaviorMethodSyntax(
-            Language language,
-            SyntaxGenerator syntaxGenerator,
-            SemanticModel semanticModel)
+            Context context)
         {
             // GENERATED CODE:
             //
             //     partial void ConfigureBehavior();
-            return syntaxGenerator.MethodDeclaration(
-                "ConfigureBehavior",
-                accessibility: language == Language.VisualBasic ? Accessibility.Private : Accessibility.NotApplicable,
-                modifiers: DeclarationModifiers.Partial);
+            return context
+                .SyntaxGenerator
+                .MethodDeclaration(
+                    "ConfigureBehavior",
+                    accessibility: context.Language == Language.VisualBasic ? Accessibility.Private : Accessibility.NotApplicable,
+                    modifiers: DeclarationModifiers.Partial);
         }
 
         private static SyntaxNode GetConfigureLooseBehaviorMethodSyntax(
-            Language language,
-            SyntaxGenerator syntaxGenerator,
-            SemanticModel semanticModel)
+            Context context)
         {
             // GENERATED CODE:
             //
             //     partial void ConfigureLooseBehavior();
-            return syntaxGenerator.MethodDeclaration(
-                "ConfigureLooseBehavior",
-                accessibility: language == Language.VisualBasic ? Accessibility.Private : Accessibility.NotApplicable,
-                modifiers: DeclarationModifiers.Partial);
+            return context
+                .SyntaxGenerator
+                .MethodDeclaration(
+                    "ConfigureLooseBehavior",
+                    accessibility: context.Language == Language.VisualBasic ? Accessibility.Private : Accessibility.NotApplicable,
+                    modifiers: DeclarationModifiers.Partial);
         }
 
         private static IEnumerable<SyntaxNode> GetMemberDeclarations(
-            ILogSink logSink,
-            SyntaxGenerator syntaxGenerator,
-            SemanticModel semanticModel,
+            Context context,
             string name,
             INamedTypeSymbol interfaceSymbol,
-            Language language,
             IImmutableList<IPlugin> plugins)
         {
             return
                 new SyntaxNode[]
                 {
-                    GetConstructorDeclarationSyntax(syntaxGenerator, semanticModel, name),
-                    GetConfigureBehaviorGeneratedSyntax(logSink, syntaxGenerator, semanticModel, interfaceSymbol, plugins, MockBehavior.Strict),
-                    GetConfigureBehaviorGeneratedSyntax(logSink, syntaxGenerator, semanticModel, interfaceSymbol, plugins, MockBehavior.Loose),
-                    GetConfigureBehaviorMethodSyntax(language, syntaxGenerator, semanticModel),
-                    GetConfigureLooseBehaviorMethodSyntax(language, syntaxGenerator, semanticModel)
+                    GetConstructorDeclarationSyntax(context, name),
+                    GetConfigureBehaviorGeneratedSyntax(context, interfaceSymbol, plugins, MockBehavior.Strict),
+                    GetConfigureBehaviorGeneratedSyntax(context, interfaceSymbol, plugins, MockBehavior.Loose),
+                    GetConfigureBehaviorMethodSyntax(context),
+                    GetConfigureLooseBehaviorMethodSyntax(context)
                 }
                 .Concat(
                     GetMembersRecursive(interfaceSymbol)
-                        .Select(x => GetMemberDeclarationSyntax(syntaxGenerator, semanticModel, x))
+                        .Select(x => GetMemberDeclarationSyntax(context, x))
                         .Where(x => x != null)
                         .GroupBy(x => x, SyntaxNodeEqualityComparer.Instance)
                         .Where(group => group.Count() == 1)
                         .SelectMany(group => group)
-                        .Select(x => syntaxGenerator.AsPublicInterfaceImplementation(x, syntaxGenerator.TypeExpression(interfaceSymbol))));
+                        .Select(x => context.SyntaxGenerator.AsPublicInterfaceImplementation(x, context.SyntaxGenerator.TypeExpression(interfaceSymbol))));
         }
 
         private static IEnumerable<ISymbol> GetMembersRecursive(INamedTypeSymbol interfaceSymbol)
@@ -549,22 +653,21 @@
         }
 
         private static SyntaxNode GetMemberDeclarationSyntax(
-            SyntaxGenerator syntaxGenerator,
-            SemanticModel semanticModel,
+            Context context,
             ISymbol symbol)
         {
             var propertySymbol = symbol as IPropertySymbol;
 
             if (propertySymbol != null)
             {
-                return GetPropertyDeclarationSyntax(syntaxGenerator, semanticModel, propertySymbol);
+                return GetPropertyDeclarationSyntax(context, propertySymbol);
             }
 
             var methodSymbol = symbol as IMethodSymbol;
 
             if (methodSymbol != null)
             {
-                return GetMethodDeclarationSyntax(syntaxGenerator, semanticModel, methodSymbol);
+                return GetMethodDeclarationSyntax(context, methodSymbol);
             }
 
             // unsupported symbol type, but we don't error - the user can supplement our code as necessary because it's a partial class
@@ -572,12 +675,11 @@
         }
 
         private static SyntaxNode GetPropertyDeclarationSyntax(
-            SyntaxGenerator syntaxGenerator,
-            SemanticModel semanticModel,
+            Context context,
             IPropertySymbol propertySymbol)
         {
-            var getAccessorStatements = GetPropertyGetAccessorsSyntax(syntaxGenerator, semanticModel, propertySymbol).ToList();
-            var setAccessorStatements = GetPropertySetAccessorsSyntax(syntaxGenerator, semanticModel, propertySymbol).ToList();
+            var getAccessorStatements = GetPropertyGetAccessorsSyntax(context, propertySymbol).ToList();
+            var setAccessorStatements = GetPropertySetAccessorsSyntax(context, propertySymbol).ToList();
             var declarationModifiers = DeclarationModifiers.None;
 
             if (getAccessorStatements.Count == 0)
@@ -595,10 +697,13 @@
 
             if (!propertySymbol.IsIndexer)
             {
-                return syntaxGenerator
+                return context
+                    .SyntaxGenerator
                     .PropertyDeclaration(
                         propertySymbol.Name,
-                        syntaxGenerator.TypeExpression(propertySymbol.Type),
+                        context
+                            .SyntaxGenerator
+                            .TypeExpression(propertySymbol.Type),
                         accessibility: Accessibility.Public,
                         modifiers: declarationModifiers,
                         getAccessorStatements: getAccessorStatements,
@@ -608,13 +713,14 @@
             {
                 var parameters = propertySymbol
                     .Parameters
-                    .Select(x => syntaxGenerator.ParameterDeclaration(x.Name, syntaxGenerator.TypeExpression(x.Type)))
+                    .Select(x => context.SyntaxGenerator.ParameterDeclaration(x.Name, context.SyntaxGenerator.TypeExpression(x.Type)))
                     .ToList();
 
-                return syntaxGenerator
+                return context
+                    .SyntaxGenerator
                     .IndexerDeclaration(
                         parameters,
-                        syntaxGenerator.TypeExpression(propertySymbol.Type),
+                        context.SyntaxGenerator.TypeExpression(propertySymbol.Type),
                         accessibility: Accessibility.Public,
                         modifiers: declarationModifiers,
                         getAccessorStatements: getAccessorStatements,
@@ -623,8 +729,7 @@
         }
 
         private static IEnumerable<SyntaxNode> GetPropertyGetAccessorsSyntax(
-            SyntaxGenerator syntaxGenerator,
-            SemanticModel semanticModel,
+            Context context,
             IPropertySymbol propertySymbol)
         {
             if (propertySymbol.GetMethod == null)
@@ -639,17 +744,32 @@
                 // GENERATED CODE:
                 //
                 //     return this.Apply(x => x.PropertyName);
-                yield return syntaxGenerator
+                yield return context
+                    .SyntaxGenerator
                     .ReturnStatement(
-                        syntaxGenerator.InvocationExpression(
-                            syntaxGenerator.MemberAccessExpression(
-                                syntaxGenerator.ThisExpression(),
-                                "Apply"),
-                            syntaxGenerator.ValueReturningLambdaExpression(
-                                lambdaParameterName,
-                                syntaxGenerator.MemberAccessExpression(
-                                    syntaxGenerator.IdentifierName(lambdaParameterName),
-                                    syntaxGenerator.IdentifierName(propertySymbol.Name)))));
+                        context
+                            .SyntaxGenerator
+                            .InvocationExpression(
+                                context
+                                    .SyntaxGenerator
+                                    .MemberAccessExpression(
+                                        context
+                                            .SyntaxGenerator
+                                            .ThisExpression(),
+                                        "Apply"),
+                                context
+                                    .SyntaxGenerator
+                                    .ValueReturningLambdaExpression(
+                                        lambdaParameterName,
+                                        context
+                                            .SyntaxGenerator
+                                            .MemberAccessExpression(
+                                                context
+                                                    .SyntaxGenerator
+                                                    .IdentifierName(lambdaParameterName),
+                                                context
+                                                    .SyntaxGenerator
+                                                    .IdentifierName(propertySymbol.Name)))));
             }
             else
             {
@@ -658,26 +778,38 @@
                 //     return this.Apply(x => x[first, second]);
                 var arguments = propertySymbol
                     .Parameters
-                    .Select(x => syntaxGenerator.Argument(syntaxGenerator.IdentifierName(x.Name)))
+                    .Select(x => context.SyntaxGenerator.Argument(context.SyntaxGenerator.IdentifierName(x.Name)))
                     .ToList();
 
-                yield return syntaxGenerator
+                yield return context
+                    .SyntaxGenerator
                     .ReturnStatement(
-                        syntaxGenerator.InvocationExpression(
-                            syntaxGenerator.MemberAccessExpression(
-                                syntaxGenerator.ThisExpression(),
-                                "Apply"),
-                            syntaxGenerator.ValueReturningLambdaExpression(
-                                lambdaParameterName,
-                                syntaxGenerator.ElementAccessExpression(
-                                    syntaxGenerator.IdentifierName(lambdaParameterName),
-                                    arguments))));
+                        context
+                            .SyntaxGenerator
+                            .InvocationExpression(
+                                context
+                                    .SyntaxGenerator
+                                    .MemberAccessExpression(
+                                        context
+                                            .SyntaxGenerator
+                                            .ThisExpression(),
+                                        "Apply"),
+                                context
+                                    .SyntaxGenerator
+                                    .ValueReturningLambdaExpression(
+                                        lambdaParameterName,
+                                        context
+                                            .SyntaxGenerator
+                                            .ElementAccessExpression(
+                                                context
+                                                    .SyntaxGenerator
+                                                    .IdentifierName(lambdaParameterName),
+                                                arguments))));
             }
         }
 
         private static IEnumerable<SyntaxNode> GetPropertySetAccessorsSyntax(
-            SyntaxGenerator syntaxGenerator,
-            SemanticModel semanticModel,
+            Context context,
             IPropertySymbol propertySymbol)
         {
             if (propertySymbol.SetMethod == null)
@@ -692,17 +824,32 @@
                 // GENERATED CODE:
                 //
                 //     this.ApplyPropertySet(x => x.PropertyName, value);
-                yield return syntaxGenerator
+                yield return context
+                    .SyntaxGenerator
                     .InvocationExpression(
-                        syntaxGenerator.MemberAccessExpression(
-                            syntaxGenerator.ThisExpression(),
-                            "ApplyPropertySet"),
-                        syntaxGenerator.ValueReturningLambdaExpression(
-                            lambdaParameterName,
-                            syntaxGenerator.MemberAccessExpression(
-                                syntaxGenerator.IdentifierName(lambdaParameterName),
-                                syntaxGenerator.IdentifierName(propertySymbol.Name))),
-                        syntaxGenerator.IdentifierName("value"));
+                        context
+                            .SyntaxGenerator
+                            .MemberAccessExpression(
+                                context
+                                    .SyntaxGenerator
+                                    .ThisExpression(),
+                                "ApplyPropertySet"),
+                        context
+                            .SyntaxGenerator
+                            .ValueReturningLambdaExpression(
+                                lambdaParameterName,
+                                context
+                                    .SyntaxGenerator
+                                    .MemberAccessExpression(
+                                        context
+                                            .SyntaxGenerator
+                                            .IdentifierName(lambdaParameterName),
+                                        context
+                                            .SyntaxGenerator
+                                            .IdentifierName(propertySymbol.Name))),
+                        context
+                            .SyntaxGenerator
+                            .IdentifierName("value"));
             }
             else
             {
@@ -711,26 +858,38 @@
                 //     this.ApplyPropertySet(x => x[first, second], value);
                 var arguments = propertySymbol
                     .Parameters
-                    .Select(x => syntaxGenerator.Argument(syntaxGenerator.IdentifierName(x.Name)))
+                    .Select(x => context.SyntaxGenerator.Argument(context.SyntaxGenerator.IdentifierName(x.Name)))
                     .ToList();
 
-                yield return syntaxGenerator
+                yield return context
+                    .SyntaxGenerator
                     .InvocationExpression(
-                        syntaxGenerator.MemberAccessExpression(
-                            syntaxGenerator.ThisExpression(),
-                            "ApplyPropertySet"),
-                        syntaxGenerator.ValueReturningLambdaExpression(
-                            lambdaParameterName,
-                            syntaxGenerator.ElementAccessExpression(
-                                syntaxGenerator.IdentifierName(lambdaParameterName),
-                                arguments)),
-                        syntaxGenerator.IdentifierName("value"));
+                        context
+                            .SyntaxGenerator
+                            .MemberAccessExpression(
+                                context
+                                    .SyntaxGenerator
+                                    .ThisExpression(),
+                                "ApplyPropertySet"),
+                        context
+                            .SyntaxGenerator
+                            .ValueReturningLambdaExpression(
+                                lambdaParameterName,
+                                context
+                                    .SyntaxGenerator
+                                    .ElementAccessExpression(
+                                        context
+                                            .SyntaxGenerator
+                                            .IdentifierName(lambdaParameterName),
+                                        arguments)),
+                        context
+                            .SyntaxGenerator
+                            .IdentifierName("value"));
             }
         }
 
         private static SyntaxNode GetMethodDeclarationSyntax(
-            SyntaxGenerator syntaxGenerator,
-            SemanticModel semanticModel,
+            Context context,
             IMethodSymbol methodSymbol)
         {
             if (methodSymbol.MethodKind != MethodKind.Ordinary)
@@ -738,18 +897,22 @@
                 return null;
             }
 
-            var methodDeclaration = syntaxGenerator
+            var methodDeclaration = context
+                .SyntaxGenerator
                 .MethodDeclaration(methodSymbol);
-            methodDeclaration = syntaxGenerator
+            methodDeclaration = context
+                .SyntaxGenerator
                 .WithModifiers(
                     methodDeclaration,
-                    syntaxGenerator
+                    context
+                        .SyntaxGenerator
                         .GetModifiers(methodDeclaration)
                         .WithIsAbstract(false));
-            methodDeclaration = syntaxGenerator
+            methodDeclaration = context
+                .SyntaxGenerator
                 .WithStatements(
                     methodDeclaration,
-                    GetMethodStatementsSyntax(syntaxGenerator, semanticModel, methodSymbol));
+                    GetMethodStatementsSyntax(context, methodSymbol));
 
             var csharpMethodDeclaration = methodDeclaration as MethodDeclarationSyntax;
 
@@ -763,8 +926,7 @@
         }
 
         private static IEnumerable<SyntaxNode> GetMethodStatementsSyntax(
-            SyntaxGenerator syntaxGenerator,
-            SemanticModel semanticModel,
+            Context context,
             IMethodSymbol methodSymbol)
         {
             // GENERATED CODE (for every ref or out parameter):
@@ -777,44 +939,55 @@
 
                 if (parameter.RefKind == RefKind.Out)
                 {
-                    yield return syntaxGenerator
+                    yield return context
+                        .SyntaxGenerator
                         .LocalDeclarationStatement(
-                            syntaxGenerator.TypeExpression(parameter.Type),
+                            context
+                                .SyntaxGenerator
+                                .TypeExpression(parameter.Type),
                             methodSymbol.GetNameForParameter(parameter));
                 }
                 else if (parameter.RefKind == RefKind.Ref)
                 {
-                    yield return syntaxGenerator
+                    yield return context
+                        .SyntaxGenerator
                         .LocalDeclarationStatement(
                             methodSymbol.GetNameForParameter(parameter),
-                            initializer: syntaxGenerator.DefaultExpression(syntaxGenerator.TypeExpression(parameter.Type)));
+                            initializer: context.SyntaxGenerator.DefaultExpression(context.SyntaxGenerator.TypeExpression(parameter.Type)));
                 }
             }
 
             var arguments = methodSymbol
                 .Parameters
                 .Select(x =>
-                    syntaxGenerator
+                    context
+                        .SyntaxGenerator
                         .Argument(
                             x.RefKind,
-                            syntaxGenerator.IdentifierName(methodSymbol.GetNameForParameter(x))))
+                            context
+                                .SyntaxGenerator
+                                .IdentifierName(methodSymbol.GetNameForParameter(x))))
                 .ToList();
 
             var typeArguments = methodSymbol
                 .TypeArguments
-                .Select(x => syntaxGenerator.TypeExpression(x))
+                .Select(x => context.SyntaxGenerator.TypeExpression(x))
                 .ToList();
 
             var lambdaParameterName = methodSymbol.GetUniqueName();
 
-            var lambdaInvocation = syntaxGenerator
+            var lambdaInvocation = context
+                .SyntaxGenerator
                 .MemberAccessExpression(
-                    syntaxGenerator.IdentifierName(lambdaParameterName),
+                    context
+                        .SyntaxGenerator
+                        .IdentifierName(lambdaParameterName),
                     methodSymbol.Name);
 
             if (typeArguments.Count > 0)
             {
-                lambdaInvocation = syntaxGenerator
+                lambdaInvocation = context
+                    .SyntaxGenerator
                     .WithTypeArguments(
                         lambdaInvocation,
                         typeArguments);
@@ -832,45 +1005,72 @@
                 {
                     var nameOfMethodToCall = parameter.RefKind == RefKind.Out ? "GetOutParameterValue" : "GetRefParameterValue";
 
-                    yield return syntaxGenerator
+                    yield return context
+                        .SyntaxGenerator
                         .AssignmentStatement(
-                            syntaxGenerator.IdentifierName(parameter.Name),
-                            syntaxGenerator
+                            context
+                                .SyntaxGenerator
+                                .IdentifierName(parameter.Name),
+                            context
+                                .SyntaxGenerator
                                 .InvocationExpression(
-                                    syntaxGenerator.MemberAccessExpression(
-                                        syntaxGenerator.ThisExpression(),
-                                        syntaxGenerator.GenericName(
-                                            nameOfMethodToCall,
-                                            typeArguments: syntaxGenerator.TypeExpression(parameter.Type))),
-                                            arguments: new[]
-                                            {
-                                                syntaxGenerator.ValueReturningLambdaExpression(
-                                                    lambdaParameterName,
-                                                    syntaxGenerator.InvocationExpression(
-                                                        lambdaInvocation,
-                                                        arguments: arguments)),
-                                                    syntaxGenerator.LiteralExpression(i)
-                                            }));
+                                    context
+                                        .SyntaxGenerator
+                                        .MemberAccessExpression(
+                                            context
+                                                .SyntaxGenerator
+                                                .ThisExpression(),
+                                            context
+                                                .SyntaxGenerator
+                                                .GenericName(
+                                                    nameOfMethodToCall,
+                                                    typeArguments: context.SyntaxGenerator.TypeExpression(parameter.Type))),
+                                                    arguments: new[]
+                                                    {
+                                                        context
+                                                            .SyntaxGenerator
+                                                            .ValueReturningLambdaExpression(
+                                                                lambdaParameterName,
+                                                                context
+                                                                    .SyntaxGenerator
+                                                                    .InvocationExpression(
+                                                                        lambdaInvocation,
+                                                                        arguments: arguments)),
+                                                                context
+                                                                    .SyntaxGenerator
+                                                                    .LiteralExpression(i)
+                                                    }));
                 }
             }
 
             // GENERATED CODE:
             //
             //     [return] this.Apply(x => x.SomeMethod(param1, param2));
-            var applyInvocation = syntaxGenerator
+            var applyInvocation = context
+                .SyntaxGenerator
                 .InvocationExpression(
-                    syntaxGenerator.MemberAccessExpression(
-                        syntaxGenerator.ThisExpression(),
-                        "Apply"),
-                    syntaxGenerator.ValueReturningLambdaExpression(
-                        lambdaParameterName,
-                        syntaxGenerator.InvocationExpression(
-                            lambdaInvocation,
-                            arguments: arguments)));
+                    context
+                        .SyntaxGenerator
+                        .MemberAccessExpression(
+                            context
+                                .SyntaxGenerator
+                                .ThisExpression(),
+                            "Apply"),
+                    context
+                        .SyntaxGenerator
+                        .ValueReturningLambdaExpression(
+                            lambdaParameterName,
+                            context
+                                .SyntaxGenerator
+                                .InvocationExpression(
+                                    lambdaInvocation,
+                                    arguments: arguments)));
 
             if (!methodSymbol.ReturnsVoid)
             {
-                applyInvocation = syntaxGenerator.ReturnStatement(applyInvocation);
+                applyInvocation = context
+                    .SyntaxGenerator
+                    .ReturnStatement(applyInvocation);
             }
 
             yield return applyInvocation;

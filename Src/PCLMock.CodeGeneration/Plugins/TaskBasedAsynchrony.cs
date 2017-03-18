@@ -3,7 +3,6 @@ namespace PCLMock.CodeGeneration.Plugins
     using System;
     using Logging;
     using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.Editing;
 
     /// <summary>
     /// A plugin that generates appropriate default return values for any member that uses TPL-based
@@ -39,10 +38,8 @@ namespace PCLMock.CodeGeneration.Plugins
 
         /// <inheritdoc />
         public SyntaxNode GetDefaultValueSyntax(
-            ILogSink logSink,
+            Context context,
             MockBehavior behavior,
-            SyntaxGenerator syntaxGenerator,
-            SemanticModel semanticModel,
             ISymbol symbol,
             INamedTypeSymbol returnType)
         {
@@ -51,17 +48,21 @@ namespace PCLMock.CodeGeneration.Plugins
                 return null;
             }
 
-            var taskBaseType = semanticModel
+            var taskBaseType = context
+                .SemanticModel
                 .Compilation
                 .GetTypeByMetadataName("System.Threading.Tasks.Task");
 
-            var genericTaskBaseType = semanticModel
+            var genericTaskBaseType = context
+                .SemanticModel
                 .Compilation
                 .GetTypeByMetadataName("System.Threading.Tasks.Task`1");
 
             if (taskBaseType == null || genericTaskBaseType == null)
             {
-                logSink.Warn(logSource, "Failed to resolve Task classes.");
+                context
+                    .LogSink
+                    .Warn(logSource, "Failed to resolve Task classes.");
                 return null;
             }
 
@@ -70,11 +71,14 @@ namespace PCLMock.CodeGeneration.Plugins
 
             if (!isTask && !isGenericTask)
             {
-                logSink.Debug(logSource, "Ignoring symbol '{0}' because it does not return a Task or Task<T>.", symbol);
+                context
+                    .LogSink
+                    .Debug(logSource, "Ignoring symbol '{0}' because it does not return a Task or Task<T>.", symbol);
                 return null;
             }
 
-            ITypeSymbol taskType = semanticModel
+            ITypeSymbol taskType = context
+                .SemanticModel
                 .Compilation
                 .GetSpecialType(SpecialType.System_Boolean);
 
@@ -83,16 +87,28 @@ namespace PCLMock.CodeGeneration.Plugins
                 taskType = returnType.TypeArguments[0];
             }
 
-            var fromResultInvocation = syntaxGenerator.InvocationExpression(
-                syntaxGenerator.WithTypeArguments(
-                    syntaxGenerator.MemberAccessExpression(
-                        syntaxGenerator.TypeExpression(taskBaseType),
-                        "FromResult"),
-                    syntaxGenerator.TypeExpression(taskType)),
-                arguments: new[]
-                {
-                    syntaxGenerator.DefaultExpression(taskType)
-                });
+            var fromResultInvocation = context
+                .SyntaxGenerator
+                .InvocationExpression(
+                    context
+                        .SyntaxGenerator
+                        .WithTypeArguments(
+                            context
+                                .SyntaxGenerator
+                                .MemberAccessExpression(
+                                    context
+                                        .SyntaxGenerator
+                                        .TypeExpression(taskBaseType),
+                                    "FromResult"),
+                            context
+                                .SyntaxGenerator
+                                .TypeExpression(taskType)),
+                    arguments: new[]
+                    {
+                        context
+                            .SyntaxGenerator
+                            .DefaultExpression(taskType)
+                    });
 
             return fromResultInvocation;
         }
