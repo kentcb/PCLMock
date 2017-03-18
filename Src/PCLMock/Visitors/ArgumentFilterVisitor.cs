@@ -42,7 +42,9 @@
             var filterMethod = node
                 .Method
                 .DeclaringType
-                .GetMethods(BindingFlags.Static | BindingFlags.NonPublic)
+                .GetTypeInfo()
+                .DeclaredMethods
+                .Where(declaredMethod => declaredMethod.IsStatic && declaredMethod.IsPublic)
                 .Where(x => x.Name == node.Method.Name + "Filter" && x.GetParameters().Length == node.Arguments.Count)
                 .FirstOrDefault();
 
