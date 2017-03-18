@@ -1,6 +1,7 @@
 namespace PCLMock.CodeGeneration.Plugins
 {
     using System;
+    using System.Linq;
     using System.Reactive.Linq;
     using Logging;
     using Microsoft.CodeAnalysis;
@@ -116,7 +117,7 @@ namespace PCLMock.CodeGeneration.Plugins
             }
             else
             {
-                // methods are given async operation semantics by returning Observable.Return(default(T))
+                // methods are given async operation semantics by returning Observable.Return(...)
                 observableInvocation = context
                     .SyntaxGenerator
                     .InvocationExpression(
@@ -135,13 +136,37 @@ namespace PCLMock.CodeGeneration.Plugins
                                     .TypeExpression(observableInnerType)),
                         arguments: new[]
                         {
-                            context
-                                .SyntaxGenerator
-                                .DefaultExpression(observableInnerType)
+                            GetDefaultRecursive(context, behavior, symbol, observableInnerType)
                         });
             }
 
             return observableInvocation;
+        }
+
+        private static SyntaxNode GetDefaultRecursive(
+            Context context,
+            MockBehavior behavior,
+            ISymbol symbol,
+            ITypeSymbol returnType)
+        {
+            var namedTypeSymbol = returnType as INamedTypeSymbol;
+
+            if (namedTypeSymbol != null)
+            {
+                var recursiveDefault = context
+                    .Plugins
+                    .Select(plugin => plugin.GetDefaultValueSyntax(context, behavior, symbol, namedTypeSymbol))
+                    .Where(defaultValueSyntax => defaultValueSyntax != null)
+                    .FirstOrDefault();
+
+                if (recursiveDefault != null)
+                {
+                    return recursiveDefault;
+                }
+            }
+
+            // recursive resolution not possible, so fallback to default(T)
+            return context.SyntaxGenerator.DefaultExpression(returnType);
         }
     }
 }

@@ -1,0 +1,6 @@
+using System.Threading.Tasks;
+
+interface ISomeInterface
+{
+	Task<Task<int>> SomeMethod();
+}

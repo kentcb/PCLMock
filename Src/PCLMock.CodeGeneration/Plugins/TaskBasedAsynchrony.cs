@@ -1,6 +1,7 @@
 namespace PCLMock.CodeGeneration.Plugins
 {
     using System;
+    using System.Linq;
     using Logging;
     using Microsoft.CodeAnalysis;
 
@@ -105,12 +106,36 @@ namespace PCLMock.CodeGeneration.Plugins
                                 .TypeExpression(taskType)),
                     arguments: new[]
                     {
-                        context
-                            .SyntaxGenerator
-                            .DefaultExpression(taskType)
+                        GetDefaultRecursive(context, behavior, symbol, taskType)
                     });
 
             return fromResultInvocation;
+        }
+
+        private static SyntaxNode GetDefaultRecursive(
+            Context context,
+            MockBehavior behavior,
+            ISymbol symbol,
+            ITypeSymbol returnType)
+        {
+            var namedTypeSymbol = returnType as INamedTypeSymbol;
+
+            if (namedTypeSymbol != null)
+            {
+                var recursiveDefault = context
+                    .Plugins
+                    .Select(plugin => plugin.GetDefaultValueSyntax(context, behavior, symbol, namedTypeSymbol))
+                    .Where(defaultValueSyntax => defaultValueSyntax != null)
+                    .FirstOrDefault();
+
+                if (recursiveDefault != null)
+                {
+                    return recursiveDefault;
+                }
+            }
+
+            // recursive resolution not possible, so fallback to default(T)
+            return context.SyntaxGenerator.DefaultExpression(returnType);
         }
     }
 }

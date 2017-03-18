@@ -27,6 +27,7 @@ namespace PCLMock.UnitTests.CodeGeneration.Plugins
         [InlineData("ImmutableQueues", Language.CSharp)]
         [InlineData("ImmutableSets", Language.CSharp)]
         [InlineData("ImmutableStacks", Language.CSharp)]
+        [InlineData("Recursive", Language.CSharp)]
         public async Task can_generate_mocks(string resourceBaseName, Language language)
         {
             var inputResourceName = "PCLMock.UnitTests.CodeGeneration.Plugins.CollectionsFixtureResources." + resourceBaseName + "Input_" + language.ToString() + ".txt";

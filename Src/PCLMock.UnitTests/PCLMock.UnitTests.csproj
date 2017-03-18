@@ -365,6 +365,24 @@
   <ItemGroup>
     <EmbeddedResource Include="CodeGeneration\Plugins\DisposablesFixtureResources\DisposablesOutput_CSharp.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="CodeGeneration\Plugins\CollectionsFixtureResources\RecursiveInput_CSharp.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="CodeGeneration\Plugins\CollectionsFixtureResources\RecursiveOutput_CSharp.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="CodeGeneration\Plugins\ObservableBasedAsynchronyFixtureResources\RecursiveInput_CSharp.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="CodeGeneration\Plugins\ObservableBasedAsynchronyFixtureResources\RecursiveOutput_CSharp.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="CodeGeneration\Plugins\TaskBasedAsynchronyFixtureResources\RecursiveInput_CSharp.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="CodeGeneration\Plugins\TaskBasedAsynchronyFixtureResources\RecursiveOutput_CSharp.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

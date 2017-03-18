@@ -19,6 +19,7 @@ namespace PCLMock.UnitTests.CodeGeneration.Plugins
         [InlineData("NonObservableBased", Language.CSharp)]
         [InlineData("ObservableBased", Language.CSharp)]
         [InlineData("GenericInterface", Language.CSharp)]
+        [InlineData("Recursive", Language.CSharp)]
         public async Task can_generate_mocks(string resourceBaseName, Language language)
         {
             var inputResourceName = "PCLMock.UnitTests.CodeGeneration.Plugins.ObservableBasedAsynchronyFixtureResources." + resourceBaseName + "Input_" + language.ToString() + ".txt";
