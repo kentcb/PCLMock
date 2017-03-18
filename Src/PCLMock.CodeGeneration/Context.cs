@@ -42,6 +42,7 @@
             SemanticModel semanticModel)
         {
             this.logSink = logSink;
+            this.language = language;
             this.plugins = plugins;
             this.syntaxGenerator = syntaxGenerator;
             this.semanticModel = semanticModel;
