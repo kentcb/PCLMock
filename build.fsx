@@ -20,6 +20,7 @@ let srcDir = "Src/"
 let packagesDir = "Src/packages/"
 let testDir = genDir @@ "Test"
 let nugetDir = genDir @@ "NuGet"
+let nugetSource = "https://www.nuget.org/api/v2/package"
 
 Target "Clean" (fun _ ->
     CleanDirs[genDir; testDir; nugetDir]
@@ -151,6 +152,7 @@ Target "CreateNuGetPackages" (fun _ ->
             WorkingDir = nugetDir @@ "PCLMock"
             SymbolPackage = NugetSymbolPackage.Nuspec
             Publish = System.Convert.ToBoolean(deployToNuGet)
+            PublishUrl = nugetSource
         })
         (srcDir @@ "PCLMock.nuspec")
 
@@ -193,6 +195,7 @@ Target "CreateNuGetPackages" (fun _ ->
                     "PCLMock", semanticVersion
                 ]
             Publish = System.Convert.ToBoolean(deployToNuGet)
+            PublishUrl = nugetSource
         })
         (srcDir @@ "PCLMock.CodeGeneration.nuspec")
 
@@ -208,6 +211,7 @@ Target "CreateNuGetPackages" (fun _ ->
                     "PCLMock", semanticVersion
                 ]
             Publish = System.Convert.ToBoolean(deployToNuGet)
+            PublishUrl = nugetSource
             TimeOut = System.TimeSpan.FromMinutes(15.0)
         })
         (srcDir @@ "PCLMock.CodeGeneration.T4.nuspec")
@@ -220,6 +224,7 @@ Target "CreateNuGetPackages" (fun _ ->
             WorkingDir = nugetDir @@ "PCLMock.CodeGeneration.Console"
             SymbolPackage = NugetSymbolPackage.None
             Publish = System.Convert.ToBoolean(deployToNuGet)
+            PublishUrl = nugetSource
             TimeOut = System.TimeSpan.FromMinutes(15.0)
         })
         (srcDir @@ "PCLMock.CodeGeneration.Console.nuspec")
