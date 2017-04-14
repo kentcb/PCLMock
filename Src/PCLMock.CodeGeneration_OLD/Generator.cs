@@ -4,14 +4,13 @@
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Linq;
-    using System.Reflection;
     using System.Threading.Tasks;
     using Logging;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Editing;
-    //using Microsoft.CodeAnalysis.MSBuild;
+    using Microsoft.CodeAnalysis.MSBuild;
 
     public static class Generator
     {
@@ -30,14 +29,14 @@
         public async static Task<IImmutableList<SyntaxNode>> GenerateMocksAsync(
             ILogSink logSink,
             Language language,
-            string initialPath,
+            string solutionPath,
             Func<INamedTypeSymbol, bool> interfacePredicate,
             Func<INamedTypeSymbol, string> mockNamespaceSelector,
             Func<INamedTypeSymbol, string> mockNameSelector,
             IImmutableList<IPlugin> plugins)
         {
-            var workspace = new DotNetWorkspace(initialPath);
-            var solution = await workspace.OpenSolutionAsync(initialPath);
+            var workspace = MSBuildWorkspace.Create();
+            var solution = await workspace.OpenSolutionAsync(solutionPath);
 
             return await GenerateMocksAsync(
                 logSink,
@@ -66,7 +65,7 @@
                         {
                             var compilation = await project.GetCompilationAsync();
                             // make sure the compilation has a reference to PCLMock
-                            compilation = compilation.AddReferences(MetadataReference.CreateFromFile(typeof(MockBase<>).GetTypeInfo().Assembly.Location));
+                            compilation = compilation.AddReferences(MetadataReference.CreateFromFile(typeof(MockBase<>).Assembly.Location));
 
                             foreach (var plugin in plugins)
                             {
@@ -236,7 +235,7 @@
                         .LiteralExpression("PCLMock"),
                     context
                         .SyntaxGenerator
-                        .LiteralExpression(typeof(MockBase<>).GetTypeInfo().Assembly.GetName().Version.ToString()));
+                        .LiteralExpression(typeof(MockBase<>).Assembly.GetName().Version.ToString()));
             yield return context
                 .SyntaxGenerator
                 .Attribute(

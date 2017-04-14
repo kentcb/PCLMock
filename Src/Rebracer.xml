@@ -40,7 +40,7 @@
         <PropertyValue name="Indent_BlockContents">1</PropertyValue>
         <PropertyValue name="Indent_Braces">0</PropertyValue>
         <PropertyValue name="Indent_CaseContents">1</PropertyValue>
-        <PropertyValue name="Indent_CaseLabels">0</PropertyValue>
+        <PropertyValue name="Indent_CaseLabels">1</PropertyValue>
         <PropertyValue name="Indent_FlushLabelsLeft">0</PropertyValue>
         <PropertyValue name="Indent_UnindentLabels">1</PropertyValue>
         <PropertyValue name="NewLines_AnonymousTypeInitializer_EachMember">1</PropertyValue>
@@ -331,8 +331,8 @@
         <PropertyValue name="WarnOnBuildErrors">0</PropertyValue>
         <PropertyValue name="Wrapping_IgnoreSpacesAroundBinaryOperators">0</PropertyValue>
         <PropertyValue name="Wrapping_IgnoreSpacesAroundVariableDeclaration">0</PropertyValue>
-        <PropertyValue name="Wrapping_KeepStatementsOnSingleLine">0</PropertyValue>
-        <PropertyValue name="Wrapping_PreserveSingleLine">0</PropertyValue>
+        <PropertyValue name="Wrapping_KeepStatementsOnSingleLine">1</PropertyValue>
+        <PropertyValue name="Wrapping_PreserveSingleLine">1</PropertyValue>
       </ToolsOptionsSubCategory>
       <ToolsOptionsSubCategory name="JavaScript Specific">
         <PropertyValue name="DownloadRemoteReferences">false</PropertyValue>

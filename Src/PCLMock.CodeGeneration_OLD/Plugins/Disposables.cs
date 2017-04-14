@@ -2,7 +2,6 @@ namespace PCLMock.CodeGeneration.Plugins
 {
     using System;
     using System.Reactive.Disposables;
-    using System.Reflection;
     using Logging;
     using Microsoft.CodeAnalysis;
 
@@ -30,7 +29,7 @@ namespace PCLMock.CodeGeneration.Plugins
 
         /// <inheritdoc />
         public Compilation InitializeCompilation(Compilation compilation) =>
-            compilation.AddReferences(MetadataReference.CreateFromFile(typeof(Disposable).GetTypeInfo().Assembly.Location));
+            compilation.AddReferences(MetadataReference.CreateFromFile(typeof(Disposable).Assembly.Location));
 
         /// <inheritdoc />
         public SyntaxNode GetDefaultValueSyntax(
