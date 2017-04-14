@@ -9,7 +9,7 @@ open Fake.NuGetHelper
 open Fake.Testing.XUnit2
 
 // properties
-let semanticVersion = "5.0.3-alpha"
+let semanticVersion = "5.0.4-alpha"
 let version = (>=>) @"(?<major>\d*)\.(?<minor>\d*)\.(?<build>\d*).*?" "${major}.${minor}.${build}.0" semanticVersion
 let configuration = getBuildParamOrDefault "configuration" "Release"
 // can be set by passing: -ev deployToNuGet true
@@ -110,7 +110,7 @@ Target "CreateArchives" (fun _ ->
 Target "CreateNuGetPackages" (fun _ ->
     // copy files required in the various NuGets
     !! (srcDir @@ "PCLMock/bin" @@ configuration @@ "PCLMock.*")
-        |> CopyFiles (nugetDir @@ "PCLMock/lib/portable-win+net40+sl50+WindowsPhoneApp81+wp80+MonoAndroid+Xamarin.iOS10+MonoTouch")
+        |> CopyFiles (nugetDir @@ "PCLMock/lib/portable-net45+win8+wp8+wpa81")
 
     !! (srcDir @@ "PCLMock.CodeGeneration/bin" @@ configuration @@ "PCLMock.CodeGeneration.*")
         |> CopyFiles (nugetDir @@ "PCLMock.CodeGeneration/lib/net45")
