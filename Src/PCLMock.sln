@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26228.9
+VisualStudioVersion = 15.0.27004.2002
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCLMock.UnitTests", "PCLMock.UnitTests\PCLMock.UnitTests.csproj", "{05115055-0BBC-49D5-8966-2B90325F2F08}"
 EndProject
@@ -15,9 +15,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCLMock.CodeGeneration.T4",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCLMock.CodeGeneration.Console", "PCLMock.CodeGeneration.Console\PCLMock.CodeGeneration.Console.csproj", "{B56824C1-B58E-42FB-A528-518638A7DA15}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCLMock.CodeGeneration", "PCLMock.CodeGeneration\PCLMock.CodeGeneration.csproj", "{49C812A9-5C76-4567-947F-B21A38FE4EC1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PCLMock.CodeGeneration", "PCLMock.CodeGeneration\PCLMock.CodeGeneration.csproj", "{49C812A9-5C76-4567-947F-B21A38FE4EC1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCLMock", "PCLMock\PCLMock.csproj", "{2F34337F-05B9-4B38-A072-46409A3B2ACE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PCLMock", "PCLMock\PCLMock.csproj", "{2F34337F-05B9-4B38-A072-46409A3B2ACE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -48,5 +48,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EB004448-798E-4E0A-83D2-4913F9AE04F1}
 	EndGlobalSection
 EndGlobal

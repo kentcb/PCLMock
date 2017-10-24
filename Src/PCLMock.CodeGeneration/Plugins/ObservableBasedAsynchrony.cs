@@ -42,7 +42,10 @@ namespace PCLMock.CodeGeneration.Plugins
 
         /// <inheritdoc />
         public Compilation InitializeCompilation(Compilation compilation) =>
-            compilation.AddReferences(MetadataReference.CreateFromFile(typeof(Observable).GetTypeInfo().Assembly.Location));
+            compilation
+                .AddReferences(
+                    MetadataReference.CreateFromFile(typeof(IObservable<>).GetTypeInfo().Assembly.Location),
+                    MetadataReference.CreateFromFile(typeof(Observable).GetTypeInfo().Assembly.Location));
 
         /// <inheritdoc />
         public SyntaxNode GetDefaultValueSyntax(

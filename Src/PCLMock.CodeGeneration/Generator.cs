@@ -6,12 +6,13 @@
     using System.Linq;
     using System.Reflection;
     using System.Threading.Tasks;
+    using Buildalyzer;
+    using Buildalyzer.Workspaces;
     using Logging;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Editing;
-    //using Microsoft.CodeAnalysis.MSBuild;
 
     public static class Generator
     {
@@ -36,8 +37,9 @@
             Func<INamedTypeSymbol, string> mockNameSelector,
             IImmutableList<IPlugin> plugins)
         {
-            var workspace = new DotNetWorkspace(initialPath);
-            var solution = await workspace.OpenSolutionAsync(initialPath);
+            var buildalyzerLogFactory = new BuildalyzerLogFactory(logSink);
+            var manager = new AnalyzerManager(initialPath, loggerFactory: buildalyzerLogFactory);
+            var solution = manager.GetWorkspace().CurrentSolution;
 
             return await GenerateMocksAsync(
                 logSink,
@@ -62,7 +64,8 @@
             var compilations = await Task.WhenAll(
                 solution
                     .Projects
-                    .Select(async project =>
+                    .Select(
+                        async project =>
                         {
                             var compilation = await project.GetCompilationAsync();
                             // make sure the compilation has a reference to PCLMock
@@ -93,11 +96,12 @@
                             .OfType<INamedTypeSymbol>()
                             .Where(typeSymbol => typeSymbol.TypeKind == TypeKind.Interface && !typeSymbol.IsImplicitlyDeclared)
                             .Where(typeSymbol => interfacePredicate == null || interfacePredicate(typeSymbol))
-                            .Select(interfaceSymbol => new
-                            {
-                                InterfaceSymbol = interfaceSymbol,
-                                Compilation = compilation
-                            }))
+                            .Select(
+                                interfaceSymbol => new
+                                {
+                                    InterfaceSymbol = interfaceSymbol,
+                                    Compilation = compilation
+                                }))
                 .Select(
                     x =>
                     {
