@@ -9,6 +9,7 @@
     using Buildalyzer;
     using Buildalyzer.Workspaces;
     using Logging;
+    using Microsoft.Build.Framework;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -38,7 +39,13 @@
             IImmutableList<IPlugin> plugins)
         {
             var buildalyzerLogFactory = new BuildalyzerLogFactory(logSink);
-            var manager = new AnalyzerManager(initialPath, loggerFactory: buildalyzerLogFactory);
+            var options = new AnalyzerManagerOptions
+            {
+                CleanBeforeCompile = true,
+                LoggerFactory = buildalyzerLogFactory,
+                LoggerVerbosity = LoggerVerbosity.Detailed,
+            };
+            var manager = new AnalyzerManager(initialPath, options);
             var solution = manager.GetWorkspace().CurrentSolution;
 
             return await GenerateMocksAsync(
