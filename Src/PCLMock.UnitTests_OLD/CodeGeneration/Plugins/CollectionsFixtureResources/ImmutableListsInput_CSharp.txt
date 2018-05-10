@@ -1,0 +1,47 @@
+using System;
+using System.Collections.Immutable;
+
+interface ICustomImmutableList<T> : IImmutableList<T>
+{
+}
+
+interface ISomeInterface
+{
+	IImmutableList<int> SomeProperty
+	{
+		get;
+	}
+
+	// expecting this to be ignored because it's set-only
+	IImmutableList<string> SomeSetOnlyProperty
+	{
+		set;
+	}
+
+	IImmutableList<string> SomeMethod();
+	IImmutableList<string> SomeMethod(int i, float f);
+
+	// should all be ignored because they're generic
+	IImmutableList<int> SomeGenericMethod<T>();
+	IImmutableList<T> SomeOtherGenericMethod<T>();
+
+	// should be ignored because they're a custom enumerable type
+	ICustomIImmutableList<int> SomeCustomProperty
+	{
+		get;
+	}
+
+	ICustomIImmutableList<string> SomeMethod();
+	ICustomIImmutableList<string> SomeMethod(int i, float f);
+}
+
+interface ISomeGenericInterface<T>
+{
+	IImmutableList<T> SomeProperty
+	{
+		get;
+	}
+
+	IImmutableList<T> SomeMethod();
+	IImmutableList<T> SomeMethod(int i, float f);
+}

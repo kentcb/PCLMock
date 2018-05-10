@@ -1,0 +1,34 @@
+namespace The.Namespace
+{
+    [System.CodeDom.Compiler.GeneratedCode("PCLMock", "$VERSION$")]
+    [System.Runtime.CompilerServices.CompilerGenerated]
+    internal partial class Mock : global::PCLMock.MockBase<global::ISomeInterface>, global::ISomeInterface
+    {
+        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base (behavior)
+        {
+            ConfigureBehaviorGenerated();
+            ConfigureBehavior();
+            if ((behavior) == (global::PCLMock.MockBehavior.Loose))
+            {
+                ConfigureLooseBehaviorGenerated();
+                ConfigureLooseBehavior();
+            }
+        }
+
+        private void ConfigureBehaviorGenerated()
+        {
+            this.When(x => x.SomeMethod()).Return(global::System.Reactive.Linq.Observable.Return<global::System.IObservable<System.Int32>>(global::System.Reactive.Linq.Observable.Return<System.Int32>(0)));
+        }
+
+        private void ConfigureLooseBehaviorGenerated()
+        {
+        }
+
+        partial void ConfigureBehavior();
+        partial void ConfigureLooseBehavior();
+        public global::System.IObservable<global::System.IObservable<System.Int32>> SomeMethod()
+        {
+            return this.Apply(x => x.SomeMethod());
+        }
+    }
+}

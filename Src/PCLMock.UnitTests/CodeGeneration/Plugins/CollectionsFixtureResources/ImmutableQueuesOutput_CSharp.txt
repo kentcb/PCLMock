@@ -12,7 +12,7 @@ namespace The.Namespace
     [System.Runtime.CompilerServices.CompilerGenerated]
     internal partial class Mock<T> : global::PCLMock.MockBase<global::ICustomImmutableQueue<T>>, global::ICustomImmutableQueue<T>
     {
-        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base (behavior)
+        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base(behavior)
         {
             ConfigureBehaviorGenerated();
             ConfigureBehavior();
@@ -56,7 +56,7 @@ namespace The.Namespace
             return this.Apply(x => x.Dequeue());
         }
 
-        public System.Boolean IsEmpty
+        public global::System.Boolean IsEmpty
         {
             get
             {
@@ -71,7 +71,7 @@ namespace The.Namespace
     [System.Runtime.CompilerServices.CompilerGenerated]
     internal partial class Mock : global::PCLMock.MockBase<global::ISomeInterface>, global::ISomeInterface
     {
-        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base (behavior)
+        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base(behavior)
         {
             ConfigureBehaviorGenerated();
             ConfigureBehavior();
@@ -84,9 +84,9 @@ namespace The.Namespace
 
         private void ConfigureBehaviorGenerated()
         {
-            this.When(x => x.SomeProperty).Return(global::System.Collections.Immutable.ImmutableQueue<System.Int32>.Empty);
-            this.When(x => x.SomeMethod()).Return(global::System.Collections.Immutable.ImmutableQueue<System.String>.Empty);
-            this.When(x => x.SomeMethod(global::PCLMock.It.IsAny<System.Int32>(), global::PCLMock.It.IsAny<System.Single>())).Return(global::System.Collections.Immutable.ImmutableQueue<System.String>.Empty);
+            this.When(x => x.SomeProperty).Return(global::System.Collections.Immutable.ImmutableQueue<global::System.Int32>.Empty);
+            this.When(x => x.SomeMethod()).Return(global::System.Collections.Immutable.ImmutableQueue<global::System.String>.Empty);
+            this.When(x => x.SomeMethod(global::PCLMock.It.IsAny<global::System.Int32>(), global::PCLMock.It.IsAny<global::System.Single>())).Return(global::System.Collections.Immutable.ImmutableQueue<global::System.String>.Empty);
         }
 
         private void ConfigureLooseBehaviorGenerated()
@@ -95,7 +95,7 @@ namespace The.Namespace
 
         partial void ConfigureBehavior();
         partial void ConfigureLooseBehavior();
-        public global::System.Collections.Immutable.IImmutableQueue<System.Int32> SomeProperty
+        public global::System.Collections.Immutable.IImmutableQueue<global::System.Int32> SomeProperty
         {
             get
             {
@@ -103,17 +103,17 @@ namespace The.Namespace
             }
         }
 
-        public global::System.Collections.Immutable.IImmutableQueue<System.String> SomeMethod()
+        public global::System.Collections.Immutable.IImmutableQueue<global::System.String> SomeMethod()
         {
             return this.Apply(x => x.SomeMethod());
         }
 
-        public global::System.Collections.Immutable.IImmutableQueue<System.String> SomeMethod(System.Int32 i, System.Single f)
+        public global::System.Collections.Immutable.IImmutableQueue<global::System.String> SomeMethod(global::System.Int32 i, global::System.Single f)
         {
             return this.Apply(x => x.SomeMethod(i, f));
         }
 
-        public global::System.Collections.Immutable.IImmutableQueue<System.Int32> SomeGenericMethod<T>()
+        public global::System.Collections.Immutable.IImmutableQueue<global::System.Int32> SomeGenericMethod<T>()
         {
             return this.Apply(x => x.SomeGenericMethod<T>());
         }
@@ -123,7 +123,7 @@ namespace The.Namespace
             return this.Apply(x => x.SomeOtherGenericMethod<T>());
         }
 
-        public ICustomIImmutableQueue<System.Int32> SomeCustomProperty
+        public ICustomIImmutableQueue<global::System.Int32> SomeCustomProperty
         {
             get
             {
@@ -131,12 +131,12 @@ namespace The.Namespace
             }
         }
 
-        public ICustomIImmutableQueue<System.String> SomeMethod()
+        public ICustomIImmutableQueue<global::System.String> SomeMethod()
         {
             return this.Apply(x => x.SomeMethod());
         }
 
-        public ICustomIImmutableQueue<System.String> SomeMethod(System.Int32 i, System.Single f)
+        public ICustomIImmutableQueue<global::System.String> SomeMethod(global::System.Int32 i, global::System.Single f)
         {
             return this.Apply(x => x.SomeMethod(i, f));
         }
@@ -148,7 +148,7 @@ namespace The.Namespace
     [System.Runtime.CompilerServices.CompilerGenerated]
     internal partial class Mock<T> : global::PCLMock.MockBase<global::ISomeGenericInterface<T>>, global::ISomeGenericInterface<T>
     {
-        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base (behavior)
+        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base(behavior)
         {
             ConfigureBehaviorGenerated();
             ConfigureBehavior();
@@ -163,7 +163,7 @@ namespace The.Namespace
         {
             this.When(x => x.SomeProperty).Return(global::System.Collections.Immutable.ImmutableQueue<T>.Empty);
             this.When(x => x.SomeMethod()).Return(global::System.Collections.Immutable.ImmutableQueue<T>.Empty);
-            this.When(x => x.SomeMethod(global::PCLMock.It.IsAny<System.Int32>(), global::PCLMock.It.IsAny<System.Single>())).Return(global::System.Collections.Immutable.ImmutableQueue<T>.Empty);
+            this.When(x => x.SomeMethod(global::PCLMock.It.IsAny<global::System.Int32>(), global::PCLMock.It.IsAny<global::System.Single>())).Return(global::System.Collections.Immutable.ImmutableQueue<T>.Empty);
         }
 
         private void ConfigureLooseBehaviorGenerated()
@@ -185,7 +185,7 @@ namespace The.Namespace
             return this.Apply(x => x.SomeMethod());
         }
 
-        public global::System.Collections.Immutable.IImmutableQueue<T> SomeMethod(System.Int32 i, System.Single f)
+        public global::System.Collections.Immutable.IImmutableQueue<T> SomeMethod(global::System.Int32 i, global::System.Single f)
         {
             return this.Apply(x => x.SomeMethod(i, f));
         }

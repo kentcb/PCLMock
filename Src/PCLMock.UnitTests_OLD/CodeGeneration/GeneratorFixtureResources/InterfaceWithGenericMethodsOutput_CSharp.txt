@@ -1,0 +1,53 @@
+﻿namespace The.Namespace
+{
+    [System.CodeDom.Compiler.GeneratedCode("PCLMock", "$VERSION$")]
+    [System.Runtime.CompilerServices.CompilerGenerated]
+    public partial class Mock : global::PCLMock.MockBase<global::IInterfaceWithGenericMethods>, global::IInterfaceWithGenericMethods
+    {
+        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base (behavior)
+        {
+            ConfigureBehaviorGenerated();
+            ConfigureBehavior();
+            if ((behavior) == (global::PCLMock.MockBehavior.Loose))
+            {
+                ConfigureLooseBehaviorGenerated();
+                ConfigureLooseBehavior();
+            }
+        }
+
+        private void ConfigureBehaviorGenerated()
+        {
+        }
+
+        private void ConfigureLooseBehaviorGenerated()
+        {
+        }
+
+        partial void ConfigureBehavior();
+        partial void ConfigureLooseBehavior();
+        public void VoidMethodWithGenericParameter<T>()
+        {
+            this.Apply(x => x.VoidMethodWithGenericParameter<T>());
+        }
+
+        public T NonVoidMethodWithGenericParameter<T>()
+        {
+            return this.Apply(x => x.NonVoidMethodWithGenericParameter<T>());
+        }
+
+        public void VoidMethodWithGenericArguments<TFirst, TSecond, TThird>(TFirst first, TSecond second, TThird third, System.String somethingElse)
+        {
+            this.Apply(x => x.VoidMethodWithGenericArguments<TFirst, TSecond, TThird>(first, second, third, somethingElse));
+        }
+
+        public TSecond NonVoidMethodWithGenericArguments<TFirst, TSecond>(TFirst input)
+        {
+            return this.Apply(x => x.NonVoidMethodWithGenericArguments<TFirst, TSecond>(input));
+        }
+
+        public TSecond MethodWithTypeConstraints<TFirst, TSecond>(TFirst input, System.Int32 option)where TFirst : IComparable<TFirst>, new ()where TSecond : struct
+        {
+            return this.Apply(x => x.MethodWithTypeConstraints<TFirst, TSecond>(input, option));
+        }
+    }
+}

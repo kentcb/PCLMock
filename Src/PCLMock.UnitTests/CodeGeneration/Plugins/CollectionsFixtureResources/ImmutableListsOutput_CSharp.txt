@@ -12,7 +12,7 @@ namespace The.Namespace
     [System.Runtime.CompilerServices.CompilerGenerated]
     internal partial class Mock<T> : global::PCLMock.MockBase<global::ICustomImmutableList<T>>, global::ICustomImmutableList<T>
     {
-        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base (behavior)
+        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base(behavior)
         {
             ConfigureBehaviorGenerated();
             ConfigureBehavior();
@@ -28,14 +28,14 @@ namespace The.Namespace
             this.When(x => x.Clear()).Return(global::System.Collections.Immutable.ImmutableList<T>.Empty);
             this.When(x => x.Add(global::PCLMock.It.IsAny<T>())).Return(global::System.Collections.Immutable.ImmutableList<T>.Empty);
             this.When(x => x.AddRange(global::PCLMock.It.IsAny<global::System.Collections.Generic.IEnumerable<T>>())).Return(global::System.Collections.Immutable.ImmutableList<T>.Empty);
-            this.When(x => x.Insert(global::PCLMock.It.IsAny<System.Int32>(), global::PCLMock.It.IsAny<T>())).Return(global::System.Collections.Immutable.ImmutableList<T>.Empty);
-            this.When(x => x.InsertRange(global::PCLMock.It.IsAny<System.Int32>(), global::PCLMock.It.IsAny<global::System.Collections.Generic.IEnumerable<T>>())).Return(global::System.Collections.Immutable.ImmutableList<T>.Empty);
+            this.When(x => x.Insert(global::PCLMock.It.IsAny<global::System.Int32>(), global::PCLMock.It.IsAny<T>())).Return(global::System.Collections.Immutable.ImmutableList<T>.Empty);
+            this.When(x => x.InsertRange(global::PCLMock.It.IsAny<global::System.Int32>(), global::PCLMock.It.IsAny<global::System.Collections.Generic.IEnumerable<T>>())).Return(global::System.Collections.Immutable.ImmutableList<T>.Empty);
             this.When(x => x.Remove(global::PCLMock.It.IsAny<T>(), global::PCLMock.It.IsAny<global::System.Collections.Generic.IEqualityComparer<T>>())).Return(global::System.Collections.Immutable.ImmutableList<T>.Empty);
             this.When(x => x.RemoveAll(global::PCLMock.It.IsAny<global::System.Predicate<T>>())).Return(global::System.Collections.Immutable.ImmutableList<T>.Empty);
             this.When(x => x.RemoveRange(global::PCLMock.It.IsAny<global::System.Collections.Generic.IEnumerable<T>>(), global::PCLMock.It.IsAny<global::System.Collections.Generic.IEqualityComparer<T>>())).Return(global::System.Collections.Immutable.ImmutableList<T>.Empty);
-            this.When(x => x.RemoveRange(global::PCLMock.It.IsAny<System.Int32>(), global::PCLMock.It.IsAny<System.Int32>())).Return(global::System.Collections.Immutable.ImmutableList<T>.Empty);
-            this.When(x => x.RemoveAt(global::PCLMock.It.IsAny<System.Int32>())).Return(global::System.Collections.Immutable.ImmutableList<T>.Empty);
-            this.When(x => x.SetItem(global::PCLMock.It.IsAny<System.Int32>(), global::PCLMock.It.IsAny<T>())).Return(global::System.Collections.Immutable.ImmutableList<T>.Empty);
+            this.When(x => x.RemoveRange(global::PCLMock.It.IsAny<global::System.Int32>(), global::PCLMock.It.IsAny<global::System.Int32>())).Return(global::System.Collections.Immutable.ImmutableList<T>.Empty);
+            this.When(x => x.RemoveAt(global::PCLMock.It.IsAny<global::System.Int32>())).Return(global::System.Collections.Immutable.ImmutableList<T>.Empty);
+            this.When(x => x.SetItem(global::PCLMock.It.IsAny<global::System.Int32>(), global::PCLMock.It.IsAny<T>())).Return(global::System.Collections.Immutable.ImmutableList<T>.Empty);
             this.When(x => x.Replace(global::PCLMock.It.IsAny<T>(), global::PCLMock.It.IsAny<T>(), global::PCLMock.It.IsAny<global::System.Collections.Generic.IEqualityComparer<T>>())).Return(global::System.Collections.Immutable.ImmutableList<T>.Empty);
         }
 
@@ -50,12 +50,12 @@ namespace The.Namespace
             return this.Apply(x => x.Clear());
         }
 
-        public System.Int32 IndexOf(T item, System.Int32 index, System.Int32 count, global::System.Collections.Generic.IEqualityComparer<T> equalityComparer)
+        public global::System.Int32 IndexOf(T item, global::System.Int32 index, global::System.Int32 count, global::System.Collections.Generic.IEqualityComparer<T> equalityComparer)
         {
             return this.Apply(x => x.IndexOf(item, index, count, equalityComparer));
         }
 
-        public System.Int32 LastIndexOf(T item, System.Int32 index, System.Int32 count, global::System.Collections.Generic.IEqualityComparer<T> equalityComparer)
+        public global::System.Int32 LastIndexOf(T item, global::System.Int32 index, global::System.Int32 count, global::System.Collections.Generic.IEqualityComparer<T> equalityComparer)
         {
             return this.Apply(x => x.LastIndexOf(item, index, count, equalityComparer));
         }
@@ -70,12 +70,12 @@ namespace The.Namespace
             return this.Apply(x => x.AddRange(items));
         }
 
-        public global::System.Collections.Immutable.IImmutableList<T> Insert(System.Int32 index, T element)
+        public global::System.Collections.Immutable.IImmutableList<T> Insert(global::System.Int32 index, T element)
         {
             return this.Apply(x => x.Insert(index, element));
         }
 
-        public global::System.Collections.Immutable.IImmutableList<T> InsertRange(System.Int32 index, global::System.Collections.Generic.IEnumerable<T> items)
+        public global::System.Collections.Immutable.IImmutableList<T> InsertRange(global::System.Int32 index, global::System.Collections.Generic.IEnumerable<T> items)
         {
             return this.Apply(x => x.InsertRange(index, items));
         }
@@ -95,17 +95,17 @@ namespace The.Namespace
             return this.Apply(x => x.RemoveRange(items, equalityComparer));
         }
 
-        public global::System.Collections.Immutable.IImmutableList<T> RemoveRange(System.Int32 index, System.Int32 count)
+        public global::System.Collections.Immutable.IImmutableList<T> RemoveRange(global::System.Int32 index, global::System.Int32 count)
         {
             return this.Apply(x => x.RemoveRange(index, count));
         }
 
-        public global::System.Collections.Immutable.IImmutableList<T> RemoveAt(System.Int32 index)
+        public global::System.Collections.Immutable.IImmutableList<T> RemoveAt(global::System.Int32 index)
         {
             return this.Apply(x => x.RemoveAt(index));
         }
 
-        public global::System.Collections.Immutable.IImmutableList<T> SetItem(System.Int32 index, T value)
+        public global::System.Collections.Immutable.IImmutableList<T> SetItem(global::System.Int32 index, T value)
         {
             return this.Apply(x => x.SetItem(index, value));
         }
@@ -122,7 +122,7 @@ namespace The.Namespace
     [System.Runtime.CompilerServices.CompilerGenerated]
     internal partial class Mock : global::PCLMock.MockBase<global::ISomeInterface>, global::ISomeInterface
     {
-        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base (behavior)
+        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base(behavior)
         {
             ConfigureBehaviorGenerated();
             ConfigureBehavior();
@@ -135,9 +135,9 @@ namespace The.Namespace
 
         private void ConfigureBehaviorGenerated()
         {
-            this.When(x => x.SomeProperty).Return(global::System.Collections.Immutable.ImmutableList<System.Int32>.Empty);
-            this.When(x => x.SomeMethod()).Return(global::System.Collections.Immutable.ImmutableList<System.String>.Empty);
-            this.When(x => x.SomeMethod(global::PCLMock.It.IsAny<System.Int32>(), global::PCLMock.It.IsAny<System.Single>())).Return(global::System.Collections.Immutable.ImmutableList<System.String>.Empty);
+            this.When(x => x.SomeProperty).Return(global::System.Collections.Immutable.ImmutableList<global::System.Int32>.Empty);
+            this.When(x => x.SomeMethod()).Return(global::System.Collections.Immutable.ImmutableList<global::System.String>.Empty);
+            this.When(x => x.SomeMethod(global::PCLMock.It.IsAny<global::System.Int32>(), global::PCLMock.It.IsAny<global::System.Single>())).Return(global::System.Collections.Immutable.ImmutableList<global::System.String>.Empty);
         }
 
         private void ConfigureLooseBehaviorGenerated()
@@ -146,7 +146,7 @@ namespace The.Namespace
 
         partial void ConfigureBehavior();
         partial void ConfigureLooseBehavior();
-        public global::System.Collections.Immutable.IImmutableList<System.Int32> SomeProperty
+        public global::System.Collections.Immutable.IImmutableList<global::System.Int32> SomeProperty
         {
             get
             {
@@ -154,17 +154,17 @@ namespace The.Namespace
             }
         }
 
-        public global::System.Collections.Immutable.IImmutableList<System.String> SomeMethod()
+        public global::System.Collections.Immutable.IImmutableList<global::System.String> SomeMethod()
         {
             return this.Apply(x => x.SomeMethod());
         }
 
-        public global::System.Collections.Immutable.IImmutableList<System.String> SomeMethod(System.Int32 i, System.Single f)
+        public global::System.Collections.Immutable.IImmutableList<global::System.String> SomeMethod(global::System.Int32 i, global::System.Single f)
         {
             return this.Apply(x => x.SomeMethod(i, f));
         }
 
-        public global::System.Collections.Immutable.IImmutableList<System.Int32> SomeGenericMethod<T>()
+        public global::System.Collections.Immutable.IImmutableList<global::System.Int32> SomeGenericMethod<T>()
         {
             return this.Apply(x => x.SomeGenericMethod<T>());
         }
@@ -174,7 +174,7 @@ namespace The.Namespace
             return this.Apply(x => x.SomeOtherGenericMethod<T>());
         }
 
-        public ICustomIImmutableList<System.Int32> SomeCustomProperty
+        public ICustomIImmutableList<global::System.Int32> SomeCustomProperty
         {
             get
             {
@@ -182,12 +182,12 @@ namespace The.Namespace
             }
         }
 
-        public ICustomIImmutableList<System.String> SomeMethod()
+        public ICustomIImmutableList<global::System.String> SomeMethod()
         {
             return this.Apply(x => x.SomeMethod());
         }
 
-        public ICustomIImmutableList<System.String> SomeMethod(System.Int32 i, System.Single f)
+        public ICustomIImmutableList<global::System.String> SomeMethod(global::System.Int32 i, global::System.Single f)
         {
             return this.Apply(x => x.SomeMethod(i, f));
         }
@@ -199,7 +199,7 @@ namespace The.Namespace
     [System.Runtime.CompilerServices.CompilerGenerated]
     internal partial class Mock<T> : global::PCLMock.MockBase<global::ISomeGenericInterface<T>>, global::ISomeGenericInterface<T>
     {
-        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base (behavior)
+        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base(behavior)
         {
             ConfigureBehaviorGenerated();
             ConfigureBehavior();
@@ -214,7 +214,7 @@ namespace The.Namespace
         {
             this.When(x => x.SomeProperty).Return(global::System.Collections.Immutable.ImmutableList<T>.Empty);
             this.When(x => x.SomeMethod()).Return(global::System.Collections.Immutable.ImmutableList<T>.Empty);
-            this.When(x => x.SomeMethod(global::PCLMock.It.IsAny<System.Int32>(), global::PCLMock.It.IsAny<System.Single>())).Return(global::System.Collections.Immutable.ImmutableList<T>.Empty);
+            this.When(x => x.SomeMethod(global::PCLMock.It.IsAny<global::System.Int32>(), global::PCLMock.It.IsAny<global::System.Single>())).Return(global::System.Collections.Immutable.ImmutableList<T>.Empty);
         }
 
         private void ConfigureLooseBehaviorGenerated()
@@ -236,7 +236,7 @@ namespace The.Namespace
             return this.Apply(x => x.SomeMethod());
         }
 
-        public global::System.Collections.Immutable.IImmutableList<T> SomeMethod(System.Int32 i, System.Single f)
+        public global::System.Collections.Immutable.IImmutableList<T> SomeMethod(global::System.Int32 i, global::System.Single f)
         {
             return this.Apply(x => x.SomeMethod(i, f));
         }

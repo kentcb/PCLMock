@@ -1,0 +1,14 @@
+﻿public interface IInterfaceWithGenericMethods
+{
+    void VoidMethodWithGenericParameter<T>();
+
+    T NonVoidMethodWithGenericParameter<T>();
+
+    void VoidMethodWithGenericArguments<TFirst, TSecond, TThird>(TFirst first, TSecond second, TThird third, string somethingElse);
+
+    TSecond NonVoidMethodWithGenericArguments<TFirst, TSecond>(TFirst input);
+
+    TSecond MethodWithTypeConstraints<TFirst, TSecond>(TFirst input, int option)
+        where TFirst : IComparable<TFirst>, new()
+        where TSecond : struct;
+}

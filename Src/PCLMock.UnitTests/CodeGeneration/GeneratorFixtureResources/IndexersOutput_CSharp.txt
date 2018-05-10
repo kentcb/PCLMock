@@ -4,7 +4,7 @@
     [System.Runtime.CompilerServices.CompilerGenerated]
     public partial class Mock : global::PCLMock.MockBase<global::ISomeInterface>, global::ISomeInterface
     {
-        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base (behavior)
+        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base(behavior)
         {
             ConfigureBehaviorGenerated();
             ConfigureBehavior();
@@ -25,7 +25,7 @@
 
         partial void ConfigureBehavior();
         partial void ConfigureLooseBehavior();
-        public System.Int32 this[System.Int32 i]
+        public global::System.Int32 this[global::System.Int32 i]
         {
             get
             {
@@ -33,7 +33,7 @@
             }
         }
 
-        public System.String this[System.Int32 i, System.Single j]
+        public global::System.String this[global::System.Int32 i, global::System.Single j]
         {
             get
             {
@@ -41,7 +41,7 @@
             }
         }
 
-        public System.String this[System.Int32 i, System.Single j, System.Double d]
+        public global::System.String this[global::System.Int32 i, global::System.Single j, global::System.Double d]
         {
             get
             {

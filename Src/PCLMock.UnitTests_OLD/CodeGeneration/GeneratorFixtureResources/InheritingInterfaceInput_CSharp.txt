@@ -1,0 +1,9 @@
+﻿using System;
+
+public interface IInheritingInterface : ICloneable
+{
+    int SomeProperty
+    {
+        get;
+    }
+}

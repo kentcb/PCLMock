@@ -1,0 +1,29 @@
+﻿using System;
+
+public interface IFirstInterface
+{
+	void FirstMethod();
+
+	int DuplicateProperty
+	{
+		get;
+	}
+
+    void DuplicateMethod();
+}
+
+public interface ISecondInterface
+{
+	void SecondMethod();
+
+	int DuplicateProperty
+	{
+		get;
+	}
+
+    void DuplicateMethod();
+}
+
+public interface IThirdInterface : IFirstInterface, ISecondInterface
+{
+}

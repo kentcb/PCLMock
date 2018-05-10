@@ -1,0 +1,10 @@
+using System;
+using System.Collections.Generic;
+
+interface ISomeInterface
+{
+	IList<IList<IList<int>>> SomeProperty
+	{
+		get;
+	}
+}

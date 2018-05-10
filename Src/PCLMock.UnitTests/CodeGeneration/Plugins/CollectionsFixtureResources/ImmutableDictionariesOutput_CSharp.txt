@@ -12,7 +12,7 @@ namespace The.Namespace
     [System.Runtime.CompilerServices.CompilerGenerated]
     internal partial class Mock<TKey, TValue> : global::PCLMock.MockBase<global::ICustomImmutableDictionary<TKey, TValue>>, global::ICustomImmutableDictionary<TKey, TValue>
     {
-        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base (behavior)
+        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base(behavior)
         {
             ConfigureBehaviorGenerated();
             ConfigureBehavior();
@@ -75,12 +75,12 @@ namespace The.Namespace
             return this.Apply(x => x.Remove(key));
         }
 
-        public System.Boolean Contains(global::System.Collections.Generic.KeyValuePair<TKey, TValue> pair)
+        public global::System.Boolean Contains(global::System.Collections.Generic.KeyValuePair<TKey, TValue> pair)
         {
             return this.Apply(x => x.Contains(pair));
         }
 
-        public System.Boolean TryGetKey(TKey equalKey, out TKey actualKey)
+        public global::System.Boolean TryGetKey(TKey equalKey, out TKey actualKey)
         {
             TKey _actualKey;
             actualKey = (this.GetOutParameterValue<TKey>(x => x.TryGetKey(equalKey, out _actualKey), 1));
@@ -94,7 +94,7 @@ namespace The.Namespace
     [System.Runtime.CompilerServices.CompilerGenerated]
     internal partial class Mock : global::PCLMock.MockBase<global::ISomeInterface>, global::ISomeInterface
     {
-        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base (behavior)
+        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base(behavior)
         {
             ConfigureBehaviorGenerated();
             ConfigureBehavior();
@@ -107,9 +107,9 @@ namespace The.Namespace
 
         private void ConfigureBehaviorGenerated()
         {
-            this.When(x => x.SomeProperty).Return(global::System.Collections.Immutable.ImmutableDictionary<System.Int32, System.String>.Empty);
-            this.When(x => x.SomeMethod()).Return(global::System.Collections.Immutable.ImmutableDictionary<System.Int32, System.String>.Empty);
-            this.When(x => x.SomeMethod(global::PCLMock.It.IsAny<System.Int32>(), global::PCLMock.It.IsAny<System.Single>())).Return(global::System.Collections.Immutable.ImmutableDictionary<System.Int32, System.String>.Empty);
+            this.When(x => x.SomeProperty).Return(global::System.Collections.Immutable.ImmutableDictionary<global::System.Int32, global::System.String>.Empty);
+            this.When(x => x.SomeMethod()).Return(global::System.Collections.Immutable.ImmutableDictionary<global::System.Int32, global::System.String>.Empty);
+            this.When(x => x.SomeMethod(global::PCLMock.It.IsAny<global::System.Int32>(), global::PCLMock.It.IsAny<global::System.Single>())).Return(global::System.Collections.Immutable.ImmutableDictionary<global::System.Int32, global::System.String>.Empty);
         }
 
         private void ConfigureLooseBehaviorGenerated()
@@ -118,7 +118,7 @@ namespace The.Namespace
 
         partial void ConfigureBehavior();
         partial void ConfigureLooseBehavior();
-        public global::System.Collections.Immutable.IImmutableDictionary<System.Int32, System.String> SomeProperty
+        public global::System.Collections.Immutable.IImmutableDictionary<global::System.Int32, global::System.String> SomeProperty
         {
             get
             {
@@ -126,27 +126,27 @@ namespace The.Namespace
             }
         }
 
-        public global::System.Collections.Immutable.IImmutableDictionary<System.Int32, System.String> SomeMethod()
+        public global::System.Collections.Immutable.IImmutableDictionary<global::System.Int32, global::System.String> SomeMethod()
         {
             return this.Apply(x => x.SomeMethod());
         }
 
-        public global::System.Collections.Immutable.IImmutableDictionary<System.Int32, System.String> SomeMethod(System.Int32 i, System.Single f)
+        public global::System.Collections.Immutable.IImmutableDictionary<global::System.Int32, global::System.String> SomeMethod(global::System.Int32 i, global::System.Single f)
         {
             return this.Apply(x => x.SomeMethod(i, f));
         }
 
-        public global::System.Collections.Immutable.IImmutableDictionary<System.Int32, System.String> SomeGenericMethod<T>()
+        public global::System.Collections.Immutable.IImmutableDictionary<global::System.Int32, global::System.String> SomeGenericMethod<T>()
         {
             return this.Apply(x => x.SomeGenericMethod<T>());
         }
 
-        public global::System.Collections.Immutable.IImmutableDictionary<System.Int32, T> SomeOtherGenericMethod<T>()
+        public global::System.Collections.Immutable.IImmutableDictionary<global::System.Int32, T> SomeOtherGenericMethod<T>()
         {
             return this.Apply(x => x.SomeOtherGenericMethod<T>());
         }
 
-        public global::ICustomImmutableDictionary<System.Int32, System.String> SomeCustomProperty
+        public global::ICustomImmutableDictionary<global::System.Int32, global::System.String> SomeCustomProperty
         {
             get
             {
@@ -154,12 +154,12 @@ namespace The.Namespace
             }
         }
 
-        public global::ICustomImmutableDictionary<System.Int32, System.String> SomeMethod()
+        public global::ICustomImmutableDictionary<global::System.Int32, global::System.String> SomeMethod()
         {
             return this.Apply(x => x.SomeMethod());
         }
 
-        public global::ICustomImmutableDictionary<System.Int32, System.String> SomeMethod(System.Int32 i, System.Single f)
+        public global::ICustomImmutableDictionary<global::System.Int32, global::System.String> SomeMethod(global::System.Int32 i, global::System.Single f)
         {
             return this.Apply(x => x.SomeMethod(i, f));
         }
@@ -171,7 +171,7 @@ namespace The.Namespace
     [System.Runtime.CompilerServices.CompilerGenerated]
     internal partial class Mock<TKey, TValue> : global::PCLMock.MockBase<global::ISomeGenericInterface<TKey, TValue>>, global::ISomeGenericInterface<TKey, TValue>
     {
-        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base (behavior)
+        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base(behavior)
         {
             ConfigureBehaviorGenerated();
             ConfigureBehavior();
@@ -186,7 +186,7 @@ namespace The.Namespace
         {
             this.When(x => x.SomeProperty).Return(global::System.Collections.Immutable.ImmutableDictionary<TKey, TValue>.Empty);
             this.When(x => x.SomeMethod()).Return(global::System.Collections.Immutable.ImmutableDictionary<TKey, TValue>.Empty);
-            this.When(x => x.SomeMethod(global::PCLMock.It.IsAny<System.Int32>(), global::PCLMock.It.IsAny<System.Single>())).Return(global::System.Collections.Immutable.ImmutableDictionary<TKey, TValue>.Empty);
+            this.When(x => x.SomeMethod(global::PCLMock.It.IsAny<global::System.Int32>(), global::PCLMock.It.IsAny<global::System.Single>())).Return(global::System.Collections.Immutable.ImmutableDictionary<TKey, TValue>.Empty);
         }
 
         private void ConfigureLooseBehaviorGenerated()
@@ -208,7 +208,7 @@ namespace The.Namespace
             return this.Apply(x => x.SomeMethod());
         }
 
-        public global::System.Collections.Immutable.IImmutableDictionary<TKey, TValue> SomeMethod(System.Int32 i, System.Single f)
+        public global::System.Collections.Immutable.IImmutableDictionary<TKey, TValue> SomeMethod(global::System.Int32 i, global::System.Single f)
         {
             return this.Apply(x => x.SomeMethod(i, f));
         }

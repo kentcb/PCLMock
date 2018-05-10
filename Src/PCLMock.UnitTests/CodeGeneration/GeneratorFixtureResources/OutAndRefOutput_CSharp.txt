@@ -4,7 +4,7 @@
     [System.Runtime.CompilerServices.CompilerGenerated]
     public partial class Mock : global::PCLMock.MockBase<global::ISomeInterface>, global::ISomeInterface
     {
-        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base (behavior)
+        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base(behavior)
         {
             ConfigureBehaviorGenerated();
             ConfigureBehavior();
@@ -25,42 +25,42 @@
 
         partial void ConfigureBehavior();
         partial void ConfigureLooseBehavior();
-        public void SomeMethod(out System.Int32 i)
+        public void SomeMethod(out global::System.Int32 i)
         {
-            System.Int32 _i;
-            i = (this.GetOutParameterValue<System.Int32>(x => x.SomeMethod(out _i), 0));
+            global::System.Int32 _i;
+            i = (this.GetOutParameterValue<global::System.Int32>(x => x.SomeMethod(out _i), 0));
             this.Apply(x => x.SomeMethod(out _i));
         }
 
-        public void SomeMethod(out System.Double d, System.Int32 i)
+        public void SomeMethod(out global::System.Double d, global::System.Int32 i)
         {
-            System.Double _d;
-            d = (this.GetOutParameterValue<System.Double>(x => x.SomeMethod(out _d, i), 0));
+            global::System.Double _d;
+            d = (this.GetOutParameterValue<global::System.Double>(x => x.SomeMethod(out _d, i), 0));
             this.Apply(x => x.SomeMethod(out _d, i));
         }
 
-        public void SomeMethod(System.Int32 i, out System.Double d)
+        public void SomeMethod(global::System.Int32 i, out global::System.Double d)
         {
-            System.Double _d;
-            d = (this.GetOutParameterValue<System.Double>(x => x.SomeMethod(i, out _d), 1));
+            global::System.Double _d;
+            d = (this.GetOutParameterValue<global::System.Double>(x => x.SomeMethod(i, out _d), 1));
             this.Apply(x => x.SomeMethod(i, out _d));
         }
 
-        public void SomeMethod(ref System.Int32 i, out System.String s)
+        public void SomeMethod(ref global::System.Int32 i, out global::System.String s)
         {
-            var _i = default (System.Int32);
-            System.String _s;
-            i = (this.GetRefParameterValue<System.Int32>(x => x.SomeMethod(ref _i, out _s), 0));
-            s = (this.GetOutParameterValue<System.String>(x => x.SomeMethod(ref _i, out _s), 1));
+            var _i = default(global::System.Int32);
+            global::System.String _s;
+            i = (this.GetRefParameterValue<global::System.Int32>(x => x.SomeMethod(ref _i, out _s), 0));
+            s = (this.GetOutParameterValue<global::System.String>(x => x.SomeMethod(ref _i, out _s), 1));
             this.Apply(x => x.SomeMethod(ref _i, out _s));
         }
 
-        public void SomeMethod(ref System.Int32 i, out System.String s, System.Double d)
+        public void SomeMethod(ref global::System.Int32 i, out global::System.String s, global::System.Double d)
         {
-            var _i = default (System.Int32);
-            System.String _s;
-            i = (this.GetRefParameterValue<System.Int32>(x => x.SomeMethod(ref _i, out _s, d), 0));
-            s = (this.GetOutParameterValue<System.String>(x => x.SomeMethod(ref _i, out _s, d), 1));
+            var _i = default(global::System.Int32);
+            global::System.String _s;
+            i = (this.GetRefParameterValue<global::System.Int32>(x => x.SomeMethod(ref _i, out _s, d), 0));
+            s = (this.GetOutParameterValue<global::System.String>(x => x.SomeMethod(ref _i, out _s, d), 1));
             this.Apply(x => x.SomeMethod(ref _i, out _s, d));
         }
     }

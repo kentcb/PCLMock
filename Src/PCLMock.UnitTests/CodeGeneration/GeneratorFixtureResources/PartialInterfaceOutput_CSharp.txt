@@ -4,7 +4,7 @@
     [System.Runtime.CompilerServices.CompilerGenerated]
     public partial class Mock : global::PCLMock.MockBase<global::IPartialInterface>, global::IPartialInterface
     {
-        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base (behavior)
+        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base(behavior)
         {
             ConfigureBehaviorGenerated();
             ConfigureBehavior();
@@ -25,7 +25,7 @@
 
         partial void ConfigureBehavior();
         partial void ConfigureLooseBehavior();
-        public System.Int32 Property1
+        public global::System.Int32 Property1
         {
             get
             {
@@ -33,7 +33,7 @@
             }
         }
 
-        public System.Int32 Property2
+        public global::System.Int32 Property2
         {
             get
             {

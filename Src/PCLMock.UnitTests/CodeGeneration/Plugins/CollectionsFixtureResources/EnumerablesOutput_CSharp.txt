@@ -12,7 +12,7 @@ namespace The.Namespace
     [System.Runtime.CompilerServices.CompilerGenerated]
     internal partial class Mock<T> : global::PCLMock.MockBase<global::ICustomEnumerable<T>>, global::ICustomEnumerable<T>
     {
-        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base (behavior)
+        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base(behavior)
         {
             ConfigureBehaviorGenerated();
             ConfigureBehavior();
@@ -50,7 +50,7 @@ namespace The.Namespace
     [System.Runtime.CompilerServices.CompilerGenerated]
     internal partial class Mock : global::PCLMock.MockBase<global::ISomeInterface>, global::ISomeInterface
     {
-        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base (behavior)
+        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base(behavior)
         {
             ConfigureBehaviorGenerated();
             ConfigureBehavior();
@@ -63,9 +63,9 @@ namespace The.Namespace
 
         private void ConfigureBehaviorGenerated()
         {
-            this.When(x => x.SomeProperty).Return(global::System.Linq.Enumerable.Empty<System.Int32>());
-            this.When(x => x.SomeMethod()).Return(global::System.Linq.Enumerable.Empty<System.String>());
-            this.When(x => x.SomeMethod(global::PCLMock.It.IsAny<System.Int32>(), global::PCLMock.It.IsAny<System.Single>())).Return(global::System.Linq.Enumerable.Empty<System.String>());
+            this.When(x => x.SomeProperty).Return(global::System.Linq.Enumerable.Empty<global::System.Int32>());
+            this.When(x => x.SomeMethod()).Return(global::System.Linq.Enumerable.Empty<global::System.String>());
+            this.When(x => x.SomeMethod(global::PCLMock.It.IsAny<global::System.Int32>(), global::PCLMock.It.IsAny<global::System.Single>())).Return(global::System.Linq.Enumerable.Empty<global::System.String>());
         }
 
         private void ConfigureLooseBehaviorGenerated()
@@ -74,7 +74,7 @@ namespace The.Namespace
 
         partial void ConfigureBehavior();
         partial void ConfigureLooseBehavior();
-        public global::System.Collections.Generic.IEnumerable<System.Int32> SomeProperty
+        public global::System.Collections.Generic.IEnumerable<global::System.Int32> SomeProperty
         {
             get
             {
@@ -82,17 +82,17 @@ namespace The.Namespace
             }
         }
 
-        public global::System.Collections.Generic.IEnumerable<System.String> SomeMethod()
+        public global::System.Collections.Generic.IEnumerable<global::System.String> SomeMethod()
         {
             return this.Apply(x => x.SomeMethod());
         }
 
-        public global::System.Collections.Generic.IEnumerable<System.String> SomeMethod(System.Int32 i, System.Single f)
+        public global::System.Collections.Generic.IEnumerable<global::System.String> SomeMethod(global::System.Int32 i, global::System.Single f)
         {
             return this.Apply(x => x.SomeMethod(i, f));
         }
 
-        public global::System.Collections.Generic.IEnumerable<System.Int32> SomeGenericMethod<T>()
+        public global::System.Collections.Generic.IEnumerable<global::System.Int32> SomeGenericMethod<T>()
         {
             return this.Apply(x => x.SomeGenericMethod<T>());
         }
@@ -102,7 +102,7 @@ namespace The.Namespace
             return this.Apply(x => x.SomeOtherGenericMethod<T>());
         }
 
-        public global::ICustomEnumerable<System.Int32> SomeCustomProperty
+        public global::ICustomEnumerable<global::System.Int32> SomeCustomProperty
         {
             get
             {
@@ -110,12 +110,12 @@ namespace The.Namespace
             }
         }
 
-        public global::ICustomEnumerable<System.String> SomeMethod()
+        public global::ICustomEnumerable<global::System.String> SomeMethod()
         {
             return this.Apply(x => x.SomeMethod());
         }
 
-        public global::ICustomEnumerable<System.String> SomeMethod(System.Int32 i, System.Single f)
+        public global::ICustomEnumerable<global::System.String> SomeMethod(global::System.Int32 i, global::System.Single f)
         {
             return this.Apply(x => x.SomeMethod(i, f));
         }
@@ -127,7 +127,7 @@ namespace The.Namespace
     [System.Runtime.CompilerServices.CompilerGenerated]
     internal partial class Mock<T> : global::PCLMock.MockBase<global::ISomeGenericInterface<T>>, global::ISomeGenericInterface<T>
     {
-        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base (behavior)
+        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base(behavior)
         {
             ConfigureBehaviorGenerated();
             ConfigureBehavior();
@@ -142,7 +142,7 @@ namespace The.Namespace
         {
             this.When(x => x.SomeProperty).Return(global::System.Linq.Enumerable.Empty<T>());
             this.When(x => x.SomeMethod()).Return(global::System.Linq.Enumerable.Empty<T>());
-            this.When(x => x.SomeMethod(global::PCLMock.It.IsAny<System.Int32>(), global::PCLMock.It.IsAny<System.Single>())).Return(global::System.Linq.Enumerable.Empty<T>());
+            this.When(x => x.SomeMethod(global::PCLMock.It.IsAny<global::System.Int32>(), global::PCLMock.It.IsAny<global::System.Single>())).Return(global::System.Linq.Enumerable.Empty<T>());
         }
 
         private void ConfigureLooseBehaviorGenerated()
@@ -164,7 +164,7 @@ namespace The.Namespace
             return this.Apply(x => x.SomeMethod());
         }
 
-        public global::System.Collections.Generic.IEnumerable<T> SomeMethod(System.Int32 i, System.Single f)
+        public global::System.Collections.Generic.IEnumerable<T> SomeMethod(global::System.Int32 i, global::System.Single f)
         {
             return this.Apply(x => x.SomeMethod(i, f));
         }

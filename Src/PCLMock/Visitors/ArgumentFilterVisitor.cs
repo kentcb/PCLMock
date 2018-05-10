@@ -44,7 +44,7 @@
                 .DeclaringType
                 .GetTypeInfo()
                 .DeclaredMethods
-                .Where(declaredMethod => declaredMethod.IsStatic && declaredMethod.IsPublic)
+                .Where(declaredMethod => declaredMethod.IsStatic)
                 .Where(x => x.Name == node.Method.Name + "Filter" && x.GetParameters().Length == node.Arguments.Count)
                 .FirstOrDefault();
 

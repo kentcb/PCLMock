@@ -1,0 +1,26 @@
+﻿internal interface IInternalInterface
+{
+    int GetProperty
+    {
+        get;
+    }
+
+    int SetProperty
+    {
+        set;
+    }
+
+    int GetSetProperty
+    {
+        get;
+        set;
+    }
+
+    void VoidMethod();
+
+    void VoidMethodWithArguments(int i, string s);
+
+    string NonVoidMethod();
+
+    string NonVoidMethodWithArguments(int i, string s);
+}

@@ -12,7 +12,7 @@
         {
             var arguments = ArgumentsVisitor.FindArgumentsWithin(GetExpression(() => Console.WriteLine()));
             Assert.NotNull(arguments);
-            Assert.Equal(0, arguments.Length);
+            Assert.Empty(arguments);
         }
 
         [Fact]
