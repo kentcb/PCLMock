@@ -2,6 +2,7 @@ namespace PCLMock.CodeGeneration.Plugins
 {
     using System;
     using System.Linq;
+    using System.Reactive;
     using System.Reactive.Linq;
     using System.Reflection;
     using Logging;
@@ -45,6 +46,7 @@ namespace PCLMock.CodeGeneration.Plugins
             compilation
                 .AddReferences(
                     MetadataReference.CreateFromFile(typeof(IObservable<>).GetTypeInfo().Assembly.Location),
+                    MetadataReference.CreateFromFile(typeof(Unit).GetTypeInfo().Assembly.Location),
                     MetadataReference.CreateFromFile(typeof(Observable).GetTypeInfo().Assembly.Location));
 
         /// <inheritdoc />

@@ -418,7 +418,7 @@
             {
                 context
                     .LogSink
-                    .Warn(logSource, "Ignoring symbol '{0}' because its return type could not be determined (it's probably a sgeneric).", symbol);
+                    .Warn(logSource, "Ignoring symbol '{0}' because its return type could not be determined (it's probably a generic).", symbol);
                 return null;
             }
 

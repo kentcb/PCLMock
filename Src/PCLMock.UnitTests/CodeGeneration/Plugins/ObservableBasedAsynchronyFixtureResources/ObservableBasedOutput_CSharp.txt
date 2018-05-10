@@ -22,6 +22,7 @@ namespace The.Namespace
             this.When(x => x[global::PCLMock.It.IsAny<global::System.Int32>(), global::PCLMock.It.IsAny<global::System.Single>()]).Return(global::System.Reactive.Linq.Observable.Empty<global::System.Int32>());
             this.When(x => x.SomeMethod()).Return(global::System.Reactive.Linq.Observable.Return<global::System.Int32>(0));
             this.When(x => x.SomeMethod(global::PCLMock.It.IsAny<global::System.String>(), global::PCLMock.It.IsAny<global::System.Int32>())).Return(global::System.Reactive.Linq.Observable.Return<global::System.String>(null));
+            this.When(x => x.SomeOtherMethod()).Return(global::System.Reactive.Linq.Observable.Return<global::System.Reactive.Unit>(default(global::System.Reactive.Unit)));
         }
 
         private void ConfigureLooseBehaviorGenerated()
@@ -62,6 +63,11 @@ namespace The.Namespace
         public global::System.IObservable<global::System.String> SomeMethod(global::System.String s, global::System.Int32 i)
         {
             return this.Apply(x => x.SomeMethod(s, i));
+        }
+
+        public global::System.IObservable<global::System.Reactive.Unit> SomeOtherMethod()
+        {
+            return this.Apply(x => x.SomeOtherMethod());
         }
 
         public global::System.IObservable<global::System.Int32> SomeMethod<T>()

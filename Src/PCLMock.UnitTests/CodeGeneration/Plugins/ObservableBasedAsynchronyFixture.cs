@@ -4,6 +4,7 @@ namespace PCLMock.UnitTests.CodeGeneration.Plugins
     using System.Collections.Immutable;
     using System.IO;
     using System.Linq;
+    using System.Reactive;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
     using Microsoft.CodeAnalysis;
@@ -42,7 +43,7 @@ namespace PCLMock.UnitTests.CodeGeneration.Plugins
                     {
                         MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
                         MetadataReference.CreateFromFile(typeof(Uri).Assembly.Location),
-                        MetadataReference.CreateFromFile(typeof(MockBase<>).Assembly.Location)
+                        MetadataReference.CreateFromFile(typeof(MockBase<>).Assembly.Location),
                     });
                 var project = workspace.AddProject(projectInfo);
                 workspace.AddDocument(projectId, "Source.cs", SourceText.From(inputStream));
