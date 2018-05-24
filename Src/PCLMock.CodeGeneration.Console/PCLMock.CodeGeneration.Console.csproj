@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
@@ -7,9 +7,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Buildalyzer" Version="0.4.0" />
-        <PackageReference Include="Buildalyzer.Workspaces" Version="0.4.0" />
-        <PackageReference Include="PowerArgs" Version="3.0.0" />
+        <PackageReference Include="Buildalyzer" />
+        <PackageReference Include="Buildalyzer.Workspaces" />
+        <PackageReference Include="PowerArgs" />
     </ItemGroup>
 
     <ItemGroup>

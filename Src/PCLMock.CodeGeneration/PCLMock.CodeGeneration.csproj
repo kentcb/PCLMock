@@ -6,12 +6,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Buildalyzer" Version="0.4.0" />
-    <PackageReference Include="Buildalyzer.Workspaces" Version="0.4.0" />
-    <PackageReference Include="System.Reactive" Version="3.0.0" />
-    <PackageReference Include="System.Xml.XPath.XDocument" Version="4.3.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="2.8.2" />
-    <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic.Workspaces" Version="2.8.2" />
+    <PackageReference Include="Buildalyzer" />
+    <PackageReference Include="Buildalyzer.Workspaces" />
+    <PackageReference Include="System.Reactive" />
+    <PackageReference Include="System.Xml.XPath.XDocument" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" />
+    <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic.Workspaces" />
   </ItemGroup>
 
   <ItemGroup>
