@@ -4,7 +4,7 @@ namespace The.Namespace
     [System.Runtime.CompilerServices.CompilerGenerated]
     internal partial class Mock : global::PCLMock.MockBase<global::ISomeInterface>, global::ISomeInterface
     {
-        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base (behavior)
+        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base(behavior)
         {
             ConfigureBehaviorGenerated();
             ConfigureBehavior();
@@ -17,11 +17,11 @@ namespace The.Namespace
 
         private void ConfigureBehaviorGenerated()
         {
-            this.When(x => x.SomeProperty).Return(global::System.Threading.Tasks.Task.FromResult<System.Boolean>(false));
-            this.When(x => x.SomeOtherProperty).Return(global::System.Threading.Tasks.Task.FromResult<System.Boolean>(false));
-            this.When(x => x[global::PCLMock.It.IsAny<System.Int32>(), global::PCLMock.It.IsAny<System.Single>()]).Return(global::System.Threading.Tasks.Task.FromResult<System.Boolean>(false));
-            this.When(x => x.SomeMethod()).Return(global::System.Threading.Tasks.Task.FromResult<System.Boolean>(false));
-            this.When(x => x.SomeMethod(global::PCLMock.It.IsAny<System.String>(), global::PCLMock.It.IsAny<System.Int32>())).Return(global::System.Threading.Tasks.Task.FromResult<System.Boolean>(false));
+            this.When(x => x.SomeProperty).Return(global::System.Threading.Tasks.Task.FromResult<global::System.Boolean>(false));
+            this.When(x => x.SomeOtherProperty).Return(global::System.Threading.Tasks.Task.FromResult<global::System.Boolean>(false));
+            this.When(x => x[global::PCLMock.It.IsAny<global::System.Int32>(), global::PCLMock.It.IsAny<global::System.Single>()]).Return(global::System.Threading.Tasks.Task.FromResult<global::System.Boolean>(false));
+            this.When(x => x.SomeMethod()).Return(global::System.Threading.Tasks.Task.FromResult<global::System.Boolean>(false));
+            this.When(x => x.SomeMethod(global::PCLMock.It.IsAny<global::System.String>(), global::PCLMock.It.IsAny<global::System.Int32>())).Return(global::System.Threading.Tasks.Task.FromResult<global::System.Boolean>(false));
         }
 
         private void ConfigureLooseBehaviorGenerated()
@@ -46,7 +46,7 @@ namespace The.Namespace
             }
         }
 
-        public global::System.Threading.Tasks.Task this[System.Int32 i, System.Single f]
+        public global::System.Threading.Tasks.Task this[global::System.Int32 i, global::System.Single f]
         {
             get
             {
@@ -59,7 +59,7 @@ namespace The.Namespace
             return this.Apply(x => x.SomeMethod());
         }
 
-        public global::System.Threading.Tasks.Task SomeMethod(System.String s, System.Int32 i)
+        public global::System.Threading.Tasks.Task SomeMethod(global::System.String s, global::System.Int32 i)
         {
             return this.Apply(x => x.SomeMethod(s, i));
         }
@@ -79,7 +79,7 @@ namespace The.Namespace
             return this.Apply(x => x.SomeMethod());
         }
 
-        public global::CustomTask SomeMethod(System.String s, System.Int32 i)
+        public global::CustomTask SomeMethod(global::System.String s, global::System.Int32 i)
         {
             return this.Apply(x => x.SomeMethod(s, i));
         }

@@ -4,7 +4,7 @@ namespace The.Namespace
     [System.Runtime.CompilerServices.CompilerGenerated]
     internal partial class Mock<T> : global::PCLMock.MockBase<global::ISomeInterface<T>>, global::ISomeInterface<T>
     {
-        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base (behavior)
+        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base(behavior)
         {
             ConfigureBehaviorGenerated();
             ConfigureBehavior();
@@ -17,8 +17,8 @@ namespace The.Namespace
 
         private void ConfigureBehaviorGenerated()
         {
-            this.When(x => x.SomeProperty).Return(global::System.Threading.Tasks.Task.FromResult<T>(default (T)));
-            this.When(x => x.SomeMethod()).Return(global::System.Threading.Tasks.Task.FromResult<T>(default (T)));
+            this.When(x => x.SomeProperty).Return(global::System.Threading.Tasks.Task.FromResult<T>(default(T)));
+            this.When(x => x.SomeMethod()).Return(global::System.Threading.Tasks.Task.FromResult<T>(default(T)));
         }
 
         private void ConfigureLooseBehaviorGenerated()

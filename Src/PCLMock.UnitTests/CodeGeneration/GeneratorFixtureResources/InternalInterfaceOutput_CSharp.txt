@@ -4,7 +4,7 @@
     [System.Runtime.CompilerServices.CompilerGenerated]
     internal partial class Mock : global::PCLMock.MockBase<global::IInternalInterface>, global::IInternalInterface
     {
-        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base (behavior)
+        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base(behavior)
         {
             ConfigureBehaviorGenerated();
             ConfigureBehavior();
@@ -25,7 +25,7 @@
 
         partial void ConfigureBehavior();
         partial void ConfigureLooseBehavior();
-        public System.Int32 GetProperty
+        public global::System.Int32 GetProperty
         {
             get
             {
@@ -33,7 +33,7 @@
             }
         }
 
-        public System.Int32 GetSetProperty
+        public global::System.Int32 GetSetProperty
         {
             get
             {
@@ -51,17 +51,17 @@
             this.Apply(x => x.VoidMethod());
         }
 
-        public void VoidMethodWithArguments(System.Int32 i, System.String s)
+        public void VoidMethodWithArguments(global::System.Int32 i, global::System.String s)
         {
             this.Apply(x => x.VoidMethodWithArguments(i, s));
         }
 
-        public System.String NonVoidMethod()
+        public global::System.String NonVoidMethod()
         {
             return this.Apply(x => x.NonVoidMethod());
         }
 
-        public System.String NonVoidMethodWithArguments(System.Int32 i, System.String s)
+        public global::System.String NonVoidMethodWithArguments(global::System.Int32 i, global::System.String s)
         {
             return this.Apply(x => x.NonVoidMethodWithArguments(i, s));
         }

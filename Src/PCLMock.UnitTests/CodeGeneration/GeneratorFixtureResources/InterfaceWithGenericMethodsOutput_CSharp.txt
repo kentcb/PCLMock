@@ -4,7 +4,7 @@
     [System.Runtime.CompilerServices.CompilerGenerated]
     public partial class Mock : global::PCLMock.MockBase<global::IInterfaceWithGenericMethods>, global::IInterfaceWithGenericMethods
     {
-        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base (behavior)
+        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base(behavior)
         {
             ConfigureBehaviorGenerated();
             ConfigureBehavior();
@@ -35,7 +35,7 @@
             return this.Apply(x => x.NonVoidMethodWithGenericParameter<T>());
         }
 
-        public void VoidMethodWithGenericArguments<TFirst, TSecond, TThird>(TFirst first, TSecond second, TThird third, System.String somethingElse)
+        public void VoidMethodWithGenericArguments<TFirst, TSecond, TThird>(TFirst first, TSecond second, TThird third, global::System.String somethingElse)
         {
             this.Apply(x => x.VoidMethodWithGenericArguments<TFirst, TSecond, TThird>(first, second, third, somethingElse));
         }
@@ -45,7 +45,9 @@
             return this.Apply(x => x.NonVoidMethodWithGenericArguments<TFirst, TSecond>(input));
         }
 
-        public TSecond MethodWithTypeConstraints<TFirst, TSecond>(TFirst input, System.Int32 option)where TFirst : IComparable<TFirst>, new ()where TSecond : struct
+        public TSecond MethodWithTypeConstraints<TFirst, TSecond>(TFirst input, global::System.Int32 option)
+            where TFirst : IComparable<TFirst>, new()
+            where TSecond : struct
         {
             return this.Apply(x => x.MethodWithTypeConstraints<TFirst, TSecond>(input, option));
         }
