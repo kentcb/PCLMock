@@ -4,7 +4,7 @@
     [System.Runtime.CompilerServices.CompilerGenerated]
     public partial class Mock : global::PCLMock.MockBase<global::IThirdInterface>, global::IThirdInterface
     {
-        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base (behavior)
+        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base(behavior)
         {
             ConfigureBehaviorGenerated();
             ConfigureBehavior();

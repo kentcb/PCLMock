@@ -4,7 +4,7 @@ namespace The.Namespace
     [System.Runtime.CompilerServices.CompilerGenerated]
     internal partial class Mock : global::PCLMock.MockBase<global::ISomeInterface>, global::ISomeInterface
     {
-        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base (behavior)
+        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base(behavior)
         {
             ConfigureBehaviorGenerated();
             ConfigureBehavior();
@@ -19,7 +19,7 @@ namespace The.Namespace
         {
             this.When(x => x.SomeProperty).Return(global::System.Reactive.Disposables.Disposable.Empty);
             this.When(x => x.SomeMethod()).Return(global::System.Reactive.Disposables.Disposable.Empty);
-            this.When(x => x.SomeMethod(global::PCLMock.It.IsAny<System.Int32>(), global::PCLMock.It.IsAny<System.Single>())).Return(global::System.Reactive.Disposables.Disposable.Empty);
+            this.When(x => x.SomeMethod(global::PCLMock.It.IsAny<global::System.Int32>(), global::PCLMock.It.IsAny<global::System.Single>())).Return(global::System.Reactive.Disposables.Disposable.Empty);
         }
 
         private void ConfigureLooseBehaviorGenerated()
@@ -41,7 +41,7 @@ namespace The.Namespace
             return this.Apply(x => x.SomeMethod());
         }
 
-        public global::System.IDisposable SomeMethod(System.Int32 i, System.Single f)
+        public global::System.IDisposable SomeMethod(global::System.Int32 i, global::System.Single f)
         {
             return this.Apply(x => x.SomeMethod(i, f));
         }
@@ -69,7 +69,7 @@ namespace The.Namespace
             return this.Apply(x => x.SomeMethod());
         }
 
-        public global::ICustomDisposable SomeMethod(System.Int32 i, System.Single f)
+        public global::ICustomDisposable SomeMethod(global::System.Int32 i, global::System.Single f)
         {
             return this.Apply(x => x.SomeMethod(i, f));
         }

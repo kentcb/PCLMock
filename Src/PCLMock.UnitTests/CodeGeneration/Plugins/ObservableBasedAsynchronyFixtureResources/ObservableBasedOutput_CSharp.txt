@@ -4,7 +4,7 @@ namespace The.Namespace
     [System.Runtime.CompilerServices.CompilerGenerated]
     internal partial class Mock : global::PCLMock.MockBase<global::ISomeInterface>, global::ISomeInterface
     {
-        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base (behavior)
+        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base(behavior)
         {
             ConfigureBehaviorGenerated();
             ConfigureBehavior();
@@ -17,11 +17,11 @@ namespace The.Namespace
 
         private void ConfigureBehaviorGenerated()
         {
-            this.When(x => x.SomeProperty).Return(global::System.Reactive.Linq.Observable.Empty<System.Int32>());
-            this.When(x => x.SomeOtherProperty).Return(global::System.Reactive.Linq.Observable.Empty<System.String>());
-            this.When(x => x[global::PCLMock.It.IsAny<System.Int32>(), global::PCLMock.It.IsAny<System.Single>()]).Return(global::System.Reactive.Linq.Observable.Empty<System.Int32>());
-            this.When(x => x.SomeMethod()).Return(global::System.Reactive.Linq.Observable.Return<System.Int32>(0));
-            this.When(x => x.SomeMethod(global::PCLMock.It.IsAny<System.String>(), global::PCLMock.It.IsAny<System.Int32>())).Return(global::System.Reactive.Linq.Observable.Return<System.String>(null));
+            this.When(x => x.SomeProperty).Return(global::System.Reactive.Linq.Observable.Empty<global::System.Int32>());
+            this.When(x => x.SomeOtherProperty).Return(global::System.Reactive.Linq.Observable.Empty<global::System.String>());
+            this.When(x => x[global::PCLMock.It.IsAny<global::System.Int32>(), global::PCLMock.It.IsAny<global::System.Single>()]).Return(global::System.Reactive.Linq.Observable.Empty<global::System.Int32>());
+            this.When(x => x.SomeMethod()).Return(global::System.Reactive.Linq.Observable.Return<global::System.Int32>(0));
+            this.When(x => x.SomeMethod(global::PCLMock.It.IsAny<global::System.String>(), global::PCLMock.It.IsAny<global::System.Int32>())).Return(global::System.Reactive.Linq.Observable.Return<global::System.String>(null));
         }
 
         private void ConfigureLooseBehaviorGenerated()
@@ -30,7 +30,7 @@ namespace The.Namespace
 
         partial void ConfigureBehavior();
         partial void ConfigureLooseBehavior();
-        public global::System.IObservable<System.Int32> SomeProperty
+        public global::System.IObservable<global::System.Int32> SomeProperty
         {
             get
             {
@@ -38,7 +38,7 @@ namespace The.Namespace
             }
         }
 
-        public global::System.IObservable<System.String> SomeOtherProperty
+        public global::System.IObservable<global::System.String> SomeOtherProperty
         {
             get
             {
@@ -46,7 +46,7 @@ namespace The.Namespace
             }
         }
 
-        public global::System.IObservable<System.Int32> this[System.Int32 i, System.Single f]
+        public global::System.IObservable<global::System.Int32> this[global::System.Int32 i, global::System.Single f]
         {
             get
             {
@@ -54,32 +54,32 @@ namespace The.Namespace
             }
         }
 
-        public global::System.IObservable<System.Int32> SomeMethod()
+        public global::System.IObservable<global::System.Int32> SomeMethod()
         {
             return this.Apply(x => x.SomeMethod());
         }
 
-        public global::System.IObservable<System.String> SomeMethod(System.String s, System.Int32 i)
+        public global::System.IObservable<global::System.String> SomeMethod(global::System.String s, global::System.Int32 i)
         {
             return this.Apply(x => x.SomeMethod(s, i));
         }
 
-        public global::System.IObservable<System.Int32> SomeMethod<T>()
+        public global::System.IObservable<global::System.Int32> SomeMethod<T>()
         {
             return this.Apply(x => x.SomeMethod<T>());
         }
 
-        public global::System.IObservable<System.Int32> SomeMethod<T1, T2>()
+        public global::System.IObservable<global::System.Int32> SomeMethod<T1, T2>()
         {
             return this.Apply(x => x.SomeMethod<T1, T2>());
         }
 
-        public global::ICustomObservable<System.Int32> SomeMethod()
+        public global::ICustomObservable<global::System.Int32> SomeMethod()
         {
             return this.Apply(x => x.SomeMethod());
         }
 
-        public global::ICustomObservable<System.String> SomeMethod(System.String s, System.Int32 i)
+        public global::ICustomObservable<global::System.String> SomeMethod(global::System.String s, global::System.Int32 i)
         {
             return this.Apply(x => x.SomeMethod(s, i));
         }

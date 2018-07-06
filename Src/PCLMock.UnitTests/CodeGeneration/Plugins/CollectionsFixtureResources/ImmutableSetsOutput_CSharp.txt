@@ -12,7 +12,7 @@ namespace The.Namespace
     [System.Runtime.CompilerServices.CompilerGenerated]
     internal partial class Mock<T> : global::PCLMock.MockBase<global::ICustomImmutableSet<T>>, global::ICustomImmutableSet<T>
     {
-        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base (behavior)
+        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base(behavior)
         {
             ConfigureBehaviorGenerated();
             ConfigureBehavior();
@@ -45,7 +45,7 @@ namespace The.Namespace
             return this.Apply(x => x.Clear());
         }
 
-        public System.Boolean Contains(T value)
+        public global::System.Boolean Contains(T value)
         {
             return this.Apply(x => x.Contains(value));
         }
@@ -60,7 +60,7 @@ namespace The.Namespace
             return this.Apply(x => x.Remove(value));
         }
 
-        public System.Boolean TryGetValue(T equalValue, out T actualValue)
+        public global::System.Boolean TryGetValue(T equalValue, out T actualValue)
         {
             T _actualValue;
             actualValue = (this.GetOutParameterValue<T>(x => x.TryGetValue(equalValue, out _actualValue), 1));
@@ -87,32 +87,32 @@ namespace The.Namespace
             return this.Apply(x => x.Union(other));
         }
 
-        public System.Boolean SetEquals(global::System.Collections.Generic.IEnumerable<T> other)
+        public global::System.Boolean SetEquals(global::System.Collections.Generic.IEnumerable<T> other)
         {
             return this.Apply(x => x.SetEquals(other));
         }
 
-        public System.Boolean IsProperSubsetOf(global::System.Collections.Generic.IEnumerable<T> other)
+        public global::System.Boolean IsProperSubsetOf(global::System.Collections.Generic.IEnumerable<T> other)
         {
             return this.Apply(x => x.IsProperSubsetOf(other));
         }
 
-        public System.Boolean IsProperSupersetOf(global::System.Collections.Generic.IEnumerable<T> other)
+        public global::System.Boolean IsProperSupersetOf(global::System.Collections.Generic.IEnumerable<T> other)
         {
             return this.Apply(x => x.IsProperSupersetOf(other));
         }
 
-        public System.Boolean IsSubsetOf(global::System.Collections.Generic.IEnumerable<T> other)
+        public global::System.Boolean IsSubsetOf(global::System.Collections.Generic.IEnumerable<T> other)
         {
             return this.Apply(x => x.IsSubsetOf(other));
         }
 
-        public System.Boolean IsSupersetOf(global::System.Collections.Generic.IEnumerable<T> other)
+        public global::System.Boolean IsSupersetOf(global::System.Collections.Generic.IEnumerable<T> other)
         {
             return this.Apply(x => x.IsSupersetOf(other));
         }
 
-        public System.Boolean Overlaps(global::System.Collections.Generic.IEnumerable<T> other)
+        public global::System.Boolean Overlaps(global::System.Collections.Generic.IEnumerable<T> other)
         {
             return this.Apply(x => x.Overlaps(other));
         }
@@ -124,7 +124,7 @@ namespace The.Namespace
     [System.Runtime.CompilerServices.CompilerGenerated]
     internal partial class Mock : global::PCLMock.MockBase<global::ISomeInterface>, global::ISomeInterface
     {
-        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base (behavior)
+        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base(behavior)
         {
             ConfigureBehaviorGenerated();
             ConfigureBehavior();
@@ -137,9 +137,9 @@ namespace The.Namespace
 
         private void ConfigureBehaviorGenerated()
         {
-            this.When(x => x.SomeProperty).Return(global::System.Collections.Immutable.ImmutableHashSet<System.Int32>.Empty);
-            this.When(x => x.SomeMethod()).Return(global::System.Collections.Immutable.ImmutableHashSet<System.String>.Empty);
-            this.When(x => x.SomeMethod(global::PCLMock.It.IsAny<System.Int32>(), global::PCLMock.It.IsAny<System.Single>())).Return(global::System.Collections.Immutable.ImmutableHashSet<System.String>.Empty);
+            this.When(x => x.SomeProperty).Return(global::System.Collections.Immutable.ImmutableHashSet<global::System.Int32>.Empty);
+            this.When(x => x.SomeMethod()).Return(global::System.Collections.Immutable.ImmutableHashSet<global::System.String>.Empty);
+            this.When(x => x.SomeMethod(global::PCLMock.It.IsAny<global::System.Int32>(), global::PCLMock.It.IsAny<global::System.Single>())).Return(global::System.Collections.Immutable.ImmutableHashSet<global::System.String>.Empty);
         }
 
         private void ConfigureLooseBehaviorGenerated()
@@ -148,7 +148,7 @@ namespace The.Namespace
 
         partial void ConfigureBehavior();
         partial void ConfigureLooseBehavior();
-        public global::System.Collections.Immutable.IImmutableSet<System.Int32> SomeProperty
+        public global::System.Collections.Immutable.IImmutableSet<global::System.Int32> SomeProperty
         {
             get
             {
@@ -156,17 +156,17 @@ namespace The.Namespace
             }
         }
 
-        public global::System.Collections.Immutable.IImmutableSet<System.String> SomeMethod()
+        public global::System.Collections.Immutable.IImmutableSet<global::System.String> SomeMethod()
         {
             return this.Apply(x => x.SomeMethod());
         }
 
-        public global::System.Collections.Immutable.IImmutableSet<System.String> SomeMethod(System.Int32 i, System.Single f)
+        public global::System.Collections.Immutable.IImmutableSet<global::System.String> SomeMethod(global::System.Int32 i, global::System.Single f)
         {
             return this.Apply(x => x.SomeMethod(i, f));
         }
 
-        public global::System.Collections.Immutable.IImmutableSet<System.Int32> SomeGenericMethod<T>()
+        public global::System.Collections.Immutable.IImmutableSet<global::System.Int32> SomeGenericMethod<T>()
         {
             return this.Apply(x => x.SomeGenericMethod<T>());
         }
@@ -176,7 +176,7 @@ namespace The.Namespace
             return this.Apply(x => x.SomeOtherGenericMethod<T>());
         }
 
-        public ICustomIImmutableSet<System.Int32> SomeCustomProperty
+        public ICustomIImmutableSet<global::System.Int32> SomeCustomProperty
         {
             get
             {
@@ -184,12 +184,12 @@ namespace The.Namespace
             }
         }
 
-        public ICustomIImmutableSet<System.String> SomeMethod()
+        public ICustomIImmutableSet<global::System.String> SomeMethod()
         {
             return this.Apply(x => x.SomeMethod());
         }
 
-        public ICustomIImmutableSet<System.String> SomeMethod(System.Int32 i, System.Single f)
+        public ICustomIImmutableSet<global::System.String> SomeMethod(global::System.Int32 i, global::System.Single f)
         {
             return this.Apply(x => x.SomeMethod(i, f));
         }
@@ -201,7 +201,7 @@ namespace The.Namespace
     [System.Runtime.CompilerServices.CompilerGenerated]
     internal partial class Mock<T> : global::PCLMock.MockBase<global::ISomeGenericInterface<T>>, global::ISomeGenericInterface<T>
     {
-        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base (behavior)
+        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base(behavior)
         {
             ConfigureBehaviorGenerated();
             ConfigureBehavior();
@@ -216,7 +216,7 @@ namespace The.Namespace
         {
             this.When(x => x.SomeProperty).Return(global::System.Collections.Immutable.ImmutableHashSet<T>.Empty);
             this.When(x => x.SomeMethod()).Return(global::System.Collections.Immutable.ImmutableHashSet<T>.Empty);
-            this.When(x => x.SomeMethod(global::PCLMock.It.IsAny<System.Int32>(), global::PCLMock.It.IsAny<System.Single>())).Return(global::System.Collections.Immutable.ImmutableHashSet<T>.Empty);
+            this.When(x => x.SomeMethod(global::PCLMock.It.IsAny<global::System.Int32>(), global::PCLMock.It.IsAny<global::System.Single>())).Return(global::System.Collections.Immutable.ImmutableHashSet<T>.Empty);
         }
 
         private void ConfigureLooseBehaviorGenerated()
@@ -238,7 +238,7 @@ namespace The.Namespace
             return this.Apply(x => x.SomeMethod());
         }
 
-        public global::System.Collections.Immutable.IImmutableSet<T> SomeMethod(System.Int32 i, System.Single f)
+        public global::System.Collections.Immutable.IImmutableSet<T> SomeMethod(global::System.Int32 i, global::System.Single f)
         {
             return this.Apply(x => x.SomeMethod(i, f));
         }
