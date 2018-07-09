@@ -16,6 +16,8 @@
     </NuGetPackageImportStamp>
     <TargetFrameworkProfile />
     <AutoGenerateBindingRedirects>True</AutoGenerateBindingRedirects>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\SigningKey.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -182,7 +184,9 @@
   <ItemGroup>
     <None Include="app.config" />
     <Compile Include="CodeGeneration\Plugins\TaskBasedAsynchronyFixture.cs" />
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="CodeGeneration\GeneratorFixtureResources\InterfaceWithGenericMethodsOutput_CSharp.txt" />
