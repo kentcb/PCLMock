@@ -1,7 +1,11 @@
+using System;
 using System.Threading.Tasks;
 
 class CustomTask : Task
 {
+	CustomTask(Action action) : base(action)
+	{
+	}
 }
 
 interface ISomeInterface
@@ -35,6 +39,17 @@ interface ISomeInterface
 	Task SomeMethod<T1, T2>();
 
 	// expecting these to be ignored because of it being a custom task (which we have no way of providing a default value for)
-    CustomTask SomeMethod();
-	CustomTask SomeMethod(string s, int i);
+    CustomTask SomeOtherMethod();
+	CustomTask SomeOtherMethod(string s, int i);
+}
+
+namespace The.Namespace
+{
+	internal partial class ISomeInterfaceMock
+	{
+		public int SomeSetOnlyProperty
+		{
+			set {}
+		}
+	}
 }

@@ -2,16 +2,16 @@
 
 ## Overview
 
-**PCLMock** includes support for generating mock implementations from interfaces in your code base. Generated code can be either C# or Visual Basic. You have two code generation options:
+**PCLMock** includes support for generating mock implementations from interfaces in your code base. The core of this code generation logic is contained in the `PCLMock.CodeGeneration` project, but you will typically use that library via a code generator "front-end". There are two code generator front-ends that ship with PCLMock:
 
-1. A T4-based approach, available via the `PCLMock.CodeGeneration.T4` package.
-2. A console-based approach, available via the `PCLMock.CodeGeneration.Console` package.
+1. A [C# Source Generator](https://devblogs.microsoft.com/dotnet/introducing-c-source-generators/) (currently in preview, intended to ship with C# 9).
+2. A [.NET Core tool](https://docs.microsoft.com/en-us/dotnet/core/tools/global-tools), available via the `PCLMock.CodeGeneration.Console` package.
 
-The T4-based approach integrates into Visual Studio (Xamarin Studio is not currently supported) whereas the console-based approach is a solution-level tool that you can execute how you see fit. In both cases, these tools are driven by an XML configuration file.
+In both cases, these tools are driven by an XML configuration file.
 
-## Configuration File
+## XML Configuration File
 
-In order to know which interfaces should have mocks generated, and how those mocks should be named, the **PCLMock** code generators rely on an XML configuration file. When you install the T4-based code generator, you get a default configuration file called *Mocks.xml*.
+In order to know which interfaces should have mocks generated, and how those mocks should be named, the **PCLMock** code generators rely on an XML configuration file.
 
 ### Specifying Namespace Names
 
@@ -75,7 +75,7 @@ Each filter must be either an `Include` or `Exclude` element. In either case, th
         <Pattern>.*, MyAssembly</Pattern>
     </Include>
 </Interfaces>
-``` 
+```
 
 A more complicated filter arrangement might look like this:
 
@@ -107,35 +107,47 @@ You can read all about plugins [here](plugins.md). To configure plugins, you spe
 
 You can include any number of plugins and they will be executed in the order you specify. This is important if more than one plugin might produce specifications for the same member. You should identify which plugin's specifications should take precedence and list it after the other plugins.
 
-## T4-based Generation
+## Generator Front-ends
 
-If you're using the T4-based generation approach, you will want to add the `PCLMock.CodeGeneration.T4` package to the project in which your mocks should reside. This is probably your unit test project.
+### Source Generator
 
-Once added, you will see two new files in the root of your project:
+To use the source generator front-end, follow these steps:
 
-* *Mocks.tt*
-* *Mocks.xml*
+1. Use [.NET 5 preview](https://dotnet.microsoft.com/download/dotnet/5.0) and C# 9 preview.
+2. Include all relevant PCLMock projects in your solution: `PCLMock`, `PCLMock.CodeGeneration`, and `PCLMock.CodeGeneration.SourceGenerator`. NOTE: this step is only required while source generators are in early preview because the .NET team have not yet provided a mechanism to consume source generators from NuGet packages. Longer term, you won't have to bundle the code.
+3. Add a configuration file to your project called `PCLMock.xml` and include it as an additional file:
+    ```xml
+    <ItemGroup>
+      <AdditionalFiles Include="PCLMock.xml" />
+    </ItemGroup>
+    ```
+4. Include the source generator (this step will simplify once source generators can be consumed from a NuGet):
+    ```xml
+    <ItemGroup>
+      <Analyzer Include="$(OutDir)..\..\..\..\PCLMock.CodeGeneration.    SourceGenerator\bin\$(Configuration)\netstandard2.0\PCLMock.CodeGeneration.    SourceGenerator.dll" />
+    </ItemGroup>
+    ```
 
-*Mocks.xml* is the configuration file discussed above. *Mocks.tt* is the text template that instigates generation of the mocks. If you add a new interface or modify your configuration file, you should right-click *Mocks.tt* and select **Run Custom Tool** in order to re-generate mocks.
+One limitation of using source generators (besides the fact that they're in preview) is that source generators can only augment code in the compiling project. This means that generated mocks _must_ reside in the same project as the code being mocked, rather than being incorporated into a separate project (usually a unit tests project). One mitigation would be to add a `Condition` to the `Analyzer` such that it is only included for certain builds where mocks are required, but not for builds intended for deployment.
 
-To change the language of the generated code, open *Mocks.tt* and modify the `language` variable as specified in the comments.
+### .NET Core tool
 
-## Console-based Generation
-
-The `PCLMock.CodeGeneration.Console` package can be added to any project because it is actually a solution-level package. This means no particular project will "own" this package but, rather, the solution will.
-
-Once added, you'll find an executable called *PCLMockCodeGen.exe* within your solution's *packages\PCLMock.CodeGeneration.Console.$version$\tools* directory. Execution of this tool requires these parameters:
-
-* The path of the solution for which mocks are being generated
-* The path of the XML configuration file
-* The path of the output file which will contain the generated code
-
-You can also optionally force the language of the generated code, although it is inferred from the output file's extension. In addition, to can execute with a `-Verbose` flag gain insight into the decisions PCLMock is making during code generation.
-
-An example of executing this tool is:
+To install the PCLMock .NET Core tool globally:
 
 ```
-.\PCLMockCodeGen.exe "Path\To\MySolution.sln" "Path\To\Mocks.xml" "output.cs" -Verbose
+dotnet tool install -g pclmock
+```
+
+You can then execute it with:
+
+```
+pclmock
+```
+
+See the console output for help, but an example of executing this tool is:
+
+```
+pclmock "Path\To\MySolution.sln" "Path\To\PCLMock.xml" "output.cs" -Verbose
 ```
 
 ## Supplementing Generated Code
@@ -170,7 +182,7 @@ namespace Foo.Bar.Mocks
 
 ## Supported Members
 
-The code generator supports everything that **PCLMock** itself supports:
+The code generator (regardless of which front-end is used) supports everything that **PCLMock** itself supports:
 
 * `get`-only properties
 * `set`-only properties
@@ -184,23 +196,3 @@ The code generator supports everything that **PCLMock** itself supports:
 * generic methods (including type constraints)
 
 If the code generator comes across something the **PCLMock** [doesn't inherently support](defining-mocks.md#limitations), it will just ignore it. You can then supplement the generated partial class so that the mock successfully builds.
-
-A caveat to this is that duplicate members will be ignored, even if each is supported individually. For example:
-
-```C#
-public interface IFirst
-{
-    void SomeMethod();
-}
-
-public interface ISecond
-{
-    void SomeMethod();
-}
-
-public interface IThird : IFirst, ISecond
-{
-}
-```
-
-Here, the generated mock for `IThird` will _not_ include a `SomeMethod` implementation. This is because doing so would require either a single implementation, or multiple with one or more implemented explicitly. Either of these two options might result in a mock that is less useful to you than you would like, so the member is simply ignored. This forces you to provide the implementation yourself via a partial class, but affords you the flexibility to choose what that implementation looks like.

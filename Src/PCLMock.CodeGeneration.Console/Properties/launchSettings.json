@@ -1,9 +1,7 @@
 {
   "profiles": {
     "PCLMock.CodeGeneration.Console": {
-      "commandName": "Project",
-      "commandLineArgs": "-SolutionFile QUT.Core.sln -ConfigurationFile .\\UnitTests\\Mocks.xml -OutputFile .\\UnitTests\\Mocks.g.cs -Verbose true",
-      "workingDirectory": "C:\\Users\\kent\\Repository\\QUT\\Src"
+      "commandName": "Project"
     }
   }
 }

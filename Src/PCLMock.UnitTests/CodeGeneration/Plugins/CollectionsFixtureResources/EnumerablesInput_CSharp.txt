@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 
 interface ICustomEnumerable<T> : IEnumerable<T>
@@ -31,8 +30,8 @@ interface ISomeInterface
 		get;
 	}
 
-	ICustomEnumerable<string> SomeMethod();
-	ICustomEnumerable<string> SomeMethod(int i, float f);
+	ICustomEnumerable<string> SomeOtherMethod();
+	ICustomEnumerable<string> SomeOtherMethod(int i, float f);
 }
 
 interface ISomeGenericInterface<T>
@@ -44,4 +43,15 @@ interface ISomeGenericInterface<T>
 
 	IEnumerable<T> SomeMethod();
 	IEnumerable<T> SomeMethod(int i, float f);
+}
+
+namespace The.Namespace
+{
+	internal partial class ISomeInterfaceMock
+	{
+		public ICollection<string> SomeSetOnlyProperty
+		{
+			set {}
+		}
+	}
 }

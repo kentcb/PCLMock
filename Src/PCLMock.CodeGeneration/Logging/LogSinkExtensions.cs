@@ -1,80 +1,150 @@
 namespace PCLMock.CodeGeneration.Logging
 {
     using System;
-    using System.Globalization;
+    using System.Collections.Immutable;
 
     public static class LogSinkExtensions
     {
-        public static void Log(this ILogSink @this, Type source, LogLevel level, string format, params object[] args)
+        public static ILogSink WithSource(this ILogSink @this, Type source) =>
+            new LogSinkWithSource(@this, source.FullName);
+
+        public static ILogSink WithSource(this ILogSink @this, string source) =>
+            new LogSinkWithSource(@this, source);
+
+        public static ILogSink WithMinimumLevel(this ILogSink @this, LogLevel minimumLevel) =>
+            new LogSinkWithMinimumLevel(@this, minimumLevel);
+
+        public static void Debug(this ILogSink @this, string message)
         {
-            var message = string.Format(CultureInfo.InvariantCulture, format, args);
-            @this.Log(source, level, message);
+            var logEvent = new LogEvent(
+                default,
+                LogLevel.Debug,
+                message,
+                default);
+            @this.Log(logEvent);
         }
 
-        public static void Debug(this ILogSink @this, Type source, string message)
+        public static void Debug(this ILogSink @this, string message, params object[] messageArgs)
         {
-            @this.Log(source, LogLevel.Debug, message);
+            var logEvent = new LogEvent(
+                default,
+                LogLevel.Debug,
+                message,
+                ImmutableArray.Create(messageArgs));
+            @this.Log(logEvent);
         }
 
-        public static void Debug(this ILogSink @this, Type source, string format, params object[] args)
+        public static void Info(this ILogSink @this, string message)
         {
-            var message = string.Format(CultureInfo.InvariantCulture, format, args);
-            @this.Log(source, LogLevel.Debug, message);
+            var logEvent = new LogEvent(
+                default,
+                LogLevel.Info,
+                message,
+                default);
+            @this.Log(logEvent);
         }
 
-        public static void Info(this ILogSink @this, Type source, string message)
+        public static void Info(this ILogSink @this, string message, params object[] messageArgs)
         {
-            @this.Log(source, LogLevel.Info, message);
+            var logEvent = new LogEvent(
+                default,
+                LogLevel.Info,
+                message,
+                ImmutableArray.Create(messageArgs));
+            @this.Log(logEvent);
         }
 
-        public static void Info(this ILogSink @this, Type source, string format, params object[] args)
+        public static void Warn(this ILogSink @this, string message)
         {
-            var message = string.Format(CultureInfo.InvariantCulture, format, args);
-            @this.Log(source, LogLevel.Info, message);
+            var logEvent = new LogEvent(
+                default,
+                LogLevel.Warn,
+                message,
+                default);
+            @this.Log(logEvent);
         }
 
-        public static void Warn(this ILogSink @this, Type source, string message)
+        public static void Warn(this ILogSink @this, string message, params object[] messageArgs)
         {
-            @this.Log(source, LogLevel.Warn, message);
+            var logEvent = new LogEvent(
+                default,
+                LogLevel.Warn,
+                message,
+                ImmutableArray.Create(messageArgs));
+            @this.Log(logEvent);
         }
 
-        public static void Warn(this ILogSink @this, Type source, string format, params object[] args)
+        public static void Error(this ILogSink @this, string message)
         {
-            var message = string.Format(CultureInfo.InvariantCulture, format, args);
-            @this.Log(source, LogLevel.Warn, message);
+            var logEvent = new LogEvent(
+                default,
+                LogLevel.Error,
+                message,
+                default);
+            @this.Log(logEvent);
         }
 
-        public static void Positive(this ILogSink @this, Type source, string message)
+        public static void Error(this ILogSink @this, string message, params object[] messageArgs)
         {
-            @this.Log(source, LogLevel.Positive, message);
+            var logEvent = new LogEvent(
+                default,
+                LogLevel.Error,
+                message,
+                ImmutableArray.Create(messageArgs));
+            @this.Log(logEvent);
         }
 
-        public static void Positive(this ILogSink @this, Type source, string format, params object[] args)
+        private sealed class LogSinkWithSource : ILogSink
         {
-            var message = string.Format(CultureInfo.InvariantCulture, format, args);
-            @this.Log(source, LogLevel.Positive, message);
+            private readonly ILogSink inner;
+            private readonly string source;
+
+            public LogSinkWithSource(ILogSink inner, string source)
+            {
+                this.inner = inner;
+                this.source = source;
+            }
+
+            public void Log(LogEvent logEvent)
+            {
+                if (logEvent.Source == null)
+                {
+                    // Only overwrite the source if it's not already present, otherwise nobody can override our override!
+                    logEvent = new LogEvent(
+                        this.source,
+                        logEvent.Level,
+                        logEvent.Message,
+                        logEvent.MessageArgs);
+                }
+
+                this.inner.Log(logEvent);
+            }
+
+            public override string ToString() => this.inner.ToString();
         }
 
-        public static void Negative(this ILogSink @this, Type source, string message)
+        private sealed class LogSinkWithMinimumLevel : ILogSink
         {
-            @this.Log(source, LogLevel.Negative, message);
-        }
+            private readonly ILogSink inner;
+            private readonly LogLevel minimumLevel;
 
-        public static void Negative(this ILogSink @this, Type source, string format, params object[] args)
-        {
-            var message = string.Format(CultureInfo.InvariantCulture, format, args);
-            @this.Log(source, LogLevel.Negative, message);
-        }
+            public LogSinkWithMinimumLevel(ILogSink inner, LogLevel minimumLevel)
+            {
+                this.inner = inner;
+                this.minimumLevel = minimumLevel;
+            }
 
-        public static void Error(this ILogSink @this, Type source, string message)
-        {
-            @this.Log(source, LogLevel.Error, message);
-        }
+            public void Log(LogEvent logEvent)
+            {
+                if (logEvent.Level < this.minimumLevel)
+                {
+                    return;
+                }
 
-        public static void Error(this ILogSink @this, Type source, string format, params object[] args)
-        {
-            var message = string.Format(CultureInfo.InvariantCulture, format, args);
-            @this.Log(source, LogLevel.Error, message);
+                this.inner.Log(logEvent);
+            }
+
+            public override string ToString() => this.inner.ToString();
         }
     }
 }

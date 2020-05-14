@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 
 interface ICustomCollection<T> : ICollection<T>
@@ -36,8 +35,8 @@ interface ISomeInterface
 		get;
 	}
 
-	ICustomCollection<string> SomeMethod();
-	ICustomCollection<string> SomeMethod(int i, float f);
+	ICustomCollection<string> SomeOtherMethod();
+	ICustomCollection<string> SomeOtherMethod(int i, float f);
 }
 
 interface ISomeGenericInterface<T>
@@ -49,4 +48,15 @@ interface ISomeGenericInterface<T>
 
 	ICollection<T> SomeMethod();
 	ICollection<T> SomeMethod(int i, float f);
+}
+
+namespace The.Namespace
+{
+	internal partial class ISomeInterfaceMock
+	{
+		public ICollection<string> SomeSetOnlyProperty
+		{
+			set {}
+		}
+	}
 }

@@ -3,11 +3,11 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Buildalyzer" />
-    <PackageReference Include="Buildalyzer.Workspaces" />
     <PackageReference Include="System.Reactive" />
     <PackageReference Include="System.Xml.XPath.XDocument" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" />
@@ -17,4 +17,9 @@
   <ItemGroup>
     <ProjectReference Include="..\PCLMock\PCLMock.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\Art\Logo64x64.png" Pack="true" PackagePath=""/>
+  </ItemGroup>
+
 </Project>

@@ -29,66 +29,73 @@ namespace PCLMock.CodeGeneration.Plugins
     /// </remarks>
     public sealed class Collections : IPlugin
     {
-        private static readonly Type logSource = typeof(Collections);
-
         public string Name => "Collections";
 
         /// <inheritdoc />
-        public Compilation InitializeCompilation(Compilation compilation) =>
+        public Compilation InitializeCompilation(ILogSink logSink, Compilation compilation) =>
             compilation;
 
         /// <inheritdoc />
         public SyntaxNode GetDefaultValueSyntax(
             Context context,
-            MockBehavior behavior,
             ISymbol symbol,
-            INamedTypeSymbol returnType)
+            ITypeSymbol typeSymbol)
         {
-            if (behavior == MockBehavior.Loose)
-            {
-                return null;
-            }
+            context = context
+                .WithLogSink(
+                    context
+                        .LogSink
+                        .WithSource(typeof(Collections)));
 
-            if (!returnType.IsGenericType)
+            if (!(typeSymbol is INamedTypeSymbol namedTypeSymbol))
             {
                 context
                     .LogSink
-                    .Debug(logSource, "Ignoring symbol '{0}' because its return type is not a generic type, so it cannot be one of the supported collection types.");
+                    .Debug("Ignoring type '{0}' because it is not a named type symbol.", typeSymbol);
+                return null;
+            }
+            
+            if (!namedTypeSymbol.IsGenericType)
+            {
+                context
+                    .LogSink
+                    .Debug("Ignoring type '{0}' because its return type is not a generic type, so it cannot be one of the supported collection types.", namedTypeSymbol);
                 return null;
             }
 
             SyntaxNode returnValueSyntax;
 
-            if (!TryGetReturnValueSyntaxForEnumerableReturnType(context, returnType, out returnValueSyntax) &&
-                !TryGetReturnValueSyntaxForCollectionReturnType(context, returnType, out returnValueSyntax) &&
-                !TryGetReturnValueSyntaxForDictionaryReturnType(context, returnType, out returnValueSyntax) &&
-                !TryGetReturnValueSyntaxForSetReturnType(context, returnType, out returnValueSyntax) &&
-                !TryGetReturnValueSyntaxForImmutableListReturnType(context, returnType, out returnValueSyntax) &&
-                !TryGetReturnValueSyntaxForImmutableDictionaryReturnType(context, returnType, out returnValueSyntax) &&
-                !TryGetReturnValueSyntaxForImmutableQueueReturnType(context, returnType, out returnValueSyntax) &&
-                !TryGetReturnValueSyntaxForImmutableSetReturnType(context, returnType, out returnValueSyntax) &&
-                !TryGetReturnValueSyntaxForImmutableStackReturnType(context, returnType, out returnValueSyntax))
+            if (!TryGetReturnValueSyntaxForEnumerableReturnType(context, namedTypeSymbol, out returnValueSyntax) &&
+                !TryGetReturnValueSyntaxForCollectionReturnType(context, namedTypeSymbol, out returnValueSyntax) &&
+                !TryGetReturnValueSyntaxForDictionaryReturnType(context, namedTypeSymbol, out returnValueSyntax) &&
+                !TryGetReturnValueSyntaxForSetReturnType(context, namedTypeSymbol, out returnValueSyntax) &&
+                !TryGetReturnValueSyntaxForImmutableListReturnType(context, namedTypeSymbol, out returnValueSyntax) &&
+                !TryGetReturnValueSyntaxForImmutableDictionaryReturnType(context, namedTypeSymbol, out returnValueSyntax) &&
+                !TryGetReturnValueSyntaxForImmutableQueueReturnType(context, namedTypeSymbol, out returnValueSyntax) &&
+                !TryGetReturnValueSyntaxForImmutableSetReturnType(context, namedTypeSymbol, out returnValueSyntax) &&
+                !TryGetReturnValueSyntaxForImmutableStackReturnType(context, namedTypeSymbol, out returnValueSyntax))
             {
                 context
                     .LogSink
-                    .Debug(logSource, "Ignoring symbol '{0}' because it does not return a supported collection type.", symbol);
+                    .Debug("Type '{0}' is not a supported collection type.", namedTypeSymbol);
                 return null;
             }
+
+            context
+                .LogSink
+                .Debug("Generated a default value for type '{0}'.", namedTypeSymbol);
 
             return returnValueSyntax;
         }
 
         private static bool TryGetReturnValueSyntaxForEnumerableReturnType(
             Context context,
-            INamedTypeSymbol returnType,
+            INamedTypeSymbol typeSymbol,
             out SyntaxNode returnValueSyntax)
         {
-            var enumerableInterfaceType = context
-                .SemanticModel
-                .Compilation
-                .GetTypeByMetadataName("System.Collections.Generic.IEnumerable`1");
+            var isEnumerable = typeSymbol.ConstructedFrom?.ToDisplayString() == "System.Collections.Generic.IEnumerable<T>";
 
-            if (returnType.ConstructedFrom != enumerableInterfaceType)
+            if (!isEnumerable)
             {
                 returnValueSyntax = null;
                 return false;
@@ -97,13 +104,13 @@ namespace PCLMock.CodeGeneration.Plugins
             var enumerableType = context
                 .SemanticModel
                 .Compilation
-                .GetTypeByMetadataName("System.Linq.Enumerable");
+                .GetPreferredTypeByMetadataName("System.Linq.Enumerable", preferredAssemblyNames: new[] { "System.Linq" });
 
             if (enumerableType == null)
             {
                 context
                     .LogSink
-                    .Warn(logSource, "Failed to resolve Enumerable class.");
+                    .Warn("The Enumerable type could not be resolved (probably a missing reference to System.Linq).");
                 returnValueSyntax = null;
                 return false;
             }
@@ -123,39 +130,21 @@ namespace PCLMock.CodeGeneration.Plugins
                                     "Empty"),
                                 context
                                     .SyntaxGenerator
-                                    .TypeExpression(returnType.TypeArguments[0])));
+                                    .TypeExpression(typeSymbol.TypeArguments[0])));
             return true;
         }
 
         private static bool TryGetReturnValueSyntaxForCollectionReturnType(
             Context context,
-            INamedTypeSymbol returnType,
+            INamedTypeSymbol typeSymbol,
             out SyntaxNode returnValueSyntax)
         {
-            var collectionInterfaceType = context
-                .SemanticModel
-                .Compilation
-                .GetTypeByMetadataName("System.Collections.Generic.ICollection`1");
+            var isCollection = typeSymbol.ConstructedFrom?.ToDisplayString() == "System.Collections.Generic.ICollection<T>";
+            var isReadOnlyCollection = typeSymbol.ConstructedFrom?.ToDisplayString() == "System.Collections.Generic.IReadOnlyCollection<T>";
+            var isList = typeSymbol.ConstructedFrom?.ToDisplayString() == "System.Collections.Generic.IList<T>";
+            var isReadOnlyList = typeSymbol.ConstructedFrom?.ToDisplayString() == "System.Collections.Generic.IReadOnlyList<T>";
 
-            var readOnlyCollectionInterfaceType = context
-                .SemanticModel
-                .Compilation
-                .GetTypeByMetadataName("System.Collections.Generic.IReadOnlyCollection`1");
-
-            var listInterfaceType = context
-                .SemanticModel
-                .Compilation
-                .GetTypeByMetadataName("System.Collections.Generic.IList`1");
-
-            var readOnlyListInterfaceType = context
-                .SemanticModel
-                .Compilation
-                .GetTypeByMetadataName("System.Collections.Generic.IReadOnlyList`1");
-
-            if (returnType.ConstructedFrom != collectionInterfaceType &&
-                returnType.ConstructedFrom != readOnlyCollectionInterfaceType &&
-                returnType.ConstructedFrom != listInterfaceType &&
-                returnType.ConstructedFrom != readOnlyListInterfaceType)
+            if (!(isCollection || isReadOnlyCollection || isList || isReadOnlyList))
             {
                 returnValueSyntax = null;
                 return false;
@@ -164,13 +153,13 @@ namespace PCLMock.CodeGeneration.Plugins
             var listType = context
                 .SemanticModel
                 .Compilation
-                .GetTypeByMetadataName("System.Collections.Generic.List`1");
+                .GetPreferredTypeByMetadataName("System.Collections.Generic.List`1", preferredAssemblyNames: new[] { "System.Collections" });
 
             if (listType == null)
             {
                 context
                     .LogSink
-                    .Warn(logSource, "Failed to resolve List<T> class.");
+                    .Warn("The List type could not be resolved (probably a missing reference to System.Collections).");
                 returnValueSyntax = null;
                 return false;
             }
@@ -178,27 +167,19 @@ namespace PCLMock.CodeGeneration.Plugins
             returnValueSyntax = context
                 .SyntaxGenerator
                     .ObjectCreationExpression(
-                        listType.Construct(returnType.TypeArguments[0])).NormalizeWhitespace();
+                        listType.Construct(typeSymbol.TypeArguments[0])).NormalizeWhitespace();
             return true;
         }
 
         private static bool TryGetReturnValueSyntaxForDictionaryReturnType(
             Context context,
-            INamedTypeSymbol returnType,
+            INamedTypeSymbol typeSymbol,
             out SyntaxNode returnValueSyntax)
         {
-            var dictionaryInterfaceType = context
-                .SemanticModel
-                .Compilation
-                .GetTypeByMetadataName("System.Collections.Generic.IDictionary`2");
+            var isDictionary = typeSymbol.ConstructedFrom?.ToDisplayString() == "System.Collections.Generic.IDictionary<TKey, TValue>";
+            var isReadOnlyDictionary = typeSymbol.ConstructedFrom?.ToDisplayString() == "System.Collections.Generic.IReadOnlyDictionary<TKey, TValue>";
 
-            var readOnlyDictionaryInterfaceType = context
-                .SemanticModel
-                .Compilation
-                .GetTypeByMetadataName("System.Collections.Generic.IReadOnlyDictionary`2");
-
-            if (returnType.ConstructedFrom != dictionaryInterfaceType &&
-                returnType.ConstructedFrom != readOnlyDictionaryInterfaceType)
+            if (!(isDictionary || isReadOnlyDictionary))
             {
                 returnValueSyntax = null;
                 return false;
@@ -207,13 +188,13 @@ namespace PCLMock.CodeGeneration.Plugins
             var dictionaryType = context
                 .SemanticModel
                 .Compilation
-                .GetTypeByMetadataName("System.Collections.Generic.Dictionary`2");
+                .GetPreferredTypeByMetadataName("System.Collections.Generic.Dictionary`2", preferredAssemblyNames: new[] { "System.Collections" });
 
             if (dictionaryType == null)
             {
                 context
                     .LogSink
-                    .Warn(logSource, "Failed to resolve Dictionary<TKey, TValue> class.");
+                    .Warn("The Dictionary type could not be resolved (probably a missing reference to System.Collections).");
                 returnValueSyntax = null;
                 return false;
             }
@@ -221,36 +202,33 @@ namespace PCLMock.CodeGeneration.Plugins
             returnValueSyntax = context
                 .SyntaxGenerator
                 .ObjectCreationExpression(
-                    dictionaryType.Construct(returnType.TypeArguments[0], returnType.TypeArguments[1])).NormalizeWhitespace();
+                    dictionaryType.Construct(typeSymbol.TypeArguments[0], typeSymbol.TypeArguments[1])).NormalizeWhitespace();
             return true;
         }
 
         private static bool TryGetReturnValueSyntaxForSetReturnType(
             Context context,
-            INamedTypeSymbol returnType,
+            INamedTypeSymbol typeSymbol,
             out SyntaxNode returnValueSyntax)
         {
-            var setInterfaceType = context
-                .SemanticModel
-                .Compilation
-                .GetTypeByMetadataName("System.Collections.Generic.ISet`1");
+            var isSet = typeSymbol.ConstructedFrom?.ToDisplayString() == "System.Collections.Generic.ISet<T>";
 
-            if (returnType.ConstructedFrom != setInterfaceType)
+            if (!isSet)
             {
                 returnValueSyntax = null;
                 return false;
             }
 
-            var dictionaryType = context
+            var hashSetType = context
                 .SemanticModel
                 .Compilation
-                .GetTypeByMetadataName("System.Collections.Generic.HashSet`1");
+                .GetPreferredTypeByMetadataName("System.Collections.Generic.HashSet`1", preferredAssemblyNames: new[] { "System.Collections" });
 
-            if (dictionaryType == null)
+            if (hashSetType == null)
             {
                 context
                     .LogSink
-                    .Warn(logSource, "Failed to resolve HashSet<T> class.");
+                    .Warn("The HashSet type could not be resolved (probably a missing reference to System.Collections).");
                 returnValueSyntax = null;
                 return false;
             }
@@ -258,21 +236,18 @@ namespace PCLMock.CodeGeneration.Plugins
             returnValueSyntax = context
                 .SyntaxGenerator
                 .ObjectCreationExpression(
-                    dictionaryType.Construct(returnType.TypeArguments[0])).NormalizeWhitespace();
+                    hashSetType.Construct(typeSymbol.TypeArguments[0])).NormalizeWhitespace();
             return true;
         }
 
         private static bool TryGetReturnValueSyntaxForImmutableListReturnType(
             Context context,
-            INamedTypeSymbol returnType,
+            INamedTypeSymbol typeSymbol,
             out SyntaxNode returnValueSyntax)
         {
-            var immutableListInterfaceType = context
-                .SemanticModel
-                .Compilation
-                .GetTypeByMetadataName("System.Collections.Immutable.IImmutableList`1");
+            var isImmutableList = typeSymbol.ConstructedFrom?.ToDisplayString() == "System.Collections.Immutable.IImmutableList<T>";
 
-            if (returnType.ConstructedFrom != immutableListInterfaceType)
+            if (!isImmutableList)
             {
                 returnValueSyntax = null;
                 return false;
@@ -281,13 +256,13 @@ namespace PCLMock.CodeGeneration.Plugins
             var immutableListType = context
                 .SemanticModel
                 .Compilation
-                .GetTypeByMetadataName("System.Collections.Immutable.ImmutableList");
+                .GetPreferredTypeByMetadataName("System.Collections.Immutable.ImmutableList", preferredAssemblyNames: new[] { "System.Collections.Immutable" });
 
             if (immutableListType == null)
             {
                 context
                     .LogSink
-                    .Warn(logSource, "Failed to resolve ImmutableList class.");
+                    .Warn("The ImmutableList type could not be resolved (probably a missing reference to System.Collections.Immutable).");
                 returnValueSyntax = null;
                 return false;
             }
@@ -303,22 +278,19 @@ namespace PCLMock.CodeGeneration.Plugins
                                 .TypeExpression(immutableListType),
                             context
                                 .SyntaxGenerator
-                                .TypeExpression(returnType.TypeArguments[0])),
+                                .TypeExpression(typeSymbol.TypeArguments[0])),
                     "Empty");
             return true;
         }
 
         private static bool TryGetReturnValueSyntaxForImmutableDictionaryReturnType(
             Context context,
-            INamedTypeSymbol returnType,
+            INamedTypeSymbol typeSymbol,
             out SyntaxNode returnValueSyntax)
         {
-            var immutableDictionaryInterfaceType = context
-                .SemanticModel
-                .Compilation
-                .GetTypeByMetadataName("System.Collections.Immutable.IImmutableDictionary`2");
+            var isImmutableDictionary = typeSymbol.ConstructedFrom?.ToDisplayString() == "System.Collections.Immutable.IImmutableDictionary<TKey, TValue>";
 
-            if (returnType.ConstructedFrom != immutableDictionaryInterfaceType)
+            if (!isImmutableDictionary)
             {
                 returnValueSyntax = null;
                 return false;
@@ -327,13 +299,13 @@ namespace PCLMock.CodeGeneration.Plugins
             var immutableDictionaryType = context
                 .SemanticModel
                 .Compilation
-                .GetTypeByMetadataName("System.Collections.Immutable.ImmutableDictionary");
+                .GetPreferredTypeByMetadataName("System.Collections.Immutable.ImmutableDictionary", preferredAssemblyNames: new[] { "System.Collections.Immutable" });
 
             if (immutableDictionaryType == null)
             {
                 context
                     .LogSink
-                    .Warn(logSource, "Failed to resolve ImmutableDictionary class.");
+                    .Warn("The ImmutableDictionary type could not be resolved (probably a missing reference to System.Collections.Immutable).");
                 returnValueSyntax = null;
                 return false;
             }
@@ -349,25 +321,22 @@ namespace PCLMock.CodeGeneration.Plugins
                                 .TypeExpression(immutableDictionaryType),
                             context
                                 .SyntaxGenerator
-                                .TypeExpression(returnType.TypeArguments[0]),
+                                .TypeExpression(typeSymbol.TypeArguments[0]),
                             context
                                 .SyntaxGenerator
-                                .TypeExpression(returnType.TypeArguments[1])),
+                                .TypeExpression(typeSymbol.TypeArguments[1])),
                     "Empty");
             return true;
         }
 
         private static bool TryGetReturnValueSyntaxForImmutableQueueReturnType(
             Context context,
-            INamedTypeSymbol returnType,
+            INamedTypeSymbol typeSymbol,
             out SyntaxNode returnValueSyntax)
         {
-            var immutableQueueInterfaceType = context
-                .SemanticModel
-                .Compilation
-                .GetTypeByMetadataName("System.Collections.Immutable.IImmutableQueue`1");
+            var isImmutableQueue = typeSymbol.ConstructedFrom?.ToDisplayString() == "System.Collections.Immutable.IImmutableQueue<T>";
 
-            if (returnType.ConstructedFrom != immutableQueueInterfaceType)
+            if (!isImmutableQueue)
             {
                 returnValueSyntax = null;
                 return false;
@@ -376,13 +345,13 @@ namespace PCLMock.CodeGeneration.Plugins
             var immutableQueueType = context
                 .SemanticModel
                 .Compilation
-                .GetTypeByMetadataName("System.Collections.Immutable.ImmutableQueue");
+                .GetPreferredTypeByMetadataName("System.Collections.Immutable.ImmutableQueue", preferredAssemblyNames: new[] { "System.Collections.Immutable" });
 
             if (immutableQueueType == null)
             {
                 context
                     .LogSink
-                    .Warn(logSource, "Failed to resolve ImmutableQueue class.");
+                    .Warn("The ImmutableDictionary type could not be resolved (probably a missing reference to System.Collections.Immutable).");
                 returnValueSyntax = null;
                 return false;
             }
@@ -398,37 +367,34 @@ namespace PCLMock.CodeGeneration.Plugins
                                 .TypeExpression(immutableQueueType),
                             context
                                 .SyntaxGenerator
-                                .TypeExpression(returnType.TypeArguments[0])),
+                                .TypeExpression(typeSymbol.TypeArguments[0])),
                     "Empty");
             return true;
         }
 
         private static bool TryGetReturnValueSyntaxForImmutableSetReturnType(
             Context context,
-            INamedTypeSymbol returnType,
+            INamedTypeSymbol typeSymbol,
             out SyntaxNode returnValueSyntax)
         {
-            var immutableSetInterfaceType = context
-                .SemanticModel
-                .Compilation
-                .GetTypeByMetadataName("System.Collections.Immutable.IImmutableSet`1");
+            var isImmutableSet = typeSymbol.ConstructedFrom?.ToDisplayString() == "System.Collections.Immutable.IImmutableSet<T>";
 
-            if (returnType.ConstructedFrom != immutableSetInterfaceType)
+            if (!isImmutableSet)
             {
                 returnValueSyntax = null;
                 return false;
             }
 
-            var immutableSetType = context
+            var immutableHashSetType = context
                 .SemanticModel
                 .Compilation
-                .GetTypeByMetadataName("System.Collections.Immutable.ImmutableHashSet");
+                .GetPreferredTypeByMetadataName("System.Collections.Immutable.ImmutableHashSet", preferredAssemblyNames: new[] { "System.Collections.Immutable" });
 
-            if (immutableSetType == null)
+            if (immutableHashSetType == null)
             {
                 context
                     .LogSink
-                    .Warn(logSource, "Failed to resolve ImmutableSet class.");
+                    .Warn("The ImmutableHashSet type could not be resolved (probably a missing reference to System.Collections.Immutable).");
                 returnValueSyntax = null;
                 return false;
             }
@@ -441,25 +407,22 @@ namespace PCLMock.CodeGeneration.Plugins
                         .WithTypeArguments(
                             context
                                 .SyntaxGenerator
-                                .TypeExpression(immutableSetType),
+                                .TypeExpression(immutableHashSetType),
                             context
                                 .SyntaxGenerator
-                                .TypeExpression(returnType.TypeArguments[0])),
+                                .TypeExpression(typeSymbol.TypeArguments[0])),
                     "Empty");
             return true;
         }
 
         private static bool TryGetReturnValueSyntaxForImmutableStackReturnType(
             Context context,
-            INamedTypeSymbol returnType,
+            INamedTypeSymbol typeSymbol,
             out SyntaxNode returnValueSyntax)
         {
-            var immutableStackInterfaceType = context
-                .SemanticModel
-                .Compilation
-                .GetTypeByMetadataName("System.Collections.Immutable.IImmutableStack`1");
+            var isImmutableStack = typeSymbol.ConstructedFrom?.ToDisplayString() == "System.Collections.Immutable.IImmutableStack<T>";
 
-            if (returnType.ConstructedFrom != immutableStackInterfaceType)
+            if (!isImmutableStack)
             {
                 returnValueSyntax = null;
                 return false;
@@ -468,13 +431,13 @@ namespace PCLMock.CodeGeneration.Plugins
             var immutableStackType = context
                 .SemanticModel
                 .Compilation
-                .GetTypeByMetadataName("System.Collections.Immutable.ImmutableStack");
+                .GetPreferredTypeByMetadataName("System.Collections.Immutable.ImmutableStack", preferredAssemblyNames: new[] { "System.Collections.Immutable" });
 
             if (immutableStackType == null)
             {
                 context
                     .LogSink
-                    .Warn(logSource, "Failed to resolve ImmutableStack class.");
+                    .Warn("The ImmutableStack type could not be resolved (probably a missing reference to System.Collections.Immutable).");
                 returnValueSyntax = null;
                 return false;
             }
@@ -490,7 +453,7 @@ namespace PCLMock.CodeGeneration.Plugins
                                 .TypeExpression(immutableStackType),
                             context
                                 .SyntaxGenerator
-                                .TypeExpression(returnType.TypeArguments[0])),
+                                .TypeExpression(typeSymbol.TypeArguments[0])),
                     "Empty");
             return true;
         }

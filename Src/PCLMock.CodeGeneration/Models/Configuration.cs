@@ -14,8 +14,6 @@
 
     public sealed class Configuration
     {
-        private static readonly Type logSource = typeof(Configuration);
-
         private readonly ILogSink logSink;
         private readonly IImmutableList<Transformation> namespaceTransformations;
         private readonly IImmutableList<Transformation> nameTransformations;
@@ -29,36 +27,34 @@
             IEnumerable<Filter> interfaceFilters,
             IEnumerable<Plugin> plugins)
         {
-            this.logSink = logSink;
+            this.logSink = logSink
+                .WithSource(typeof(Configuration));
             this.namespaceTransformations = namespaceTransformations.ToImmutableList();
             this.nameTransformations = nameTransformations.ToImmutableList();
             this.interfaceFilters = interfaceFilters.ToImmutableList();
             this.plugins = plugins.ToImmutableList();
 
-            if (logSink.IsEnabled)
-            {
-                var namespaceTransformationsLog = this
-                    .namespaceTransformations
-                    .Aggregate(
-                        new StringBuilder(),
-                        (sb, next) => sb.Append(" - Namespaces matching '").Append(next.Pattern).Append("' will be replaced with '").Append(next.Replacement).AppendLine("'."), sb => sb.ToString());
-                var nameTransformationsLog = this
-                    .nameTransformations
-                    .Aggregate(
-                        new StringBuilder(),
-                        (sb, next) => sb.Append(" - Names matching '").Append(next.Pattern).Append("' will be replaced with '").Append(next.Replacement).AppendLine("'."), sb => sb.ToString());
-                var interfaceFiltersLog = this
-                    .interfaceFilters
-                    .Aggregate(
-                        new StringBuilder(),
-                        (sb, next) => sb.Append(" - Interfaces matching '").Append(next.Pattern).Append("' will be '").Append(next.Type == FilterType.Include ? "included" : "excluded").AppendLine("."), sb => sb.ToString());
-                var pluginsLog = this
-                    .plugins
-                    .Aggregate(
-                        new StringBuilder(),
-                        (sb, next) => sb.Append(" - Plugin with assembly-qualified name '").Append(next.AssemblyQualifiedName).AppendLine("' will be applied."));
-                logSink.Debug(logSource, $"Created configuration with the following rules:{Environment.NewLine}{namespaceTransformationsLog}{nameTransformationsLog}{interfaceFiltersLog}{pluginsLog}");
-            }
+            var namespaceTransformationsLog = this
+                .namespaceTransformations
+                .Aggregate(
+                    new StringBuilder(),
+                    (sb, next) => sb.Append(" - Namespaces matching '").Append(next.Pattern).Append("' will be replaced with '").Append(next.Replacement).AppendLine("'."), sb => sb.ToString());
+            var nameTransformationsLog = this
+                .nameTransformations
+                .Aggregate(
+                    new StringBuilder(),
+                    (sb, next) => sb.Append(" - Names matching '").Append(next.Pattern).Append("' will be replaced with '").Append(next.Replacement).AppendLine("'."), sb => sb.ToString());
+            var interfaceFiltersLog = this
+                .interfaceFilters
+                .Aggregate(
+                    new StringBuilder(),
+                    (sb, next) => sb.Append(" - Interfaces matching '").Append(next.Pattern).Append("' will be '").Append(next.Type == FilterType.Include ? "included" : "excluded").AppendLine("."), sb => sb.ToString());
+            var pluginsLog = this
+                .plugins
+                .Aggregate(
+                    new StringBuilder(),
+                    (sb, next) => sb.Append(" - Plugin with assembly-qualified name '").Append(next.AssemblyQualifiedName).AppendLine("' will be applied."));
+            logSink.Debug($"Created configuration with the following rules:{Environment.NewLine}{namespaceTransformationsLog}{nameTransformationsLog}{interfaceFiltersLog}{pluginsLog}");
         }
 
         public IImmutableList<Transformation> NamespaceTransformations => this.namespaceTransformations;
@@ -100,11 +96,11 @@
                 var name = string.Format(
                     CultureInfo.InvariantCulture,
                     "{0}, {1}",
-                    symbol.ToDisplayString(),
+                    symbol,
                     symbol.ContainingAssembly.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat));
                 var include = false;
 
-                this.logSink.Info(logSource, "Determining inclusivity of interface: '{0}'.", name);
+                this.logSink.Info("Determining inclusivity of interface: '{0}'.", name);
 
                 foreach (var filter in this.InterfaceFilters)
                 {
@@ -117,26 +113,17 @@
                         include = Regex.IsMatch(name, filter.Pattern);
                     }
 
-                    if (this.logSink.IsEnabled)
-                    {
-                        this.logSink.Debug(
-                            logSource,
-                            " - after {0} filter '{1}', it is {2}.",
-                            filter.Type == FilterType.Include ? "inclusion" : "exclusion",
-                            filter.Pattern,
-                            include ? "included" : "excluded");
-                    }
-                }
-
-                if (logSink.IsEnabled)
-                {
-                    this.logSink.Log(
-                        logSource,
-                        include ? LogLevel.Positive : LogLevel.Negative,
-                        "'{0}' has been {1}.",
-                        name,
+                    this.logSink.Debug(
+                        " - after {0} filter '{1}', it is {2}.",
+                        filter.Type == FilterType.Include ? "inclusion" : "exclusion",
+                        filter.Pattern,
                         include ? "included" : "excluded");
                 }
+
+                this.logSink.Info(
+                    "'{0}' has been {1}.",
+                    name,
+                    include ? "included" : "excluded");
 
                 return include;
             };
@@ -158,12 +145,12 @@
 
             foreach (var plugin in this.plugins)
             {
-                this.logSink.Info(logSource, "Attempting to resolve plugin from type name '{0}'.", plugin.AssemblyQualifiedName);
+                this.logSink.Info("Attempting to resolve plugin from type name '{0}'.", plugin.AssemblyQualifiedName);
                 var type = Type.GetType(plugin.AssemblyQualifiedName);
 
                 if (type == null)
                 {
-                    this.logSink.Error(logSource, "Failed to resolve plugin from type name '{0}'.", plugin.AssemblyQualifiedName);
+                    this.logSink.Error("Failed to resolve plugin from type name '{0}'.", plugin.AssemblyQualifiedName);
                     continue;
                 }
 
@@ -173,7 +160,7 @@
 
                     if (!(resolvedPlugin is IPlugin))
                     {
-                        this.logSink.Error(logSource, "Resolved plugin '{0}' does not implement '{1}'.", resolvedPlugin.GetType().AssemblyQualifiedName, typeof(IPlugin).AssemblyQualifiedName);
+                        this.logSink.Error("Resolved plugin '{0}' does not implement '{1}'.", resolvedPlugin.GetType().AssemblyQualifiedName, typeof(IPlugin).AssemblyQualifiedName);
                         continue;
                     }
 
@@ -181,7 +168,7 @@
                 }
                 catch (Exception ex)
                 {
-                    this.logSink.Error(logSource, "Failed to create plugin from type name '{0}'. Exception was: {1}", plugin.AssemblyQualifiedName, ex);
+                    this.logSink.Error("Failed to create plugin from type name '{0}'. Exception was: {1}", plugin.AssemblyQualifiedName, ex);
                 }
             }
 
@@ -190,21 +177,17 @@
 
         private static string ApplyTransformations(ILogSink logSink, string type, string input, IImmutableList<Transformation> transformations)
         {
-            logSink.Info(logSource, "Applying {0} transformations to input: '{1}'.", type, input);
+            logSink.Info("Applying {0} transformations to input: '{1}'.", type, input);
 
             foreach (var transformation in transformations)
             {
                 input = Regex.Replace(input, transformation.Pattern, transformation.Replacement);
 
-                if (logSink.IsEnabled)
-                {
-                    logSink.Debug(
-                        logSource,
-                        " - after transformation '{0}' -> '{1}', input is now '{2}'.",
-                        transformation.Pattern,
-                        transformation.Replacement,
-                        input);
-                }
+                logSink.Debug(
+                    " - after transformation '{0}' -> '{1}', input is now '{2}'.",
+                    transformation.Pattern,
+                    transformation.Replacement,
+                    input);
             }
 
             return input;

@@ -3,6 +3,12 @@
   <PropertyGroup>
     <TargetFramework>netstandard1.0</TargetFramework>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\Art\Logo64x64.png" Pack="true" PackagePath=""/>
+  </ItemGroup>
 
 </Project>

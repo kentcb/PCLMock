@@ -1,20 +1,16 @@
 namespace PCLMock.CodeGeneration.Plugins
 {
-    using System;
     using System.Linq;
-    using System.Reflection;
-    using System.Threading.Tasks;
     using Logging;
     using Microsoft.CodeAnalysis;
 
     /// <summary>
-    /// A plugin that generates appropriate default return values for any member that uses TPL-based
-    /// asynchrony.
+    /// A plugin that generates appropriate default return values for any member that uses TPL-based asynchrony.
     /// </summary>
     /// <remarks>
     /// <para>
     /// This plugin generates default return specifications for properties and methods that use TPL-based asynchrony.
-    /// SThat is, they return an object of type <see cref="System.Threading.Tasks.Task"/> or
+    /// That is, they return an object of type <see cref="System.Threading.Tasks.Task"/> or
     /// <see cref="System.Threading.Tasks.Task{TResult}"/>. In either case, a specification is generated for the member
     /// such that a task with a default value will be returned rather than returning <see langword="null"/>.
     /// </para>
@@ -31,65 +27,64 @@ namespace PCLMock.CodeGeneration.Plugins
     /// </remarks>
     public sealed class TaskBasedAsynchrony : IPlugin
     {
-        private static readonly Type logSource = typeof(TaskBasedAsynchrony);
-
         public string Name => "Task-based Asynchrony";
 
         /// <inheritdoc />
-        public Compilation InitializeCompilation(Compilation compilation) =>
-            compilation
-                .AddReferences(
-                    MetadataReference.CreateFromFile(typeof(Task).GetTypeInfo().Assembly.Location));
+        public Compilation InitializeCompilation(ILogSink logSink, Compilation compilation) =>
+            compilation;
 
         /// <inheritdoc />
         public SyntaxNode GetDefaultValueSyntax(
             Context context,
-            MockBehavior behavior,
             ISymbol symbol,
-            INamedTypeSymbol returnType)
+            ITypeSymbol typeSymbol)
         {
-            if (behavior == MockBehavior.Loose)
-            {
-                return null;
-            }
+            context = context
+                .WithLogSink(
+                    context
+                        .LogSink
+                        .WithSource(typeof(TaskBasedAsynchrony)));
 
-            var taskBaseType = context
-                .SemanticModel
-                .Compilation
-                .GetTypeByMetadataName("System.Threading.Tasks.Task");
-
-            var genericTaskBaseType = context
-                .SemanticModel
-                .Compilation
-                .GetTypeByMetadataName("System.Threading.Tasks.Task`1");
-
-            if (taskBaseType == null || genericTaskBaseType == null)
+            if (!(typeSymbol is INamedTypeSymbol namedTypeSymbol))
             {
                 context
                     .LogSink
-                    .Warn(logSource, "Failed to resolve Task classes.");
+                    .Debug("Ignoring type '{0}' because it is not a named type symbol.", typeSymbol);
                 return null;
             }
 
-            var isGenericTask = returnType.IsGenericType && returnType.ConstructedFrom == genericTaskBaseType;
-            var isTask = returnType == taskBaseType;
+            var isTask = namedTypeSymbol.ToDisplayString() == "System.Threading.Tasks.Task";
+            var isGenericTask = namedTypeSymbol.ConstructedFrom?.ToDisplayString() == "System.Threading.Tasks.Task<TResult>";
 
             if (!isTask && !isGenericTask)
             {
                 context
                     .LogSink
-                    .Debug(logSource, "Ignoring symbol '{0}' because it does not return a Task or Task<T>.", symbol);
+                    .Debug("Type is not a task (it is '{0}').", namedTypeSymbol);
                 return null;
             }
 
-            ITypeSymbol taskType = context
+            var taskType = context
+                .SemanticModel
+                .Compilation
+                .GetPreferredTypeByMetadataName("System.Threading.Tasks.Task", preferredAssemblyNames: new[] { "System.Runtime" });
+
+            if (taskType == null)
+            {
+                context
+                    .LogSink
+                    .Debug("The Task type could not be resolved (probably a missing reference to System.Runtime).");
+                return null;
+            }
+
+            ITypeSymbol taskInnerType = context
                 .SemanticModel
                 .Compilation
                 .GetSpecialType(SpecialType.System_Boolean);
 
             if (isGenericTask)
             {
-                taskType = returnType.TypeArguments[0];
+                taskInnerType = namedTypeSymbol.TypeArguments[0];
             }
 
             var fromResultInvocation = context
@@ -103,43 +98,31 @@ namespace PCLMock.CodeGeneration.Plugins
                                 .MemberAccessExpression(
                                     context
                                         .SyntaxGenerator
-                                        .TypeExpression(taskBaseType),
+                                        .TypeExpression(taskType),
                                     "FromResult"),
                             context
                                 .SyntaxGenerator
-                                .TypeExpression(taskType)),
+                                .TypeExpression(taskInnerType)),
                     arguments: new[]
                     {
-                        GetDefaultRecursive(context, behavior, symbol, taskType)
+                        GetDefaultRecursive(context, symbol, taskInnerType)
                     });
+
+            context
+                .LogSink
+                .Debug("Generated a default value (used type '{0}' from assembly '{1}').", taskType, taskType.ContainingAssembly);
 
             return fromResultInvocation;
         }
 
         private static SyntaxNode GetDefaultRecursive(
             Context context,
-            MockBehavior behavior,
             ISymbol symbol,
-            ITypeSymbol returnType)
-        {
-            var namedTypeSymbol = returnType as INamedTypeSymbol;
-
-            if (namedTypeSymbol != null)
-            {
-                var recursiveDefault = context
+            ITypeSymbol returnType) =>
+                context
                     .Plugins
-                    .Select(plugin => plugin.GetDefaultValueSyntax(context, behavior, symbol, namedTypeSymbol))
+                    .Select(plugin => plugin.GetDefaultValueSyntax(context, symbol, returnType))
                     .Where(defaultValueSyntax => defaultValueSyntax != null)
                     .FirstOrDefault();
-
-                if (recursiveDefault != null)
-                {
-                    return recursiveDefault;
-                }
-            }
-
-            // recursive resolution not possible, so fallback to default(T)
-            return context.SyntaxGenerator.DefaultExpression(returnType);
-        }
     }
 }

@@ -1,6 +1,5 @@
 namespace PCLMock.CodeGeneration.Logging
 {
-    using System;
     using System.Text;
 
     public sealed class StringLogSink : ILogSink
@@ -12,17 +11,17 @@ namespace PCLMock.CodeGeneration.Logging
             this.stringBuilder = new StringBuilder();
         }
 
-        public bool IsEnabled => true;
-
-        public void Log(Type source, LogLevel level, string message) =>
+        public void Log(LogEvent logEvent)
+        {
             this
                 .stringBuilder
                 .Append("[")
-                .Append(source.FullName)
+                .Append(logEvent.Source ?? "<<UNKNOWN SOURCE>>")
                 .Append("] [")
-                .Append(level)
+                .Append(logEvent.Level)
                 .Append("] ")
-                .AppendLine(message);
+                .AppendLine(logEvent.FormattedMessage);
+        }
 
         public override string ToString() =>
             this.stringBuilder.ToString();

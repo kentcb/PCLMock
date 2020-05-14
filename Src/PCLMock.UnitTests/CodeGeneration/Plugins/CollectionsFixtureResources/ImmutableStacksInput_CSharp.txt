@@ -1,4 +1,4 @@
-using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 
 interface ICustomImmutableStack<T> : IImmutableStack<T>
@@ -26,13 +26,13 @@ interface ISomeInterface
 	IImmutableStack<T> SomeOtherGenericMethod<T>();
 
 	// should be ignored because they're a custom enumerable type
-	ICustomIImmutableStack<int> SomeCustomProperty
+	ICustomImmutableStack<int> SomeCustomProperty
 	{
 		get;
 	}
 
-	ICustomIImmutableStack<string> SomeMethod();
-	ICustomIImmutableStack<string> SomeMethod(int i, float f);
+	ICustomImmutableStack<string> SomeOtherMethod();
+	ICustomImmutableStack<string> SomeOtherMethod(int i, float f);
 }
 
 interface ISomeGenericInterface<T>
@@ -44,4 +44,15 @@ interface ISomeGenericInterface<T>
 
 	IImmutableStack<T> SomeMethod();
 	IImmutableStack<T> SomeMethod(int i, float f);
+}
+
+namespace The.Namespace
+{
+	internal partial class ISomeInterfaceMock
+	{
+		public ICollection<string> SomeSetOnlyProperty
+		{
+			set {}
+		}
+	}
 }

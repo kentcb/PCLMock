@@ -5,6 +5,7 @@
 *.suo
 *.user
 *.sln.docstates
+.ionide/
 
 # Build results
 
@@ -16,8 +17,9 @@ build/
 [Oo]bj/
 Gen/
 
-# FAKE
-.fake
+# Cake
+tools/**
+!tools/packages.config
 
 # Visual Studio 2015 cache/options directory
 .vs/

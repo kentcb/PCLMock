@@ -4,13 +4,13 @@
 
 PCLMock's code generator includes support for plugins. These are implementations of `PCLMock.CodeGeneration.IPlugin`. Plugins are able to participate in the code generation process, generating specifications for the target mock.
 
-PCLMock itself comes with several plugins, discussed below. They are enabled by default, but you can always disable them or replace them with your own.
+PCLMock itself comes with several plugins, discussed below. Plugins are not enabled by default (apart from an internal `Default` plugin, which is always enabled), so you'll need to ensure you add them to your configuration.
 
 ## The `IPlugin` Interface
 
 Plugins must implement the `PCLMock.CodeGeneration.IPlugin` interface. If you're writing your own plugin, you can get this interface by adding the `PCLMock.CodeGeneration` NuGet package.
 
-The `IPlugin` interface defines members that allow you to generate code that applies to all mock instances, or only loose mocks. In either case, you need to return an instance of `Microsoft.CodeAnalysis.SyntaxNode` containing the code you wish to inject into the mock.
+The `IPlugin` interface defines members that allow you to generate default values for specific types. Plugins are applied recursively, such that separate plugins can collaborate to provide a default value for complex generic types, such as `Task<List<string>>`.
 
 ## Built-in Plugins
 
@@ -140,4 +140,4 @@ This plugin can be configured thusly:
 
 Its purpose is to ensure that any method or property returning `IDisposable` will return `System.Reactive.Disposables.Disposable.Empty` by default. This ensures that consuming code can dispose of the returned value without triggering a `NullReferenceException`.
 
-Naturally, if the target code does not include a reference to _System.Reactive.Core.dll_ then no specification will be generated. 
+Naturally, if the target code does not include a reference to _System.Reactive.Core.dll_ then no specification will be generated.

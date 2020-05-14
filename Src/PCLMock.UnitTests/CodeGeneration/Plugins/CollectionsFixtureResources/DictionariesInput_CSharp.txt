@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 
 interface ICustomDictionary<TKey, TValue> : IDictionary<TKey, TValue>
@@ -36,8 +35,8 @@ interface ISomeInterface
 		get;
 	}
 
-	ICustomDictionary<int, string> SomeMethod();
-	ICustomDictionary<int, string> SomeMethod(int i, float f);
+	ICustomDictionary<int, string> SomeOtherMethod();
+	ICustomDictionary<int, string> SomeOtherMethod(int i, float f);
 }
 
 interface ISomeGenericInterface<TKey, TValue>
@@ -49,4 +48,15 @@ interface ISomeGenericInterface<TKey, TValue>
 
 	IDictionary<TKey, TValue> SomeMethod();
 	IDictionary<TKey, TValue> SomeMethod(int i, float f);
+}
+
+namespace The.Namespace
+{
+	internal partial class ISomeInterfaceMock
+	{
+		public ICollection<string> SomeSetOnlyProperty
+		{
+			set {}
+		}
+	}
 }

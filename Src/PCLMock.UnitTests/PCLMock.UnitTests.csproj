@@ -3,26 +3,12 @@
     <PropertyGroup>
         <AssemblyName>PCLMock.UnitTests</AssemblyName>
         <RootNamespace>PCLMock.UnitTests</RootNamespace>
-        <TargetFrameworks>net471;netstandard2.0</TargetFrameworks>
+        <TargetFramework>netcoreapp5.0</TargetFramework>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <LangVersion>latest</LangVersion>
         <Features>IOperation</Features>
-
-        <!--
-        see https://github.com/dotnet/corefx/issues/9788
-        TODO: remove this once fully netstandard
-        -->
-        <PackageTargetFallback>$(PackageTargetFallback);portable-net45+win8+wp8+wpa81</PackageTargetFallback>
     </PropertyGroup>
-
-    <ItemGroup>
-      <None Remove="CodeGeneration\GeneratorFixtureResources\DuplicateMemberInput_CSharp.txt" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <Compile Include="..\AssemblyInfoCommon.cs" Link="Properties\AssemblyInfoCommon.cs" />
-    </ItemGroup>
 
     <ItemGroup>
       <EmbeddedResource Include="CodeGeneration\**\*.txt" />
@@ -32,7 +18,9 @@
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" />
         <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic.Workspaces" />
         <PackageReference Include="System.Collections.Immutable" />
+        <PackageReference Include="System.Reactive" />
         <PackageReference Include="xunit" />
+        <PackageReference Include="xunit.runner.visualstudio" />
     </ItemGroup>
 
     <ItemGroup>

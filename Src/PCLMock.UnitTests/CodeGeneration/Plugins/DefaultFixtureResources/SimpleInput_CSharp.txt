@@ -1,0 +1,18 @@
+﻿interface ISomeInterface
+{
+	string StringProperty
+	{
+		get;
+	}
+
+	int IntProperty
+	{
+		get;
+	}
+
+	void VoidMethod();
+
+	string StringMethod();
+
+	int IntMethod();
+}

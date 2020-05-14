@@ -1,19 +1,28 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <OutputType>Exe</OutputType>
-        <TargetFramework>netcoreapp2.0</TargetFramework>
-        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    </PropertyGroup>
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>pclmock</ToolCommandName>
+  </PropertyGroup>
 
-    <ItemGroup>
-        <PackageReference Include="Buildalyzer" />
-        <PackageReference Include="Buildalyzer.Workspaces" />
-        <PackageReference Include="PowerArgs" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Buildalyzer" />
+    <PackageReference Include="Buildalyzer.Workspaces" />
+    <PackageReference Include="PowerArgs" />
+    <PackageReference Include="System.Reactive" />
+  </ItemGroup>
 
-    <ItemGroup>
-        <ProjectReference Include="..\PCLMock.CodeGeneration\PCLMock.CodeGeneration.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PCLMock.CodeGeneration\PCLMock.CodeGeneration.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\Art\Logo64x64.png" Pack="true" PackagePath=""/>
+  </ItemGroup>
 
 </Project>

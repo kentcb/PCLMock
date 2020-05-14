@@ -1,6 +1,7 @@
 namespace PCLMock.CodeGeneration
 {
     using Microsoft.CodeAnalysis;
+    using PCLMock.CodeGeneration.Logging;
 
     /// <summary>
     /// Defines the interface for a plugin.
@@ -34,13 +35,16 @@ namespace PCLMock.CodeGeneration
         /// plugins should simply return the provided compilation.
         /// </para>
         /// </remarks>
+        /// <param name="logSink">
+        /// The current log sink.
+        /// </param>
         /// <param name="compilation">
         /// The compilation.
         /// </param>
         /// <returns>
         /// The initialized compilation.
         /// </returns>
-        Compilation InitializeCompilation(Compilation compilation);
+        Compilation InitializeCompilation(ILogSink logSink, Compilation compilation);
 
         /// <summary>
         /// Called to generate the default value for a given symbol.
@@ -55,23 +59,19 @@ namespace PCLMock.CodeGeneration
         /// <param name="context">
         /// A context for the operation.
         /// </param>
-        /// <param name="behavior">
-        /// Indicates whether the default value is being generated for strict or loose behavioral semantics.
-        /// </param>
         /// <param name="symbol">
-        /// The symbol.
+        /// The symbol that returns a value of type <paramref name="typeSymbol"/>.
         /// </param>
-        /// <param name="returnType">
-        /// The symbol's return type.
+        /// <param name="typeSymbol">
+        /// The type for which default value syntax should be generated.
         /// </param>
         /// <returns>
-        /// An instance of <see cref="SyntaxNode"/> containing the default value, or <see langword="null"/> if no default value is
-        /// relevant.
+        /// An instance of <see cref="SyntaxNode"/> representing the default value, or <see langword="null"/> if no default value could
+        /// be determined.
         /// </returns>
         SyntaxNode GetDefaultValueSyntax(
             Context context,
-            MockBehavior behavior,
             ISymbol symbol,
-            INamedTypeSymbol returnType);
+            ITypeSymbol typeSymbol);
     }
 }

@@ -1,4 +1,4 @@
-using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 
 interface ICustomImmutableDictionary<TKey, TValue> : IImmutableDictionary<TKey, TValue>
@@ -31,8 +31,8 @@ interface ISomeInterface
 		get;
 	}
 
-	ICustomImmutableDictionary<int, string> SomeMethod();
-	ICustomImmutableDictionary<int, string> SomeMethod(int i, float f);
+	ICustomImmutableDictionary<int, string> SomeOtherMethod();
+	ICustomImmutableDictionary<int, string> SomeOtherMethod(int i, float f);
 }
 
 interface ISomeGenericInterface<TKey, TValue>
@@ -44,4 +44,15 @@ interface ISomeGenericInterface<TKey, TValue>
 
 	IImmutableDictionary<TKey, TValue> SomeMethod();
 	IImmutableDictionary<TKey, TValue> SomeMethod(int i, float f);
+}
+
+namespace The.Namespace
+{
+	internal partial class ISomeInterfaceMock
+	{
+		public ICollection<string> SomeSetOnlyProperty
+		{
+			set {}
+		}
+	}
 }

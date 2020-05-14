@@ -10,25 +10,22 @@ namespace The.Namespace
 {
     [System.CodeDom.Compiler.GeneratedCode("PCLMock", "$VERSION$")]
     [System.Runtime.CompilerServices.CompilerGenerated]
-    internal partial class Mock<T> : global::PCLMock.MockBase<global::ICustomEnumerable<T>>, global::ICustomEnumerable<T>
+    internal partial class ICustomEnumerableMock<T> : global::PCLMock.MockBase<global::ICustomEnumerable<T>>, global::ICustomEnumerable<T>
     {
-        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base(behavior)
+        public ICustomEnumerableMock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base(behavior)
         {
             ConfigureBehaviorGenerated();
             ConfigureBehavior();
             if ((behavior) == (global::PCLMock.MockBehavior.Loose))
             {
-                ConfigureLooseBehaviorGenerated();
                 ConfigureLooseBehavior();
             }
         }
 
         private void ConfigureBehaviorGenerated()
         {
-        }
-
-        private void ConfigureLooseBehaviorGenerated()
-        {
+            this.When(x => x.GetEnumerator()).Return((global::System.Collections.Generic.IEnumerator<T>)(default));
+            this.When(x => ((global::System.Collections.IEnumerable)(x)).GetEnumerator()).Return((global::System.Collections.IEnumerator)(default));
         }
 
         partial void ConfigureBehavior();
@@ -38,9 +35,9 @@ namespace The.Namespace
             return this.Apply(x => x.GetEnumerator());
         }
 
-        public global::System.Collections.IEnumerator GetEnumerator()
+        global::System.Collections.IEnumerator global::System.Collections.IEnumerable.GetEnumerator()
         {
-            return this.Apply(x => x.GetEnumerator());
+            return this.Apply(x => ((global::System.Collections.IEnumerable)(x)).GetEnumerator());
         }
     }
 }
@@ -48,15 +45,14 @@ namespace The.Namespace
 {
     [System.CodeDom.Compiler.GeneratedCode("PCLMock", "$VERSION$")]
     [System.Runtime.CompilerServices.CompilerGenerated]
-    internal partial class Mock : global::PCLMock.MockBase<global::ISomeInterface>, global::ISomeInterface
+    internal partial class ISomeInterfaceMock : global::PCLMock.MockBase<global::ISomeInterface>, global::ISomeInterface
     {
-        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base(behavior)
+        public ISomeInterfaceMock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base(behavior)
         {
             ConfigureBehaviorGenerated();
             ConfigureBehavior();
             if ((behavior) == (global::PCLMock.MockBehavior.Loose))
             {
-                ConfigureLooseBehaviorGenerated();
                 ConfigureLooseBehavior();
             }
         }
@@ -66,10 +62,9 @@ namespace The.Namespace
             this.When(x => x.SomeProperty).Return(global::System.Linq.Enumerable.Empty<global::System.Int32>());
             this.When(x => x.SomeMethod()).Return(global::System.Linq.Enumerable.Empty<global::System.String>());
             this.When(x => x.SomeMethod(global::PCLMock.It.IsAny<global::System.Int32>(), global::PCLMock.It.IsAny<global::System.Single>())).Return(global::System.Linq.Enumerable.Empty<global::System.String>());
-        }
-
-        private void ConfigureLooseBehaviorGenerated()
-        {
+            this.When(x => x.SomeCustomProperty).Return((global::ICustomEnumerable<global::System.Int32>)(default));
+            this.When(x => x.SomeOtherMethod()).Return((global::ICustomEnumerable<global::System.String>)(default));
+            this.When(x => x.SomeOtherMethod(global::PCLMock.It.IsAny<global::System.Int32>(), global::PCLMock.It.IsAny<global::System.Single>())).Return((global::ICustomEnumerable<global::System.String>)(default));
         }
 
         partial void ConfigureBehavior();
@@ -110,14 +105,14 @@ namespace The.Namespace
             }
         }
 
-        public global::ICustomEnumerable<global::System.String> SomeMethod()
+        public global::ICustomEnumerable<global::System.String> SomeOtherMethod()
         {
-            return this.Apply(x => x.SomeMethod());
+            return this.Apply(x => x.SomeOtherMethod());
         }
 
-        public global::ICustomEnumerable<global::System.String> SomeMethod(global::System.Int32 i, global::System.Single f)
+        public global::ICustomEnumerable<global::System.String> SomeOtherMethod(global::System.Int32 i, global::System.Single f)
         {
-            return this.Apply(x => x.SomeMethod(i, f));
+            return this.Apply(x => x.SomeOtherMethod(i, f));
         }
     }
 }
@@ -125,15 +120,14 @@ namespace The.Namespace
 {
     [System.CodeDom.Compiler.GeneratedCode("PCLMock", "$VERSION$")]
     [System.Runtime.CompilerServices.CompilerGenerated]
-    internal partial class Mock<T> : global::PCLMock.MockBase<global::ISomeGenericInterface<T>>, global::ISomeGenericInterface<T>
+    internal partial class ISomeGenericInterfaceMock<T> : global::PCLMock.MockBase<global::ISomeGenericInterface<T>>, global::ISomeGenericInterface<T>
     {
-        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base(behavior)
+        public ISomeGenericInterfaceMock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base(behavior)
         {
             ConfigureBehaviorGenerated();
             ConfigureBehavior();
             if ((behavior) == (global::PCLMock.MockBehavior.Loose))
             {
-                ConfigureLooseBehaviorGenerated();
                 ConfigureLooseBehavior();
             }
         }
@@ -143,10 +137,6 @@ namespace The.Namespace
             this.When(x => x.SomeProperty).Return(global::System.Linq.Enumerable.Empty<T>());
             this.When(x => x.SomeMethod()).Return(global::System.Linq.Enumerable.Empty<T>());
             this.When(x => x.SomeMethod(global::PCLMock.It.IsAny<global::System.Int32>(), global::PCLMock.It.IsAny<global::System.Single>())).Return(global::System.Linq.Enumerable.Empty<T>());
-        }
-
-        private void ConfigureLooseBehaviorGenerated()
-        {
         }
 
         partial void ConfigureBehavior();
