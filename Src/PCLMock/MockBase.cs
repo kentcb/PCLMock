@@ -49,10 +49,7 @@ Full mocked object type name: {3}";
         /// <summary>
         /// Gets the behavior of this mock.
         /// </summary>
-        public MockBehavior Behavior
-        {
-            get { return this.behavior; }
-        }
+        public MockBehavior Behavior => this.behavior;
 
         /// <summary>
         /// Gets the mocked object.

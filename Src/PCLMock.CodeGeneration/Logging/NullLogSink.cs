@@ -1,7 +1,5 @@
 namespace PCLMock.CodeGeneration.Logging
 {
-    using System;
-
     public sealed class NullLogSink : ILogSink
     {
         public static readonly NullLogSink Instance = new NullLogSink();
@@ -10,9 +8,7 @@ namespace PCLMock.CodeGeneration.Logging
         {
         }
 
-        public bool IsEnabled => false;
-
-        public void Log(Type source, LogLevel level, string message)
+        public void Log(LogEvent logEvent)
         {
         }
     }

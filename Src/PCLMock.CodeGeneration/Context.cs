@@ -72,5 +72,22 @@
         /// Gets the semantic model.
         /// </summary>
         public SemanticModel SemanticModel => this.semanticModel;
+
+        /// <summary>
+        /// Replaces this context's log sink with <paramref name="logSink"/>.
+        /// </summary>
+        /// <param name="logSink">
+        /// The new log sink.
+        /// </param>
+        /// <returns>
+        /// The new context.
+        /// </returns>
+        public Context WithLogSink(ILogSink logSink) =>
+            new Context(
+                logSink,
+                this.language,
+                this.plugins,
+                this.syntaxGenerator,
+                this.semanticModel);
     }
 }

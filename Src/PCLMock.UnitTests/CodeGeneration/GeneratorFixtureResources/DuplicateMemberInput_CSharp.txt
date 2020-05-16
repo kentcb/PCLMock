@@ -1,6 +1,4 @@
-﻿using System;
-
-public interface IFirstInterface
+﻿public interface IFirstInterface
 {
 	void FirstMethod();
 

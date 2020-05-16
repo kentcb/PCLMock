@@ -1,7 +1,6 @@
 namespace PCLMock.CodeGeneration.Plugins
 {
     using System;
-    using System.Reactive.Disposables;
     using Logging;
     using Microsoft.CodeAnalysis;
 
@@ -23,57 +22,44 @@ namespace PCLMock.CodeGeneration.Plugins
     /// </remarks>
     public sealed class Disposables : IPlugin
     {
-        private static readonly Type logSource = typeof(Disposables);
-
         public string Name => "Disposables";
 
         /// <inheritdoc />
-        public Compilation InitializeCompilation(Compilation compilation) =>
-            compilation.AddReferences(MetadataReference.CreateFromFile(typeof(Disposable).Assembly.Location));
+        public Compilation InitializeCompilation(ILogSink logSink, Compilation compilation) =>
+            compilation;
 
         /// <inheritdoc />
         public SyntaxNode GetDefaultValueSyntax(
             Context context,
-            MockBehavior behavior,
             ISymbol symbol,
-            INamedTypeSymbol returnType)
+            ITypeSymbol typeSymbol)
         {
-            if (behavior == MockBehavior.Loose)
-            {
-                return null;
-            }
+            context = context
+                .WithLogSink(
+                    context
+                        .LogSink
+                        .WithSource(typeof(Disposables)));
 
-            var disposableInterfaceType = context
-                .SemanticModel
-                .Compilation
-                .GetTypeByMetadataName("System.IDisposable");
+            var isDisposable = typeSymbol.ToDisplayString() == "System.IDisposable";
 
-            if (disposableInterfaceType == null)
+            if (!isDisposable)
             {
                 context
                     .LogSink
-                    .Warn(logSource, "Failed to resolve IDisposable type.");
-                return null;
-            }
-
-            if (returnType != disposableInterfaceType)
-            {
-                context
-                    .LogSink
-                    .Debug(logSource, "Ignoring symbol '{0}' because its return type is not IDisposable.");
+                    .Debug("Type is not IDisposable (it is '{0}').", typeSymbol);
                 return null;
             }
 
             var disposableType = context
                 .SemanticModel
                 .Compilation
-                .GetTypeByMetadataName("System.Reactive.Disposables.Disposable");
+                .GetPreferredTypeByMetadataName("System.Reactive.Disposables.Disposable", preferredAssemblyNames: new[] { "System.Reactive.Core" });
 
             if (disposableType == null)
             {
                 context
                     .LogSink
-                    .Debug(logSource, "Ignoring symbol '{0}' because Disposable type could not be resolved (probably a missing reference to System.Reactive.Core).");
+                    .Warn("The Disposable type could not be resolved (probably a missing reference to System.Reactive.Core).");
                 return null;
             }
 
@@ -86,6 +72,10 @@ namespace PCLMock.CodeGeneration.Plugins
                     context
                         .SyntaxGenerator
                         .IdentifierName("Empty"));
+
+            context
+                .LogSink
+                .Debug("Generated a default value (used type '{0}' from assembly '{1}').", disposableType, disposableType.ContainingAssembly);
 
             return result;
         }

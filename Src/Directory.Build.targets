@@ -1,0 +1,30 @@
+<Project>
+
+  <PropertyGroup>
+    <Authors>Kent Boogaart</Authors>
+    <Company />
+    <PackageLicense>https://github.com/kentcb/PCLMock/blob/master/LICENSE</PackageLicense>
+    <PackageProjectUrl>https://github.com/kentcb/PCLMock</PackageProjectUrl>
+    <PackageIcon>Logo64x64.png</PackageIcon>
+    <RepositoryUrl>https://github.com/kentcb/PCLMock</RepositoryUrl>
+    <PackageTags>.NET mono portable pcl mocking ios android xamarin</PackageTags>
+    <Description>PCLMock is mocking framework in a PCL, making it usable on platforms such as iOS and Android.</Description>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Update="Buildalyzer" Version="2.6.0" />
+    <PackageReference Update="Buildalyzer.Workspaces" Version="2.6.0" />
+    <PackageReference Update="Microsoft.CodeAnalysis.Analyzers" Version="3.0.0" />
+    <PackageReference Update="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.6.0-4.final" />
+    <PackageReference Update="Microsoft.CodeAnalysis.VisualBasic.Workspaces" Version="3.6.0-4.final" />
+    <PackageReference Update="Microsoft.CodeAnalysis.Common" Version="3.6.0-4.final" />
+    <PackageReference Update="PowerArgs" Version="3.6.0" />
+    <PackageReference Update="System.Collections.Immutable" Version="1.7.1" />
+    <PackageReference Update="System.Reactive" Version="4.4.1" />
+    <PackageReference Update="System.Xml.XPath.XDocument" Version="4.3.0" />
+    <PackageReference Update="xunit" Version="2.4.1" />
+    <PackageReference Update="xunit.runner.visualstudio" Version="2.4.1" />
+  </ItemGroup>
+
+</Project>

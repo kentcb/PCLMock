@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Globalization;
+    using System.Linq;
     using System.Reflection;
     using System.Text;
 
@@ -111,7 +112,7 @@
             if (@this is Enum)
             {
                 var @enum = (Enum)@this;
-                var isFlags = @this.GetType().GetCustomAttributes(typeof(FlagsAttribute), false).Length > 0;
+                var isFlags = @this.GetType().GetTypeInfo().GetCustomAttributes(typeof(FlagsAttribute), false).Any();
                 var result = new StringBuilder();
 
                 if (isFlags)

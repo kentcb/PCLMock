@@ -22,13 +22,24 @@ interface ISomeInterface
 
     void SomeMethod();
 
-    string SomeMethod();
+    string SomeStringMethod();
 
-    int SomeMethod();
+    int SomeIntMethod();
 
-    object SomeMethod();
+    object SomeObjectMethod();
 
-	int SomeMethod<T>();
+	int SomeGeneric1Method<T>();
 
-	int SomeMethod<T1, T2>();
+	int SomeGeneric2Method<T1, T2>();
+}
+
+namespace The.Namespace
+{
+	internal partial class ISomeInterfaceMock
+	{
+		public int SomeSetOnlyProperty
+		{
+			set {}
+		}
+	}
 }

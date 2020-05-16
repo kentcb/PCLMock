@@ -30,6 +30,6 @@ interface ISomeInterface
 		get;
 	}
 
-	ICustomDisposable SomeMethod();
-	ICustomDisposable SomeMethod(int i, float f);
+	ICustomDisposable SomeOtherMethod();
+	ICustomDisposable SomeOtherMethod(int i, float f);
 }

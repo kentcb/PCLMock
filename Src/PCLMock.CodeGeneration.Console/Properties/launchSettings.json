@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "PCLMock.CodeGeneration.Console": {
+      "commandName": "Project"
+    }
+  }
+}

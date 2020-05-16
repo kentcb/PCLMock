@@ -27,14 +27,25 @@ interface ISomeInterface
 		get;
 	}
 
-    IObservable<int> SomeMethod();
+	IObservable<int> SomeMethod();
 	IObservable<string> SomeMethod(string s, int i);
 
 	// expecting these to be ignored because of the type parameters
-	IObservable<int> SomeMethod<T>();
-	IObservable<int> SomeMethod<T1, T2>();
+	IObservable<int> SomeGeneric1Method<T>();
+	IObservable<int> SomeGeneric2Method<T1, T2>();
 
 	// expecting these two to be ignored because of it being a custom observable (which we have no way of providing a default value for)
-    ICustomObservable<int> SomeMethod();
-	ICustomObservable<string> SomeMethod(string s, int i);
+	ICustomObservable<int> SomeCustomObservableMethod();
+	ICustomObservable<string> SomeCustomObservableMethod(string s, int i);
+}
+
+namespace The.Namespace
+{
+	internal partial class ISomeInterfaceMock
+	{
+		public int SomeSetOnlyProperty
+		{
+			set {}
+		}
+	}
 }

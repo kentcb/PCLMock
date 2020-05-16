@@ -1,6 +1,4 @@
-﻿using System;
-
-public interface ISomeInterface
+﻿public interface ISomeInterface
 {
     int this[int x]
     {

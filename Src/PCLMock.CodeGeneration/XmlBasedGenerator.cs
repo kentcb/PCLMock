@@ -1,11 +1,7 @@
 ﻿namespace PCLMock.CodeGeneration
 {
-    using System;
     using System.Collections.Immutable;
     using System.IO;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
     using System.Xml.Linq;
     using Logging;
     using Microsoft.CodeAnalysis;
@@ -13,56 +9,34 @@
 
     public static class XmlBasedGenerator
     {
-        private static readonly Type logSource = typeof(XmlBasedGenerator);
-
-        public static string GenerateMocks(
-            ILogSink logSink,
-            string solutionPath,
-            string xmlPath,
-            string language)
-        {
-            var castLanguage = (Language)Enum.Parse(typeof(Language), language);
-            return GenerateMocks(logSink, castLanguage, solutionPath, xmlPath);
-        }
-
-        public static string GenerateMocks(
+        public static IImmutableList<SyntaxNode> GenerateMocks(
             ILogSink logSink,
             Language language,
-            string solutionPath,
+            IImmutableList<Compilation> compilations,
             string xmlPath)
         {
-            return GenerateMocksAsync(logSink, language, solutionPath, xmlPath)
-                .Result
-                .Select(x => x.ToFullString())
-                .Aggregate(new StringBuilder(), (current, next) => current.AppendLine(next), x => x.ToString());
-        }
+            logSink = logSink
+                .WithSource(typeof(XmlBasedGenerator));
 
-        public async static Task<IImmutableList<SyntaxNode>> GenerateMocksAsync(
-            ILogSink logSink,
-            Language language,
-            string solutionPath,
-            string xmlPath)
-        {
             if (!File.Exists(xmlPath))
             {
-                var message = $"XML input file '{xmlPath}' no found.";
-                logSink.Error(logSource, message);
-                throw new IOException(message);
+                logSink.Error("XML input file '{0}' not found.", xmlPath);
+                return ImmutableList<SyntaxNode>.Empty;
             }
 
-            logSink.Info(logSource, "Loading XML input file '{0}'.", xmlPath);
+            logSink.Info("Loading XML input file '{0}'.", xmlPath);
 
             var document = XDocument.Load(xmlPath);
             var configuration = Configuration.FromXDocument(logSink, document);
 
-            return await Generator.GenerateMocksAsync(
+            return Generator.GenerateMocks(
                 logSink,
                 language,
-                solutionPath,
+                compilations,
+                configuration.GetPlugins(),
                 configuration.GetInterfacePredicate(),
                 configuration.GetNamespaceSelector(),
-                configuration.GetNameSelector(),
-                configuration.GetPlugins());
+                configuration.GetNameSelector());
         }
     }
 }

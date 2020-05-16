@@ -10,15 +10,14 @@ namespace The.Namespace
 {
     [System.CodeDom.Compiler.GeneratedCode("PCLMock", "$VERSION$")]
     [System.Runtime.CompilerServices.CompilerGenerated]
-    internal partial class Mock<T> : global::PCLMock.MockBase<global::ICustomImmutableStack<T>>, global::ICustomImmutableStack<T>
+    internal partial class ICustomImmutableStackMock<T> : global::PCLMock.MockBase<global::ICustomImmutableStack<T>>, global::ICustomImmutableStack<T>
     {
-        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base (behavior)
+        public ICustomImmutableStackMock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base(behavior)
         {
             ConfigureBehaviorGenerated();
             ConfigureBehavior();
             if ((behavior) == (global::PCLMock.MockBehavior.Loose))
             {
-                ConfigureLooseBehaviorGenerated();
                 ConfigureLooseBehavior();
             }
         }
@@ -28,10 +27,9 @@ namespace The.Namespace
             this.When(x => x.Clear()).Return(global::System.Collections.Immutable.ImmutableStack<T>.Empty);
             this.When(x => x.Push(global::PCLMock.It.IsAny<T>())).Return(global::System.Collections.Immutable.ImmutableStack<T>.Empty);
             this.When(x => x.Pop()).Return(global::System.Collections.Immutable.ImmutableStack<T>.Empty);
-        }
-
-        private void ConfigureLooseBehaviorGenerated()
-        {
+            this.When(x => x.IsEmpty).Return((global::System.Boolean)(default));
+            this.When(x => x.GetEnumerator()).Return((global::System.Collections.Generic.IEnumerator<T>)(default));
+            this.When(x => ((global::System.Collections.IEnumerable)(x)).GetEnumerator()).Return((global::System.Collections.IEnumerator)(default));
         }
 
         partial void ConfigureBehavior();
@@ -56,12 +54,22 @@ namespace The.Namespace
             return this.Apply(x => x.Peek());
         }
 
-        public System.Boolean IsEmpty
+        public global::System.Boolean IsEmpty
         {
             get
             {
                 return this.Apply(x => x.IsEmpty);
             }
+        }
+
+        public global::System.Collections.Generic.IEnumerator<T> GetEnumerator()
+        {
+            return this.Apply(x => x.GetEnumerator());
+        }
+
+        global::System.Collections.IEnumerator global::System.Collections.IEnumerable.GetEnumerator()
+        {
+            return this.Apply(x => ((global::System.Collections.IEnumerable)(x)).GetEnumerator());
         }
     }
 }
@@ -69,33 +77,31 @@ namespace The.Namespace
 {
     [System.CodeDom.Compiler.GeneratedCode("PCLMock", "$VERSION$")]
     [System.Runtime.CompilerServices.CompilerGenerated]
-    internal partial class Mock : global::PCLMock.MockBase<global::ISomeInterface>, global::ISomeInterface
+    internal partial class ISomeInterfaceMock : global::PCLMock.MockBase<global::ISomeInterface>, global::ISomeInterface
     {
-        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base (behavior)
+        public ISomeInterfaceMock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base(behavior)
         {
             ConfigureBehaviorGenerated();
             ConfigureBehavior();
             if ((behavior) == (global::PCLMock.MockBehavior.Loose))
             {
-                ConfigureLooseBehaviorGenerated();
                 ConfigureLooseBehavior();
             }
         }
 
         private void ConfigureBehaviorGenerated()
         {
-            this.When(x => x.SomeProperty).Return(global::System.Collections.Immutable.ImmutableStack<System.Int32>.Empty);
-            this.When(x => x.SomeMethod()).Return(global::System.Collections.Immutable.ImmutableStack<System.String>.Empty);
-            this.When(x => x.SomeMethod(global::PCLMock.It.IsAny<System.Int32>(), global::PCLMock.It.IsAny<System.Single>())).Return(global::System.Collections.Immutable.ImmutableStack<System.String>.Empty);
-        }
-
-        private void ConfigureLooseBehaviorGenerated()
-        {
+            this.When(x => x.SomeProperty).Return(global::System.Collections.Immutable.ImmutableStack<global::System.Int32>.Empty);
+            this.When(x => x.SomeMethod()).Return(global::System.Collections.Immutable.ImmutableStack<global::System.String>.Empty);
+            this.When(x => x.SomeMethod(global::PCLMock.It.IsAny<global::System.Int32>(), global::PCLMock.It.IsAny<global::System.Single>())).Return(global::System.Collections.Immutable.ImmutableStack<global::System.String>.Empty);
+            this.When(x => x.SomeCustomProperty).Return((global::ICustomImmutableStack<global::System.Int32>)(default));
+            this.When(x => x.SomeOtherMethod()).Return((global::ICustomImmutableStack<global::System.String>)(default));
+            this.When(x => x.SomeOtherMethod(global::PCLMock.It.IsAny<global::System.Int32>(), global::PCLMock.It.IsAny<global::System.Single>())).Return((global::ICustomImmutableStack<global::System.String>)(default));
         }
 
         partial void ConfigureBehavior();
         partial void ConfigureLooseBehavior();
-        public global::System.Collections.Immutable.IImmutableStack<System.Int32> SomeProperty
+        public global::System.Collections.Immutable.IImmutableStack<global::System.Int32> SomeProperty
         {
             get
             {
@@ -103,17 +109,17 @@ namespace The.Namespace
             }
         }
 
-        public global::System.Collections.Immutable.IImmutableStack<System.String> SomeMethod()
+        public global::System.Collections.Immutable.IImmutableStack<global::System.String> SomeMethod()
         {
             return this.Apply(x => x.SomeMethod());
         }
 
-        public global::System.Collections.Immutable.IImmutableStack<System.String> SomeMethod(System.Int32 i, System.Single f)
+        public global::System.Collections.Immutable.IImmutableStack<global::System.String> SomeMethod(global::System.Int32 i, global::System.Single f)
         {
             return this.Apply(x => x.SomeMethod(i, f));
         }
 
-        public global::System.Collections.Immutable.IImmutableStack<System.Int32> SomeGenericMethod<T>()
+        public global::System.Collections.Immutable.IImmutableStack<global::System.Int32> SomeGenericMethod<T>()
         {
             return this.Apply(x => x.SomeGenericMethod<T>());
         }
@@ -123,7 +129,7 @@ namespace The.Namespace
             return this.Apply(x => x.SomeOtherGenericMethod<T>());
         }
 
-        public ICustomIImmutableStack<System.Int32> SomeCustomProperty
+        public global::ICustomImmutableStack<global::System.Int32> SomeCustomProperty
         {
             get
             {
@@ -131,14 +137,14 @@ namespace The.Namespace
             }
         }
 
-        public ICustomIImmutableStack<System.String> SomeMethod()
+        public global::ICustomImmutableStack<global::System.String> SomeOtherMethod()
         {
-            return this.Apply(x => x.SomeMethod());
+            return this.Apply(x => x.SomeOtherMethod());
         }
 
-        public ICustomIImmutableStack<System.String> SomeMethod(System.Int32 i, System.Single f)
+        public global::ICustomImmutableStack<global::System.String> SomeOtherMethod(global::System.Int32 i, global::System.Single f)
         {
-            return this.Apply(x => x.SomeMethod(i, f));
+            return this.Apply(x => x.SomeOtherMethod(i, f));
         }
     }
 }
@@ -146,15 +152,14 @@ namespace The.Namespace
 {
     [System.CodeDom.Compiler.GeneratedCode("PCLMock", "$VERSION$")]
     [System.Runtime.CompilerServices.CompilerGenerated]
-    internal partial class Mock<T> : global::PCLMock.MockBase<global::ISomeGenericInterface<T>>, global::ISomeGenericInterface<T>
+    internal partial class ISomeGenericInterfaceMock<T> : global::PCLMock.MockBase<global::ISomeGenericInterface<T>>, global::ISomeGenericInterface<T>
     {
-        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base (behavior)
+        public ISomeGenericInterfaceMock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base(behavior)
         {
             ConfigureBehaviorGenerated();
             ConfigureBehavior();
             if ((behavior) == (global::PCLMock.MockBehavior.Loose))
             {
-                ConfigureLooseBehaviorGenerated();
                 ConfigureLooseBehavior();
             }
         }
@@ -163,11 +168,7 @@ namespace The.Namespace
         {
             this.When(x => x.SomeProperty).Return(global::System.Collections.Immutable.ImmutableStack<T>.Empty);
             this.When(x => x.SomeMethod()).Return(global::System.Collections.Immutable.ImmutableStack<T>.Empty);
-            this.When(x => x.SomeMethod(global::PCLMock.It.IsAny<System.Int32>(), global::PCLMock.It.IsAny<System.Single>())).Return(global::System.Collections.Immutable.ImmutableStack<T>.Empty);
-        }
-
-        private void ConfigureLooseBehaviorGenerated()
-        {
+            this.When(x => x.SomeMethod(global::PCLMock.It.IsAny<global::System.Int32>(), global::PCLMock.It.IsAny<global::System.Single>())).Return(global::System.Collections.Immutable.ImmutableStack<T>.Empty);
         }
 
         partial void ConfigureBehavior();
@@ -185,7 +186,7 @@ namespace The.Namespace
             return this.Apply(x => x.SomeMethod());
         }
 
-        public global::System.Collections.Immutable.IImmutableStack<T> SomeMethod(System.Int32 i, System.Single f)
+        public global::System.Collections.Immutable.IImmutableStack<T> SomeMethod(global::System.Int32 i, global::System.Single f)
         {
             return this.Apply(x => x.SomeMethod(i, f));
         }

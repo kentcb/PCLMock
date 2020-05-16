@@ -10,25 +10,26 @@ namespace The.Namespace
 {
     [System.CodeDom.Compiler.GeneratedCode("PCLMock", "$VERSION$")]
     [System.Runtime.CompilerServices.CompilerGenerated]
-    internal partial class Mock<T> : global::PCLMock.MockBase<global::ICustomCollection<T>>, global::ICustomCollection<T>
+    internal partial class ICustomCollectionMock<T> : global::PCLMock.MockBase<global::ICustomCollection<T>>, global::ICustomCollection<T>
     {
-        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base (behavior)
+        public ICustomCollectionMock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base(behavior)
         {
             ConfigureBehaviorGenerated();
             ConfigureBehavior();
             if ((behavior) == (global::PCLMock.MockBehavior.Loose))
             {
-                ConfigureLooseBehaviorGenerated();
                 ConfigureLooseBehavior();
             }
         }
 
         private void ConfigureBehaviorGenerated()
         {
-        }
-
-        private void ConfigureLooseBehaviorGenerated()
-        {
+            this.When(x => x.Contains(global::PCLMock.It.IsAny<T>())).Return((global::System.Boolean)(default));
+            this.When(x => x.Remove(global::PCLMock.It.IsAny<T>())).Return((global::System.Boolean)(default));
+            this.When(x => x.Count).Return((global::System.Int32)(default));
+            this.When(x => x.IsReadOnly).Return((global::System.Boolean)(default));
+            this.When(x => x.GetEnumerator()).Return((global::System.Collections.Generic.IEnumerator<T>)(default));
+            this.When(x => ((global::System.Collections.IEnumerable)(x)).GetEnumerator()).Return((global::System.Collections.IEnumerator)(default));
         }
 
         partial void ConfigureBehavior();
@@ -43,22 +44,22 @@ namespace The.Namespace
             this.Apply(x => x.Clear());
         }
 
-        public System.Boolean Contains(T item)
+        public global::System.Boolean Contains(T item)
         {
             return this.Apply(x => x.Contains(item));
         }
 
-        public void CopyTo(T[] array, System.Int32 arrayIndex)
+        public void CopyTo(T[] array, global::System.Int32 arrayIndex)
         {
             this.Apply(x => x.CopyTo(array, arrayIndex));
         }
 
-        public System.Boolean Remove(T item)
+        public global::System.Boolean Remove(T item)
         {
             return this.Apply(x => x.Remove(item));
         }
 
-        public System.Int32 Count
+        public global::System.Int32 Count
         {
             get
             {
@@ -66,7 +67,7 @@ namespace The.Namespace
             }
         }
 
-        public System.Boolean IsReadOnly
+        public global::System.Boolean IsReadOnly
         {
             get
             {
@@ -78,40 +79,43 @@ namespace The.Namespace
         {
             return this.Apply(x => x.GetEnumerator());
         }
+
+        global::System.Collections.IEnumerator global::System.Collections.IEnumerable.GetEnumerator()
+        {
+            return this.Apply(x => ((global::System.Collections.IEnumerable)(x)).GetEnumerator());
+        }
     }
 }
 namespace The.Namespace
 {
     [System.CodeDom.Compiler.GeneratedCode("PCLMock", "$VERSION$")]
     [System.Runtime.CompilerServices.CompilerGenerated]
-    internal partial class Mock : global::PCLMock.MockBase<global::ISomeInterface>, global::ISomeInterface
+    internal partial class ISomeInterfaceMock : global::PCLMock.MockBase<global::ISomeInterface>, global::ISomeInterface
     {
-        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base (behavior)
+        public ISomeInterfaceMock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base(behavior)
         {
             ConfigureBehaviorGenerated();
             ConfigureBehavior();
             if ((behavior) == (global::PCLMock.MockBehavior.Loose))
             {
-                ConfigureLooseBehaviorGenerated();
                 ConfigureLooseBehavior();
             }
         }
 
         private void ConfigureBehaviorGenerated()
         {
-            this.When(x => x.SomeProperty).Return(new global::System.Collections.Generic.List<System.Int32>());
-            this.When(x => x.SomeReadOnlyProperty).Return(new global::System.Collections.Generic.List<System.Int32>());
-            this.When(x => x.SomeMethod()).Return(new global::System.Collections.Generic.List<System.String>());
-            this.When(x => x.SomeMethod(global::PCLMock.It.IsAny<System.Int32>(), global::PCLMock.It.IsAny<System.Single>())).Return(new global::System.Collections.Generic.List<System.String>());
-        }
-
-        private void ConfigureLooseBehaviorGenerated()
-        {
+            this.When(x => x.SomeProperty).Return(new global::System.Collections.Generic.List<global::System.Int32>());
+            this.When(x => x.SomeReadOnlyProperty).Return(new global::System.Collections.Generic.List<global::System.Int32>());
+            this.When(x => x.SomeMethod()).Return(new global::System.Collections.Generic.List<global::System.String>());
+            this.When(x => x.SomeMethod(global::PCLMock.It.IsAny<global::System.Int32>(), global::PCLMock.It.IsAny<global::System.Single>())).Return(new global::System.Collections.Generic.List<global::System.String>());
+            this.When(x => x.SomeCustomProperty).Return((global::ICustomCollection<global::System.Int32>)(default));
+            this.When(x => x.SomeOtherMethod()).Return((global::ICustomCollection<global::System.String>)(default));
+            this.When(x => x.SomeOtherMethod(global::PCLMock.It.IsAny<global::System.Int32>(), global::PCLMock.It.IsAny<global::System.Single>())).Return((global::ICustomCollection<global::System.String>)(default));
         }
 
         partial void ConfigureBehavior();
         partial void ConfigureLooseBehavior();
-        public global::System.Collections.Generic.ICollection<System.Int32> SomeProperty
+        public global::System.Collections.Generic.ICollection<global::System.Int32> SomeProperty
         {
             get
             {
@@ -119,7 +123,7 @@ namespace The.Namespace
             }
         }
 
-        public global::System.Collections.Generic.IReadOnlyCollection<System.Int32> SomeReadOnlyProperty
+        public global::System.Collections.Generic.IReadOnlyCollection<global::System.Int32> SomeReadOnlyProperty
         {
             get
             {
@@ -127,17 +131,17 @@ namespace The.Namespace
             }
         }
 
-        public global::System.Collections.Generic.ICollection<System.String> SomeMethod()
+        public global::System.Collections.Generic.ICollection<global::System.String> SomeMethod()
         {
             return this.Apply(x => x.SomeMethod());
         }
 
-        public global::System.Collections.Generic.ICollection<System.String> SomeMethod(System.Int32 i, System.Single f)
+        public global::System.Collections.Generic.ICollection<global::System.String> SomeMethod(global::System.Int32 i, global::System.Single f)
         {
             return this.Apply(x => x.SomeMethod(i, f));
         }
 
-        public global::System.Collections.Generic.ICollection<System.Int32> SomeGenericMethod<T>()
+        public global::System.Collections.Generic.ICollection<global::System.Int32> SomeGenericMethod<T>()
         {
             return this.Apply(x => x.SomeGenericMethod<T>());
         }
@@ -147,7 +151,7 @@ namespace The.Namespace
             return this.Apply(x => x.SomeOtherGenericMethod<T>());
         }
 
-        public global::ICustomCollection<System.Int32> SomeCustomProperty
+        public global::ICustomCollection<global::System.Int32> SomeCustomProperty
         {
             get
             {
@@ -155,14 +159,14 @@ namespace The.Namespace
             }
         }
 
-        public global::ICustomCollection<System.String> SomeMethod()
+        public global::ICustomCollection<global::System.String> SomeOtherMethod()
         {
-            return this.Apply(x => x.SomeMethod());
+            return this.Apply(x => x.SomeOtherMethod());
         }
 
-        public global::ICustomCollection<System.String> SomeMethod(System.Int32 i, System.Single f)
+        public global::ICustomCollection<global::System.String> SomeOtherMethod(global::System.Int32 i, global::System.Single f)
         {
-            return this.Apply(x => x.SomeMethod(i, f));
+            return this.Apply(x => x.SomeOtherMethod(i, f));
         }
     }
 }
@@ -170,15 +174,14 @@ namespace The.Namespace
 {
     [System.CodeDom.Compiler.GeneratedCode("PCLMock", "$VERSION$")]
     [System.Runtime.CompilerServices.CompilerGenerated]
-    internal partial class Mock<T> : global::PCLMock.MockBase<global::ISomeGenericInterface<T>>, global::ISomeGenericInterface<T>
+    internal partial class ISomeGenericInterfaceMock<T> : global::PCLMock.MockBase<global::ISomeGenericInterface<T>>, global::ISomeGenericInterface<T>
     {
-        public Mock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base (behavior)
+        public ISomeGenericInterfaceMock(global::PCLMock.MockBehavior behavior = global::PCLMock.MockBehavior.Strict): base(behavior)
         {
             ConfigureBehaviorGenerated();
             ConfigureBehavior();
             if ((behavior) == (global::PCLMock.MockBehavior.Loose))
             {
-                ConfigureLooseBehaviorGenerated();
                 ConfigureLooseBehavior();
             }
         }
@@ -187,11 +190,7 @@ namespace The.Namespace
         {
             this.When(x => x.SomeProperty).Return(new global::System.Collections.Generic.List<T>());
             this.When(x => x.SomeMethod()).Return(new global::System.Collections.Generic.List<T>());
-            this.When(x => x.SomeMethod(global::PCLMock.It.IsAny<System.Int32>(), global::PCLMock.It.IsAny<System.Single>())).Return(new global::System.Collections.Generic.List<T>());
-        }
-
-        private void ConfigureLooseBehaviorGenerated()
-        {
+            this.When(x => x.SomeMethod(global::PCLMock.It.IsAny<global::System.Int32>(), global::PCLMock.It.IsAny<global::System.Single>())).Return(new global::System.Collections.Generic.List<T>());
         }
 
         partial void ConfigureBehavior();
@@ -209,7 +208,7 @@ namespace The.Namespace
             return this.Apply(x => x.SomeMethod());
         }
 
-        public global::System.Collections.Generic.ICollection<T> SomeMethod(System.Int32 i, System.Single f)
+        public global::System.Collections.Generic.ICollection<T> SomeMethod(global::System.Int32 i, global::System.Single f)
         {
             return this.Apply(x => x.SomeMethod(i, f));
         }

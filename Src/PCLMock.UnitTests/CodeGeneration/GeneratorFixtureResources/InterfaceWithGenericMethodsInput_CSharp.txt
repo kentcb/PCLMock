@@ -1,4 +1,6 @@
-﻿public interface IInterfaceWithGenericMethods
+﻿using System;
+
+public interface IInterfaceWithGenericMethods
 {
     void VoidMethodWithGenericParameter<T>();
 

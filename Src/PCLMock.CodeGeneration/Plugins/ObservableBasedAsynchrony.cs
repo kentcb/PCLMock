@@ -7,8 +7,7 @@ namespace PCLMock.CodeGeneration.Plugins
     using Microsoft.CodeAnalysis;
 
     /// <summary>
-    /// A plugin that generates appropriate default return values for any member that uses observable-based
-    /// asynchrony.
+    /// A plugin that generates appropriate default return values for any member that uses observable-based asynchrony.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -35,63 +34,56 @@ namespace PCLMock.CodeGeneration.Plugins
     /// </remarks>
     public sealed class ObservableBasedAsynchrony : IPlugin
     {
-        private static readonly Type logSource = typeof(ObservableBasedAsynchrony);
-
         public string Name => "Observable-based Asynchrony";
 
         /// <inheritdoc />
-        public Compilation InitializeCompilation(Compilation compilation) =>
-            compilation.AddReferences(MetadataReference.CreateFromFile(typeof(Observable).Assembly.Location));
+        public Compilation InitializeCompilation(ILogSink logSink, Compilation compilation) =>
+            compilation;
 
         /// <inheritdoc />
         public SyntaxNode GetDefaultValueSyntax(
             Context context,
-            MockBehavior behavior,
             ISymbol symbol,
-            INamedTypeSymbol returnType)
+            ITypeSymbol typeSymbol)
         {
-            if (behavior == MockBehavior.Loose)
-            {
-                return null;
-            }
+            context = context
+                .WithLogSink(
+                    context
+                        .LogSink
+                        .WithSource(typeof(ObservableBasedAsynchrony)));
 
-            var observableInterfaceType = context
-                .SemanticModel
-                .Compilation
-                .GetTypeByMetadataName("System.IObservable`1");
-
-            var observableType = context
-                .SemanticModel
-                .Compilation
-                .GetTypeByMetadataName("System.Reactive.Linq.Observable");
-
-            if (observableInterfaceType == null)
+            if (!(typeSymbol is INamedTypeSymbol namedTypeSymbol))
             {
                 context
                     .LogSink
-                    .Warn(logSource, "Failed to resolve System.IObservable<T>.");
+                    .Debug("Ignoring type '{0}' because it is not a named type symbol.", typeSymbol);
                 return null;
             }
 
-            if (observableType == null)
-            {
-                context
-                    .LogSink
-                    .Warn(logSource, "Failed to resolve System.Reactive.Linq.Observable.");
-                return null;
-            }
-
-            var isObservable = returnType.IsGenericType && returnType.ConstructedFrom == observableInterfaceType;
+            var isObservable = namedTypeSymbol.ConstructedFrom?.ToDisplayString() == "System.IObservable<T>";
 
             if (!isObservable)
             {
                 context
                     .LogSink
-                    .Debug(logSource, "Ignoring symbol '{0}' because it does not return IObservable<T>.", symbol);
+                    .Debug("Type is not IObservable (it is '{0}').", namedTypeSymbol);
                 return null;
             }
 
-            var observableInnerType = returnType.TypeArguments[0];
+            var observableType = context
+                .SemanticModel
+                .Compilation
+                .GetPreferredTypeByMetadataName("System.Reactive.Linq.Observable", preferredAssemblyNames: new[] { "System.Reactive.Linq" });
+
+            if (observableType == null)
+            {
+                context
+                    .LogSink
+                    .Debug("The Observable type could not be resolved (probably a missing reference to System.Reactive.Linq).");
+                return null;
+            }
+
+            var observableInnerType = namedTypeSymbol.TypeArguments[0];
             SyntaxNode observableInvocation;
             var propertySymbol = symbol as IPropertySymbol;
 
@@ -136,37 +128,25 @@ namespace PCLMock.CodeGeneration.Plugins
                                     .TypeExpression(observableInnerType)),
                         arguments: new[]
                         {
-                            GetDefaultRecursive(context, behavior, symbol, observableInnerType)
+                            GetDefaultRecursive(context, symbol, observableInnerType)
                         });
             }
+
+            context
+                .LogSink
+                .Debug("Generated a default value (used type '{0}' from assembly '{1}').", observableType, observableType.ContainingAssembly);
 
             return observableInvocation;
         }
 
         private static SyntaxNode GetDefaultRecursive(
             Context context,
-            MockBehavior behavior,
             ISymbol symbol,
-            ITypeSymbol returnType)
-        {
-            var namedTypeSymbol = returnType as INamedTypeSymbol;
-
-            if (namedTypeSymbol != null)
-            {
-                var recursiveDefault = context
+            ITypeSymbol returnType) =>
+                context
                     .Plugins
-                    .Select(plugin => plugin.GetDefaultValueSyntax(context, behavior, symbol, namedTypeSymbol))
+                    .Select(plugin => plugin.GetDefaultValueSyntax(context, symbol, returnType))
                     .Where(defaultValueSyntax => defaultValueSyntax != null)
                     .FirstOrDefault();
-
-                if (recursiveDefault != null)
-                {
-                    return recursiveDefault;
-                }
-            }
-
-            // recursive resolution not possible, so fallback to default(T)
-            return context.SyntaxGenerator.DefaultExpression(returnType);
-        }
     }
 }
