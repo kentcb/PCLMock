@@ -22,9 +22,7 @@
         {
             Debug.Assert(expression != null);
 
-            var methodCallExpression = expression as MethodCallExpression;
-
-            if (methodCallExpression != null && methodCallExpression.Method.ReturnType == typeof(void))
+            if (expression is MethodCallExpression methodCallExpression && methodCallExpression.Method.ReturnType == typeof(void))
             {
                 value = null;
                 return false;

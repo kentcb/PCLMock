@@ -44,8 +44,11 @@
                 .DeclaringType
                 .GetTypeInfo()
                 .DeclaredMethods
-                .Where(declaredMethod => declaredMethod.IsStatic)
-                .Where(x => x.Name == node.Method.Name + "Filter" && x.GetParameters().Length == node.Arguments.Count)
+                .Where(
+                    declaredMethod =>
+                        declaredMethod.IsStatic &&
+                        declaredMethod.Name == node.Method.Name + "Filter" &&
+                        declaredMethod.GetParameters().Length == node.Arguments.Count)
                 .FirstOrDefault();
 
             if (filterMethod != null && filterMethod.ReturnType == typeof(IArgumentFilter))

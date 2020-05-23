@@ -49,7 +49,8 @@
 
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
-            this.arguments = node.Arguments
+            this.arguments = node
+                .Arguments
                 .Select(x => ValueExtractor.FindValueWithin(x))
                 .ToArray();
 

@@ -159,10 +159,8 @@
             }
         }
 
-        private static void ThrowVerificationException(string format, params object[] args)
-        {
+        private static void ThrowVerificationException(string format, params object[] args) =>
             throw new VerificationException(string.Format(CultureInfo.InvariantCulture, format, args));
-        }
 
         private string GetSelectorString()
         {
@@ -171,12 +169,11 @@
             return visitor.ToString();
         }
 
-        private IList<Invocation> GetMatchingInvocations()
-        {
-            return this
-                .whenContinuationCollection.Invocations
+        private IList<Invocation> GetMatchingInvocations() =>
+            this
+                .whenContinuationCollection
+                .Invocations
                 .Where(x => this.filters.Matches(x.Arguments))
                 .ToList();
-        }
     }
 }
