@@ -7,6 +7,7 @@
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
+    using System.Runtime.ExceptionServices;
     using System.Text;
     using PCLMock.Utility;
     using PCLMock.Visitors;
@@ -346,15 +347,26 @@
         {
             Debug.Assert(args != null);
 
-            if (this.exception != null)
-            {
-                throw this.exception;
-            }
-
             if (this.doAction != null)
             {
                 args = this.ValidateActionArgs("Do", this.doAction.GetMethodInfo().GetParameters().Select(x => x.ParameterType).ToArray(), args);
-                this.doAction.DynamicInvoke(args);
+
+                try
+                {
+                    this.doAction.DynamicInvoke(args);
+                }
+                catch (TargetInvocationException ex)
+                {
+                    // Unwrap the inner exception and preserve its stack trace.
+                    ExceptionDispatchInfo
+                        .Capture(ex.InnerException)
+                        .Throw();
+                }
+            }
+
+            if (this.exception != null)
+            {
+                throw this.exception;
             }
 
             return null;
