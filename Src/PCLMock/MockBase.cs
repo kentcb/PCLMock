@@ -41,9 +41,9 @@ Full mocked object type name: {3}";
         /// </param>
         protected MockBase(MockBehavior behavior)
         {
+            this.behavior = behavior;
             this.continuations = new Dictionary<ContinuationKey, WhenContinuationCollection>();
             this.continuationsSync = new object();
-            this.behavior = behavior;
         }
 
         /// <summary>
@@ -148,8 +148,10 @@ Full mocked object type name: {3}";
                 valueFilterSelector = () => It.IsAny<TMember>();
             }
 
-            var filters = new ArgumentFilterCollection();
-            filters.Add(ArgumentFilterVisitor.FindArgumentFilterWithin(valueFilterSelector.Body));
+            var filters = new ArgumentFilterCollection
+            {
+                ArgumentFilterVisitor.FindArgumentFilterWithin(valueFilterSelector.Body)
+            };
             var continuation = new WhenContinuation<TMock, TMember>(propertySelector, filters);
             this.AddOrReplaceWhenContinuation(propertySelector, continuation);
             return continuation;
@@ -265,7 +267,7 @@ Full mocked object type name: {3}";
 
             if (continuation == null)
             {
-                return default(TMember);
+                return default;
             }
 
             return (TMember)continuation.Apply(this.MockedObject, args);
@@ -321,7 +323,7 @@ Full mocked object type name: {3}";
 
             if (continuation == null)
             {
-                return default(T);
+                return default;
             }
 
             return continuation.GetOutParameterValue<T>(parameterIndex);
@@ -345,13 +347,13 @@ Full mocked object type name: {3}";
         /// <returns>
         /// The value assigned to that <c>ref</c> parameter.
         /// </returns>
-        protected T GetRefParameterValue<T>(Expression<Action<TMock>> selector, int parameterIndex, T defaultValue = default(T))
+        protected T GetRefParameterValue<T>(Expression<Action<TMock>> selector, int parameterIndex, T defaultValue = default)
         {
             var continuation = this.GetWhenContinuation(selector, null);
 
             if (continuation == null)
             {
-                return default(T);
+                return default;
             }
 
             return continuation.GetRefParameterValue<T>(parameterIndex, defaultValue);

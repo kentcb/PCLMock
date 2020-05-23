@@ -30,10 +30,7 @@
             this.outAndRefAssignments = new Dictionary<int, object>();
         }
 
-        internal ArgumentFilterCollection Filters
-        {
-            get { return this.filters; }
-        }
+        internal ArgumentFilterCollection Filters => this.filters;
 
         /// <inheritdoc/>
         public bool Equals(WhenContinuation other)
