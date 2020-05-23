@@ -2,7 +2,7 @@ using System;
 
 // Parameters.
 var projectName = "PCLMock";
-var versionMajorMinorPatch = "5.1.2";
+var versionMajorMinorPatch = "5.1.3";
 var versionSuffix = "-alpha";
 var semanticVersion = versionMajorMinorPatch + versionSuffix;
 var version = versionMajorMinorPatch + ".0" + versionSuffix;
