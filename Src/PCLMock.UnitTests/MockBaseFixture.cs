@@ -4,7 +4,6 @@
     using System.Text.RegularExpressions;
     using PCLMock;
     using Xunit;
-    using Xunit.Extensions;
 
     public sealed class MockBaseFixture
     {
@@ -269,6 +268,45 @@ Full mocked object type name: PCLMock.UnitTests.MockBaseFixture+UnsealedClass";
 
             Assert.Equal(21, iValue);
             Assert.Equal(43f, fValue);
+        }
+
+        [Fact]
+        public void do_executes_even_if_there_is_a_throw()
+        {
+            var mock = new TestTargetMock();
+            var called = false;
+            mock
+                .When(x => x.SomeMethod())
+                .Do(() => called = true)
+                .Throw();
+
+            try
+            {
+                mock.SomeMethod();
+            }
+            catch
+            {
+            }
+
+            Assert.True(called);
+        }
+
+        [Fact]
+        public void do_that_throws_will_throw_the_original_exception_rather_than_a_wrapped_one()
+        {
+            var mock = new TestTargetMock();
+            mock
+                .When(x => x.SomeMethod())
+                .Do(() => throw new InvalidOperationException("My message"));
+
+            try
+            {
+                mock.SomeMethod();
+            }
+            catch (InvalidOperationException ex)
+            {
+                Assert.Equal("My message", ex.Message);
+            }
         }
 
         [Fact]
